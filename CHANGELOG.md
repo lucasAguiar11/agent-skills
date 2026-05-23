@@ -1,11 +1,15 @@
 # Changelog
 
+## 1.1.0 — 2026-05-22
+
+- Rename marketplace: `stafebank-agent-skills` → `agent-workflows`
+- Rename plugin: `stafebank-feature-delivery` → `feature-delivery`
+- Branding generico para qualquer workflow/projeto
+- Licenca MIT no plugin
+- Paths: `plugins/feature-delivery/`
+
 ## 1.0.0 — 2026-05-22
 
 - Marketplace multi-plataforma: Cursor, Claude Code e Codex
-- Manifests: `.cursor-plugin/`, `.claude-plugin/`, `.codex-plugin/`
-- Marketplaces: `.cursor-plugin/marketplace.json`, `.claude-plugin/marketplace.json`, `.agents/plugins/marketplace.json`
-- Plugin `stafebank-feature-delivery` em `plugins/stafebank-feature-delivery/`
-- Skill orquestradora `feature-delivery` com waves, launch spec e Integration Coordinator
-- Skills auxiliares: plan, review, test-guide, PRD, ADR, commit, pr-review
-- Script `scripts/bump-version.sh` para sincronizar versao entre manifests
+- Plugin inicial com feature-delivery e skills auxiliares
+- Waves, launch spec e Integration Coordinator

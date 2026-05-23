@@ -37,9 +37,9 @@ for file in \
   "$ROOT/.agents/plugins/marketplace.json" \
   "$ROOT/.claude-plugin/marketplace.json" \
   "$ROOT/.cursor-plugin/marketplace.json" \
-  "$ROOT/plugins/stafebank-feature-delivery/.codex-plugin/plugin.json" \
-  "$ROOT/plugins/stafebank-feature-delivery/.claude-plugin/plugin.json" \
-  "$ROOT/plugins/stafebank-feature-delivery/.cursor-plugin/plugin.json"
+  "$ROOT/plugins/feature-delivery/.codex-plugin/plugin.json" \
+  "$ROOT/plugins/feature-delivery/.claude-plugin/plugin.json" \
+  "$ROOT/plugins/feature-delivery/.cursor-plugin/plugin.json"
 do
   update_json_version "$file"
   echo "updated $file"

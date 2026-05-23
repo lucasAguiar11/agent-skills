@@ -1,25 +1,24 @@
 {
-  "name": "stafebank-agent-skills",
+  "name": "agent-workflows",
   "owner": {
-    "name": "Stafebank",
-    "email": "dev@stafebank.com.br"
+    "name": "lucasAguiar11"
   },
   "metadata": {
-    "description": "Skills de entrega de features, planejamento, review e subagent orchestration para projetos Stafebank/manager-v3",
-    "version": "1.0.0"
+    "description": "Skills de entrega, planejamento, review e execucao com subagents para qualquer projeto",
+    "version": "1.1.0"
   },
   "plugins": [
     {
-      "name": "stafebank-feature-delivery",
-      "source": "./plugins/stafebank-feature-delivery",
-      "description": "Orquestracao feature-delivery com waves, subagents, PRD, ADR, planos e verificacao",
-      "version": "1.0.0",
+      "name": "feature-delivery",
+      "source": "./plugins/feature-delivery",
+      "description": "Orquestracao de features com waves, subagents, PRD, ADR, planos e verificacao",
+      "version": "1.1.0",
       "keywords": [
         "feature-delivery",
         "planning",
         "subagents",
-        "nestjs",
-        "manager-v3"
+        "workflow",
+        "review"
       ],
       "category": "workflow"
     }

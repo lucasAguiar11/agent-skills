@@ -11,15 +11,15 @@ The goal is to make delivery easier for humans and AI agents working in parallel
 
 ## Plugin installation
 
-When installed from the `stafebank-feature-delivery` plugin (Cursor, Claude Code, or Codex), invoke the orchestrator as:
+When installed from the `feature-delivery` plugin (Cursor, Claude Code, or Codex), invoke the orchestrator as:
 
 | Platform | Invocation |
 |---|---|
 | Cursor | `/feature-delivery` |
-| Claude Code | `/stafebank-feature-delivery:feature-delivery` |
-| Codex | `@stafebank-feature-delivery` or `@feature-delivery` |
+| Claude Code | `/feature-delivery:feature-delivery` |
+| Codex | `@feature-delivery` |
 
-Bundled helper skills follow the same plugin namespace in Claude Code, for example `/stafebank-feature-delivery:review-plan`.
+Bundled helper skills follow the same plugin namespace in Claude Code, for example `/feature-delivery:review-plan`.
 
 If the host loads plugin skills without namespace, `/feature-delivery` and `$feature-delivery` remain valid aliases.
 

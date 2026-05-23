@@ -5,9 +5,9 @@ description: 'Create a new implementation plan file for new features, refactorin
 
 # Create Implementation Plan
 
-## Plugin defaults — stafebank-feature-delivery
+## Plugin defaults — feature-delivery plugin
 
-When this skill is installed from the `stafebank-feature-delivery` plugin, follow the bundled `feature-delivery` skill instead of the generic `/plan/` output below:
+When this skill is installed from the `feature-delivery` plugin, follow the bundled `feature-delivery` skill instead of the generic `/plan/` output below:
 
 - Save plans in `docs/plans/<FEATURE-ID>-plan.md`.
 - Use `templates/implementation-plan.md` from the bundled `feature-delivery` skill as the mandatory shape.
