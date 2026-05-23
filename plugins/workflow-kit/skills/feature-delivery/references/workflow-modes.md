@@ -12,7 +12,7 @@ Infer the mode from the request.
 | `execute` | Coordinator + Workers/Verifiers by wave | yes, by wave |
 | `update` | Scout impact scan, then Planner diff | usually serial |
 
-Read `references/subagent-policy.md` for role mapping and `references/subagent-handoff.md` for launch/handoff rules.
+Read `references/subagent-policy.md` for role mapping, `references/model-tier-policy.md` for model tiers, and `references/subagent-handoff.md` for launch/handoff rules.
 
 ## triage
 
@@ -100,6 +100,7 @@ Steps:
 3. Set plan status to `in_progress` if not already.
 4. Run optional wave 0 work: contract confirmation, discovery, or pre-review.
 5. For each wave:
+   - resolve `model_tier` per launch-spec row and pass `model` when supported;
    - launch eligible subagents in parallel;
    - collect handoff blocks;
    - run wave verification;

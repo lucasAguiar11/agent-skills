@@ -50,6 +50,7 @@ Use this before implementation.
 - Tasks are ordered by dependency.
 - Parallel work has non-overlapping write scopes.
 - Parallel plans include `Wave Schedule` and `Subagent Launch Spec`.
+- Every launch-spec row includes `model_tier`; risk-heavy workstreams use `high` per `references/model-tier-policy.md`.
 - Wave order matches task and contract dependencies.
 - Each task maps to a workstream when subagents will be used.
 - Each task has expected output.

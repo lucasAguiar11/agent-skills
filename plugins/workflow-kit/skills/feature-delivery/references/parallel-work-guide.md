@@ -74,6 +74,8 @@ Every parallelizable implementation plan should include these sections:
 | B | Worker | `src/domain/auth/**` | `src/application/**` | auth contract | yes |
 ```
 
+Add `model_tier` per workstream in `Subagent Launch Spec` (for example Scout `fast`, Worker `standard`, domain-critical Worker `high`).
+
 ### Wave Schedule
 
 Group workstreams into ordered waves:
@@ -96,7 +98,7 @@ Rules:
 
 ### Subagent Launch Spec
 
-See `references/subagent-policy.md` for the launch table format.
+See `references/subagent-policy.md` for the launch table format. Every row must include `model_tier`; see `references/model-tier-policy.md` for defaults and escalation.
 
 ### Wave Execution Log
 
@@ -125,4 +127,4 @@ Do not use parallel Workers on the same branch when they can edit the same files
 
 ## Coordinator Notes
 
-The parent agent in `execute` mode merges wave outcomes, updates the execution log, and decides whether the next wave may start. Workers must not skip this step.
+The parent agent in `execute` mode merges wave outcomes, updates the execution log, resolves model tiers at launch, and decides whether the next wave may start. Workers must not skip this step.
