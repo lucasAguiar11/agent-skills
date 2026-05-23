@@ -43,8 +43,9 @@ When launching a subagent through the Task tool:
 1. Build the prompt from `templates/subagent-task.md`.
 2. Copy bounded context from the plan task section and the matching launch-spec row.
 3. Set `readonly: true` for Scout, Reviewer, and read-only Verifier work.
-4. Launch all subagents for the current wave in a **single message with multiple Task calls** when parallel execution is allowed.
-5. Pass the workstream id, wave number, allowed write paths, forbidden paths, verification commands, and stop conditions explicitly.
+4. Resolve `model_tier` from the launch-spec row using `references/model-tier-policy.md`; pass `model` to Task when the host supports it.
+5. Launch all subagents for the current wave in a **single message with multiple Task calls** when parallel execution is allowed.
+6. Pass the workstream id, wave number, model tier (and resolved model if applicable), allowed write paths, forbidden paths, verification commands, and stop conditions explicitly.
 
 Do not launch parallel Workers with overlapping write paths. Prefer sequential execution or split the plan first.
 
@@ -90,6 +91,9 @@ After a wave completes:
 | Reviewer found high-severity issue | Append to `Review Findings` or `Post-execute Updates`; do not mark wave done |
 | Verifier failed | Mark wave `failed`; retry once if plan allows; otherwise stop |
 | Contract dependency unresolved | Mark wave `blocked`; launch Planner or ask user |
+| Model slug rejected by host | Retry with platform default; record fallback in execution log |
+
+When retrying a failed Worker after domain or contract issues, escalate `model_tier` to `high` per `references/model-tier-policy.md`.
 
 When using git worktrees or branches per workstream, merge sequentially in dependency order and run verification after each merge.
 

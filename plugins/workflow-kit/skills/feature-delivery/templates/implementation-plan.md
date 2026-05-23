@@ -74,9 +74,9 @@ Required when more than one workstream exists or any row has `Can run parallel =
 
 Required when the plan is parallelizable. Omit for strictly sequential single-agent work.
 
-| Workstream | Role | subagent_type | Wave | Depends on | Task ref | Allowed write paths | readonly |
-|---|---|---|---|---|---|---|---|
-| A | Worker | generalPurpose | 1 | none | Task 1 | `src/example/**` | no |
+| Workstream | Role | subagent_type | model_tier | Wave | Depends on | Task ref | Allowed write paths | readonly |
+|---|---|---|---|---|---|---|---|---|
+| A | Worker | generalPurpose | standard | 1 | none | Task 1 | `src/example/**` | no |
 
 ## Wave Execution Log
 
@@ -84,7 +84,7 @@ Append during `execute`. Leave placeholder rows empty before execution.
 
 | Wave | Workstream | Status | Evidence | Notes |
 |---|---|---|---|---|
-| 1 | A | pending | | |
+| 1 | A | pending | | model: resolved at launch |
 
 Status values: `pending`, `in_progress`, `completed`, `blocked`, `failed`.
 

@@ -35,7 +35,7 @@ Repository-specific domain rules still live in the project `AGENTS.md`, not in t
 6. Create or update `docs/plans/<FEATURE-ID>-plan.md`.
 7. Review the plan before implementation. The review output lives inside the plan itself — never as a separate `*-review*.md` file.
 8. When work can run in parallel, add `Parallelization`, `Wave Schedule`, and `Subagent Launch Spec` to the plan.
-9. In `execute`, act as Integration Coordinator: launch subagents by wave, collect handoffs, update `Wave Execution Log`, and advance only after verification passes.
+9. In `execute`, act as Integration Coordinator: resolve model tiers, launch subagents by wave, collect handoffs, update `Wave Execution Log`, and advance only after verification passes.
 10. Do not execute implementation unless the user approves or explicitly asks for execution.
 
 ## Review Output Location
@@ -116,6 +116,7 @@ Load only the reference needed for the current action:
 - `references/adr-decision-guide.md`: decide whether a change needs an ADR.
 - `references/parallel-work-guide.md`: ownership, write scope, dependency rules.
 - `references/subagent-policy.md`: when and how to suggest or launch subagents.
+- `references/model-tier-policy.md`: abstract tiers (`fast`, `standard`, `high`), defaults by role, escalation, platform model resolution.
 - `references/subagent-handoff.md`: wave execution, handoff blocks, merge rules, Coordinator duties.
 - `references/review-checklist.md`: review gates before execution.
 
@@ -140,6 +141,7 @@ Use templates as output shapes, adapting paths only when the user or repository 
 - Do not advance to the next wave while any workstream in the current wave is `blocked` or `failed`.
 - Do not allow Workers to declare feature completion; only the Integration Coordinator runs final verification and sets status to `done`.
 - Do not execute parallel work from an approved plan that lacks `Subagent Launch Spec` and `Wave Schedule`; update the plan first.
+- Do not launch subagents from a launch spec row that lacks `model_tier`; use `references/model-tier-policy.md` defaults when drafting the plan.
 - Do not allow a plan to mutate another feature's owned module without recording the dependency and impact.
 - Do not claim completion without fresh verification evidence.
 - Do not finish an implementation review without invoking `test-guide` to audit the tests changed or added by the feature. Present the `keep/improve/remove/missing` classification, ask explicit approval before modifying any test, and do not mark the review as approved while `missing` items of medium or higher severity remain unaddressed.

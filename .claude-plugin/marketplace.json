@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "Skills de entrega, planejamento, review e execucao com subagents para qualquer projeto",
-    "version": "1.2.0"
+    "version": "1.3.0"
   },
   "plugins": [
     {
       "name": "workflow-kit",
       "source": "./plugins/workflow-kit",
       "description": "Kit de workflow: feature-delivery, planos, review, testes e subagents por wave",
-      "version": "1.2.0",
+      "version": "1.3.0",
       "keywords": [
         "workflow-kit",
         "feature-delivery",

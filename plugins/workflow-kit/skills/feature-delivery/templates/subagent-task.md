@@ -12,6 +12,12 @@ Example: A
 
 Example: 1
 
+## Model Tier
+
+fast | standard | high
+
+Resolve at launch using `references/model-tier-policy.md`. Optional explicit `model_override` when the user or plan already named a host model.
+
 ## Objective
 
 State the bounded outcome.
@@ -91,5 +97,7 @@ Stop reason:
 Use when the parent agent launches this task through the Task tool:
 
 - subagent_type: explore | generalPurpose | shell | ci-investigator
+- model_tier: fast | standard | high
+- model: optional resolved slug when host supports explicit model selection
 - readonly: yes | no
 - run_in_background: prefer false for Workers unless user asked for background execution

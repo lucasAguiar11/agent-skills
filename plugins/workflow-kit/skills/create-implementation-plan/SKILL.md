@@ -13,8 +13,8 @@ When this skill is installed from the `workflow-kit` plugin, follow the bundled 
 - Use `templates/implementation-plan.md` from the bundled `feature-delivery` skill as the mandatory shape.
 - Keep the same `feature_id` across feature brief/PRD, ADR, plan, execution, and review.
 - Use status values from `feature-delivery`: `draft`, `blocked`, `planned`, `approved`, `in_progress`, `done`.
-- When the work is parallelizable, include `Parallelization`, `Wave Schedule`, `Subagent Launch Spec`, and an empty `Wave Execution Log`.
-- Read `references/subagent-policy.md` and `references/parallel-work-guide.md` from the bundled `feature-delivery` skill before marking a plan `planned`.
+- When the work is parallelizable, include `Parallelization`, `Wave Schedule`, `Subagent Launch Spec` (with `model_tier` on every row), and an empty `Wave Execution Log`.
+- Read `references/subagent-policy.md`, `references/model-tier-policy.md`, and `references/parallel-work-guide.md` from the bundled `feature-delivery` skill before marking a plan `planned`.
 - If the repository has stronger conventions in `AGENTS.md`, those win over this section.
 
 If this section conflicts with the generic sections below, the plugin defaults win unless `AGENTS.md` says otherwise.

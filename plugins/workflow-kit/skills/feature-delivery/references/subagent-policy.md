@@ -40,16 +40,16 @@ Avoid subagents when:
 
 ## Task Tool Mapping
 
-Map roles to Task tool `subagent_type` unless the user specifies otherwise:
+Map roles to Task tool `subagent_type` unless the user specifies otherwise. Read `references/model-tier-policy.md` for tier defaults, risk triggers, and platform model resolution.
 
-| Role | subagent_type | readonly | Notes |
-|---|---|---|---|
-| Scout | `explore` | yes | Discovery in docs, code, contracts |
-| Planner | `generalPurpose` | yes | Shapes artifacts and contracts |
-| Worker | `generalPurpose` | no | Bounded implementation slice |
-| Reviewer | `generalPurpose` | yes | Plan/spec/test review |
-| Verifier | `shell` | yes* | Run lint/test/build commands |
-| CI investigator | `ci-investigator` | yes | Single failing PR check diagnosis |
+| Role | subagent_type | readonly | Default model_tier | Notes |
+|---|---|---|---|---|
+| Scout | `explore` | yes | `fast` | Discovery in docs, code, contracts |
+| Planner | `generalPurpose` | yes | `standard` | Shapes artifacts and contracts |
+| Worker | `generalPurpose` | no | `standard` | Bounded implementation slice |
+| Reviewer | `generalPurpose` | yes | `standard` | Plan/spec/test review |
+| Verifier | `shell` | yes* | `fast` | Run lint/test/build commands |
+| CI investigator | `ci-investigator` | yes | `standard` | Single failing PR check diagnosis |
 
 \* Verifier must not mutate code. If a command would modify files, stop and report.
 
@@ -74,6 +74,7 @@ Every subagent task — suggested or launched — must include:
 - context;
 - workstream id;
 - wave number;
+- model tier (`fast`, `standard`, `high`) or explicit model override when the user requested one;
 - allowed write paths;
 - read-only paths;
 - forbidden paths;
@@ -101,17 +102,19 @@ If parallel work is not expected, omit `Wave Schedule` and `Subagent Launch Spec
 ```md
 ## Subagent Launch Spec
 
-| Workstream | Role | subagent_type | Wave | Depends on | Task ref | Allowed write paths | readonly |
-|---|---|---|---|---|---|---|---|
-| A | Worker | generalPurpose | 1 | none | Task 1 | `src/modules/auth/**` | no |
-| B | Scout | explore | 0 | none | discovery-auth | none | yes |
-| C | Reviewer | generalPurpose | 3 | A,B | review-plan | none | yes |
+| Workstream | Role | subagent_type | model_tier | Wave | Depends on | Task ref | Allowed write paths | readonly |
+|---|---|---|---|---|---|---|---|---|
+| A | Worker | generalPurpose | standard | 1 | none | Task 1 | `src/modules/auth/**` | no |
+| B | Scout | explore | fast | 0 | none | discovery-auth | none | yes |
+| C | Reviewer | generalPurpose | standard | 3 | A,B | review-plan | none | yes |
 ```
 
 Rules:
 
 - `Wave 0` is optional pre-work: discovery, contract planning, or review-before-build.
 - Every Worker row must map to exactly one task section in the plan.
+- Every row must include `model_tier`. Use `references/model-tier-policy.md` for defaults and escalation.
+- Optional `model_override` column: explicit host model slug when already chosen.
 - `Depends on` must match `Parallelization` and `Wave Schedule`.
 - Do not assign the same write path to two Workers in the same wave.
 
@@ -134,10 +137,10 @@ For plans not yet approved, a lighter suggestion is enough:
 ```md
 ## Suggested Subagents
 
-| Workstream | Role | Objective | Write scope | Wave | Stop condition |
-|---|---|---|---|---|---|
-| A | Worker | Implement token service | `src/modules/auth/**` | 1 | Needs changes outside auth |
-| B | Reviewer | Check plan compliance | none | 2 | Any missing acceptance criterion |
+| Workstream | Role | Objective | Write scope | Wave | model_tier | Stop condition |
+|---|---|---|---|---|---|---|
+| A | Worker | Implement token service | `src/modules/auth/**` | 1 | standard | Needs changes outside auth |
+| B | Reviewer | Check plan compliance | none | 2 | standard | Any missing acceptance criterion |
 ```
 
 When the user approves execution, convert suggestions into `Subagent Launch Spec` and `Wave Schedule` if they are not already present.
@@ -146,9 +149,10 @@ When the user approves execution, convert suggestions into `Subagent Launch Spec
 
 1. Read `Subagent Launch Spec` and `Wave Schedule`.
 2. Confirm contract-first gate when parallel Workers cross layers.
-3. Launch all subagents for the current wave in parallel when allowed.
-4. Wait for handoff blocks; update `Wave Execution Log`.
-5. Run wave verification before advancing.
-6. Stop the feature on blocked/failed wave unless the user directs otherwise.
+3. Resolve `model_tier` per row using `references/model-tier-policy.md`; pass `model` when the host supports it.
+4. Launch all subagents for the current wave in parallel when allowed.
+5. Wait for handoff blocks; update `Wave Execution Log`.
+6. Run wave verification before advancing.
+7. Stop the feature on blocked/failed wave unless the user directs otherwise.
 
 Do not let Workers declare the feature complete. Only the Coordinator runs final verification and closure.

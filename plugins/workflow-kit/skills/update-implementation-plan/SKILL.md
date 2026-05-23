@@ -10,9 +10,9 @@ description: 'Update an existing implementation plan file with new or update req
 When this skill is installed from the `workflow-kit` plugin, follow the bundled `feature-delivery` skill instead of the generic `/plan/` output below:
 
 - Update plans in `docs/plans/<FEATURE-ID>-plan.md`.
-- Preserve and reconcile `Parallelization`, `Wave Schedule`, `Subagent Launch Spec`, and `Wave Execution Log` when scope or dependencies change.
+- Preserve and reconcile `Parallelization`, `Wave Schedule`, `Subagent Launch Spec` (including `model_tier`), and `Wave Execution Log` when scope or dependencies change.
 - Use status values from `feature-delivery`: `draft`, `blocked`, `planned`, `approved`, `in_progress`, `done`.
-- Read `references/subagent-handoff.md` from the bundled `feature-delivery` skill when updating a plan that is already in execution.
+- Read `references/subagent-handoff.md` and `references/model-tier-policy.md` from the bundled `feature-delivery` skill when updating a plan that is already in execution or when risk triggers change.
 - If the repository has stronger conventions in `AGENTS.md`, those win over this section.
 
 If this section conflicts with the generic sections below, the plugin defaults win unless `AGENTS.md` says otherwise.
