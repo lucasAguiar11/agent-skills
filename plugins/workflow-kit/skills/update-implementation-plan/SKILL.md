@@ -5,9 +5,9 @@ description: 'Update an existing implementation plan file with new or update req
 
 # Update Implementation Plan
 
-## Plugin defaults — feature-delivery plugin
+## Plugin defaults — workflow-kit
 
-When this skill is installed from the `feature-delivery` plugin, follow the bundled `feature-delivery` skill instead of the generic `/plan/` output below:
+When this skill is installed from the `workflow-kit` plugin, follow the bundled `feature-delivery` skill instead of the generic `/plan/` output below:
 
 - Update plans in `docs/plans/<FEATURE-ID>-plan.md`.
 - Preserve and reconcile `Parallelization`, `Wave Schedule`, `Subagent Launch Spec`, and `Wave Execution Log` when scope or dependencies change.

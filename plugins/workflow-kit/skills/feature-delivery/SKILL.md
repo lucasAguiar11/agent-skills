@@ -11,15 +11,15 @@ The goal is to make delivery easier for humans and AI agents working in parallel
 
 ## Plugin installation
 
-When installed from the `feature-delivery` plugin (Cursor, Claude Code, or Codex), invoke the orchestrator as:
+When installed from the `workflow-kit` plugin (Cursor, Claude Code, or Codex), invoke the orchestrator as:
 
 | Platform | Invocation |
 |---|---|
 | Cursor | `/feature-delivery` |
-| Claude Code | `/feature-delivery:feature-delivery` |
-| Codex | `@feature-delivery` |
+| Claude Code | `/workflow-kit:feature-delivery` |
+| Codex | `@workflow-kit` or `@feature-delivery` |
 
-Bundled helper skills follow the same plugin namespace in Claude Code, for example `/feature-delivery:review-plan`.
+Bundled helper skills follow the same plugin namespace in Claude Code, for example `/workflow-kit:review-plan`.
 
 If the host loads plugin skills without namespace, `/feature-delivery` and `$feature-delivery` remain valid aliases.
 

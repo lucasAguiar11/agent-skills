@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0 — 2026-05-22
+
+- Rename marketplace e plugin para `workflow-kit`
+- Skill orquestradora permanece `feature-delivery`
+- Claude: `/workflow-kit:feature-delivery`
+- Paths: `plugins/workflow-kit/`
+
 ## 1.1.0 — 2026-05-22
 
 - Rename marketplace: `stafebank-agent-skills` → `agent-workflows`

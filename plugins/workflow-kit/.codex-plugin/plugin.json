@@ -1,24 +1,24 @@
 {
-  "name": "feature-delivery",
-  "version": "1.1.0",
-  "description": "Feature delivery workflow with PRD, ADR, implementation plans, wave-based subagent orchestration, review and verification gates",
+  "name": "workflow-kit",
+  "version": "1.2.0",
+  "description": "Workflow kit with feature-delivery orchestration, PRD, ADR, implementation plans, wave-based subagents, review and verification gates",
   "author": {
     "name": "lucasAguiar11"
   },
   "license": "MIT",
   "keywords": [
+    "workflow-kit",
     "feature-delivery",
     "planning",
     "subagents",
     "review-plan",
-    "test-guide",
-    "workflow"
+    "test-guide"
   ],
   "skills": "./skills",
   "interface": {
-    "displayName": "Feature Delivery",
+    "displayName": "Workflow Kit",
     "shortDescription": "Planejamento, review e execucao de features com subagents por wave",
-    "longDescription": "Orquestra entrega de features com PRD, ADR, planos de implementacao, review-plan, test-guide e Integration Coordinator para execucao paralela em qualquer codebase.",
+    "longDescription": "Kit de skills para entrega de features: PRD, ADR, planos, review-plan, test-guide e Integration Coordinator para execucao paralela em qualquer codebase.",
     "developerName": "lucasAguiar11",
     "category": "Productivity",
     "capabilities": ["Interactive", "Write"],

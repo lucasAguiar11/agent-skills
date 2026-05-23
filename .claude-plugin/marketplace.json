@@ -1,23 +1,23 @@
 {
-  "name": "agent-workflows",
+  "name": "workflow-kit",
   "owner": {
     "name": "lucasAguiar11"
   },
   "metadata": {
     "description": "Skills de entrega, planejamento, review e execucao com subagents para qualquer projeto",
-    "version": "1.1.0"
+    "version": "1.2.0"
   },
   "plugins": [
     {
-      "name": "feature-delivery",
-      "source": "./plugins/feature-delivery",
-      "description": "Orquestracao de features com waves, subagents, PRD, ADR, planos e verificacao",
-      "version": "1.1.0",
+      "name": "workflow-kit",
+      "source": "./plugins/workflow-kit",
+      "description": "Kit de workflow: feature-delivery, planos, review, testes e subagents por wave",
+      "version": "1.2.0",
       "keywords": [
+        "workflow-kit",
         "feature-delivery",
         "planning",
         "subagents",
-        "workflow",
         "review"
       ],
       "category": "workflow"
