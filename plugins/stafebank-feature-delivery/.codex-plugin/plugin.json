@@ -1,0 +1,33 @@
+{
+  "name": "stafebank-feature-delivery",
+  "version": "1.0.0",
+  "description": "Feature delivery workflow with PRD, ADR, implementation plans, wave-based subagent orchestration, review and verification gates",
+  "author": {
+    "name": "Stafebank",
+    "email": "dev@stafebank.com.br"
+  },
+  "license": "UNLICENSED",
+  "keywords": [
+    "feature-delivery",
+    "planning",
+    "subagents",
+    "review-plan",
+    "test-guide",
+    "manager-v3"
+  ],
+  "skills": "./skills",
+  "interface": {
+    "displayName": "Stafebank Feature Delivery",
+    "shortDescription": "Planejamento, review e execucao de features com subagents por wave",
+    "longDescription": "Orquestra entrega de features com feature-delivery, PRD, ADR, planos de implementacao, review-plan, test-guide e Integration Coordinator para execucao paralela.",
+    "developerName": "Stafebank",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Write"],
+    "defaultPrompt": [
+      "Classifique este pedido com /feature-delivery em triage.",
+      "Crie o plano de implementacao para esta feature.",
+      "Revise o plano antes de executar."
+    ],
+    "brandColor": "#0F766E"
+  }
+}

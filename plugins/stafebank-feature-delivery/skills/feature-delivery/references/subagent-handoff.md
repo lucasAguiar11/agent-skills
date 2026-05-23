@@ -1,0 +1,114 @@
+# Subagent Handoff Protocol
+
+Use this reference when launching subagents from an approved plan or when a subagent finishes work and returns control to the parent agent.
+
+The parent agent in `execute` mode acts as **Integration Coordinator**. It orchestrates waves, merges outcomes, records evidence, and decides whether the next wave may start. It does not implement feature slices unless no Worker is available or the user asked for direct execution.
+
+## Coordinator Responsibilities
+
+The Integration Coordinator must:
+
+1. Read the plan's `Wave Schedule`, `Subagent Launch Spec`, and `Parallelization` sections.
+2. Launch only the workstreams allowed in the current wave.
+3. Wait for all subagents in the wave to finish or stop.
+4. Collect each subagent's handoff block.
+5. Run the wave verification commands from the plan.
+6. Update `Wave Execution Log` in the plan.
+7. Unblock the next wave or stop and ask the user when a stop condition triggers.
+
+The Coordinator must not declare the feature `done`. Only final verification after all waves completes that transition.
+
+## Wave Execution Rules
+
+- Execute **one wave at a time** unless the plan explicitly marks multiple waves as independent.
+- Within a wave, launch all eligible subagents **in parallel** when their write scopes do not overlap.
+- Do not start wave N+1 while any workstream in wave N is `blocked`, `failed`, or missing handoff evidence.
+- If a workstream hits a stop condition, mark the wave `blocked`, record the reason in the plan, and ask the user before continuing.
+
+## Contract-First Gate
+
+Before launching parallel Workers that touch different layers of the same feature (for example domain + application + infrastructure):
+
+1. Confirm shared contracts are listed in the plan: ports, DTOs, enums, migration boundaries, HTTP contracts.
+2. If contracts are missing, launch a **Planner** subagent first or update the plan manually.
+3. Record contract status in the plan under `Dependencies` or in the relevant workstream row (`contract: agreed`).
+4. Only then launch parallel Workers.
+
+Skip this gate when a single Worker owns the full vertical slice or when workstreams are strictly sequential.
+
+## Subagent Launch
+
+When launching a subagent through the Task tool:
+
+1. Build the prompt from `templates/subagent-task.md`.
+2. Copy bounded context from the plan task section and the matching launch-spec row.
+3. Set `readonly: true` for Scout, Reviewer, and read-only Verifier work.
+4. Launch all subagents for the current wave in a **single message with multiple Task calls** when parallel execution is allowed.
+5. Pass the workstream id, wave number, allowed write paths, forbidden paths, verification commands, and stop conditions explicitly.
+
+Do not launch parallel Workers with overlapping write paths. Prefer sequential execution or split the plan first.
+
+## Handoff Block (Required From Every Subagent)
+
+Every subagent must return a handoff block in this shape:
+
+```md
+## Handoff - <Workstream> - <Role>
+
+Status: completed | blocked | failed
+Workstream:
+Wave:
+
+Summary:
+- ...
+
+Files changed:
+- path (create|modify|delete) — only for Workers
+
+Evidence:
+- command:
+- result:
+
+Open questions:
+- ...
+
+Stop reason:
+- only when status is blocked or failed
+```
+
+The Coordinator copies the relevant rows into `Wave Execution Log`.
+
+## Merge Rules
+
+After a wave completes:
+
+| Situation | Coordinator action |
+|---|---|
+| All workstreams `completed` with passing verification | Mark wave `done`; schedule next wave |
+| Worker changed files outside allowed paths | Mark wave `blocked`; do not merge; ask user or Planner |
+| Two Workers touched the same file | Mark wave `blocked`; require sequential fix or replan |
+| Reviewer found high-severity issue | Append to `Review Findings` or `Post-execute Updates`; do not mark wave done |
+| Verifier failed | Mark wave `failed`; retry once if plan allows; otherwise stop |
+| Contract dependency unresolved | Mark wave `blocked`; launch Planner or ask user |
+
+When using git worktrees or branches per workstream, merge sequentially in dependency order and run verification after each merge.
+
+## Plan Updates During Execute
+
+The Coordinator may update only these plan sections during execution:
+
+- `Wave Execution Log`
+- task checkboxes in `Tasks`
+- `Post-execute Updates`
+- plan front matter `status` (`in_progress`, `blocked`, `done`)
+
+Do not rewrite goals, requirements, or ownership mid-flight unless the user approves a plan update through `update` mode.
+
+## Completion Gate
+
+After the last wave:
+
+1. Run `Final Verification` from the plan.
+2. Invoke `test-guide` when tests changed or domain/API/persistence behavior changed.
+3. Invoke `verification-before-completion` before claiming success.
+4. Set plan status to `done` only with fresh evidence recorded in the plan or reported to the user.

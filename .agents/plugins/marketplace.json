@@ -1,0 +1,26 @@
+{
+  "name": "stafebank-agent-skills",
+  "interface": {
+    "displayName": "Stafebank Agent Skills"
+  },
+  "metadata": {
+    "description": "Skills de entrega de features, planejamento, review e subagent orchestration para projetos Stafebank/manager-v3",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "stafebank-feature-delivery",
+      "description": "Orquestracao feature-delivery com waves, subagents, PRD, ADR, planos e verificacao",
+      "version": "1.0.0",
+      "source": {
+        "source": "local",
+        "path": "./plugins/stafebank-feature-delivery"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

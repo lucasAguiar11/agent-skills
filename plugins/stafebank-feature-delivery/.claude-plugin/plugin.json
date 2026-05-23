@@ -1,0 +1,18 @@
+{
+  "name": "stafebank-feature-delivery",
+  "version": "1.0.0",
+  "description": "Feature delivery workflow with PRD, ADR, implementation plans, wave-based subagent orchestration, review and verification gates",
+  "author": {
+    "name": "Stafebank",
+    "email": "dev@stafebank.com.br"
+  },
+  "keywords": [
+    "feature-delivery",
+    "planning",
+    "subagents",
+    "review-plan",
+    "test-guide"
+  ],
+  "license": "UNLICENSED",
+  "skills": "./skills"
+}
