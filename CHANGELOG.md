@@ -6,14 +6,14 @@
 - Skill orquestradora permanece `feature-delivery`
 - Claude: `/workflow-kit:feature-delivery`
 - Paths: `plugins/workflow-kit/`
+- Changelog neutro, sem referencias a marcas ou projetos especificos
 
 ## 1.1.0 — 2026-05-22
 
-- Rename marketplace: `stafebank-agent-skills` → `agent-workflows`
-- Rename plugin: `stafebank-feature-delivery` → `feature-delivery`
+- Marketplace renomeado para catalogo generico multi-plataforma
+- Plugin renomeado antes de consolidar em `workflow-kit`
 - Branding generico para qualquer workflow/projeto
 - Licenca MIT no plugin
-- Paths: `plugins/feature-delivery/`
 
 ## 1.0.0 — 2026-05-22
 
