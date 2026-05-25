@@ -2,6 +2,12 @@
 
 Use this before implementation.
 
+For a Level 0 micro-change or any single-workstream plan, skip the parallelization
+items (`Wave Schedule`, `Subagent Launch Spec`, wave order, task→workstream mapping).
+Do not flag those sections as missing — their absence is correct per the Plan Weight
+Rule in `references/artifact-policy.md`. Still apply Scope, Decision Gate, Ownership,
+Completion, and Test Quality.
+
 ## Review Output Location
 
 - The review writes its findings inside the plan being reviewed, not in a separate file.
@@ -48,6 +54,7 @@ Use this before implementation.
 ## Execution
 
 - Tasks are ordered by dependency.
+- Single-workstream plans carry no `Wave Schedule`/`Subagent Launch Spec`; the items below apply only to parallel plans.
 - Parallel work has non-overlapping write scopes.
 - Parallel plans include `Wave Schedule` and `Subagent Launch Spec`.
 - Every launch-spec row includes `model_tier`; risk-heavy workstreams use `high` per `references/model-tier-policy.md`.

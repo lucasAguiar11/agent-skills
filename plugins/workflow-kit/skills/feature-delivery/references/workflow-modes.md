@@ -51,8 +51,8 @@ Steps:
 5. Decide whether ADR is needed.
 6. Classify open decisions as blocking, non-blocking, or assumptions.
 7. If blocking decisions exist, ask the user before finalizing, or create artifacts only as `draft`/`blocked`.
-8. Create/update implementation plan using `templates/implementation-plan.md`.
-9. When work can be parallelized, add `Parallelization`, `Wave Schedule`, and `Subagent Launch Spec`.
+8. Create/update implementation plan using `templates/implementation-plan.md`. For a Level 0 micro-change, keep only `Goal`, `Tasks`, `Verification`, `Risks` (see Plan Weight Rule in `references/artifact-policy.md`).
+9. When work can be parallelized, add `Parallelization`, `Wave Schedule`, and `Subagent Launch Spec`. Omit these for single-workstream plans.
 10. Summarize blocking decisions, assumptions, open questions, and suggested execution waves; stop for approval.
 
 Planner subagents may draft PRD/plan/ADR sections, but the parent agent must keep `feature_id`, paths, and repository conventions consistent.
@@ -73,6 +73,8 @@ Check:
 - `Subagent Launch Spec` completeness when the plan is parallelizable;
 - wave order vs task dependencies;
 - test usefulness and missing coverage when execution added tests or touched domain rules, validation, persistence, archive/status behavior, hierarchy movement, or API contracts.
+
+For Level 0 / single-workstream plans, skip the parallelization checks (launch spec, wave order) — their absence is correct by design (see Plan Weight Rule in `references/artifact-policy.md`). Do not report missing wave/subagent sections as findings.
 
 Prefer parallel Reviewer subagents when reviews are independent:
 
