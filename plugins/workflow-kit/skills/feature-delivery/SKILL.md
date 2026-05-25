@@ -84,12 +84,13 @@ Read `references/workflow-modes.md` when the mode is unclear or when switching m
 
 Use the smallest artifact set that gives enough clarity:
 
+- Micro change (one logic path, no blocking decision/migration/contract change): inline plan (Level 0 — `Goal`, `Tasks`, `Verification`, `Risks` only).
 - Small change: feature brief + plan.
 - Medium feature: PRD + plan.
 - Structural change: PRD + ADR + plan.
 - Existing codebase change: discovery + feature brief/PRD + ADR if needed + plan.
 
-Read `references/artifact-policy.md` before creating artifacts.
+Match section weight to the change: a single-workstream plan omits wave/subagent sections entirely. Read `references/artifact-policy.md` before creating artifacts.
 
 ## Related Skills
 
@@ -141,6 +142,7 @@ Use templates as output shapes, adapting paths only when the user or repository 
 - Do not advance to the next wave while any workstream in the current wave is `blocked` or `failed`.
 - Do not allow Workers to declare feature completion; only the Integration Coordinator runs final verification and sets status to `done`.
 - Do not execute parallel work from an approved plan that lacks `Subagent Launch Spec` and `Wave Schedule`; update the plan first.
+- Do not add `Wave Execution Log`, `Wave Schedule`, or `Subagent Launch Spec` to a single-workstream plan. Record execution as a one-line note under `Tasks`; add those sections only when the plan defines actual parallel work.
 - Do not launch subagents from a launch spec row that lacks `model_tier`; use `references/model-tier-policy.md` defaults when drafting the plan.
 - Do not allow a plan to mutate another feature's owned module without recording the dependency and impact.
 - Do not claim completion without fresh verification evidence.

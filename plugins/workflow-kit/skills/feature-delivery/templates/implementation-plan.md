@@ -8,6 +8,12 @@ adr: []
 
 # FEAT-0001 Implementation Plan
 
+> Section weight follows the change. For a Level 0 micro-change or any
+> single-workstream plan, keep only `Goal`, `Tasks`, `Verification`, `Risks`
+> and delete `Parallelization`, `Wave Schedule`, `Subagent Launch Spec`, and
+> `Wave Execution Log`. Add those back only when the plan defines real parallel
+> work. See `references/artifact-policy.md` (Plan Weight Rule).
+
 ## Goal
 
 State the implementation outcome.
@@ -53,6 +59,8 @@ Shared contracts for parallel work:
 - DTO-001:
 
 ## Parallelization
+
+<!-- Omit this section (and Wave Schedule / Subagent Launch Spec / Wave Execution Log) for Level 0 or single-workstream plans. -->
 
 | Workstream | Type | Allowed write paths | Read-only paths | Depends on | Can run parallel |
 |---|---|---|---|---|---|

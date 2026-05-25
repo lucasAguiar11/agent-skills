@@ -4,6 +4,26 @@ Use the smallest set of artifacts that makes the work clear and parallelizable.
 
 ## Artifact Levels
 
+### Level 0: Inline Plan (micro-change)
+
+Use for a change that touches one logic path, has no blocking decision, no
+migration, no contract change, and no parallelization.
+
+Examples:
+- Swap a hardcoded value or list for an existing service/gateway call.
+- Add one field to an existing DTO plus its validation.
+- Fix a scoped bug with an obvious, single-path cause.
+
+Required artifacts:
+- `docs/features/<FEATURE-ID>.md` — objective, scope, acceptance criteria (~15 lines).
+- `docs/plans/<FEATURE-ID>-plan.md` with ONLY these sections: `Goal`, `Tasks`,
+  `Verification`, `Risks`. No `Wave Execution Log`, no `Wave Schedule`, no
+  `Subagent Launch Spec`, no `Parallelization`.
+
+Promote to Level 1+ the moment a blocking decision, a migration, a contract or
+hierarchy change, or parallelizable work appears. Promotion adds the missing
+sections to the same plan — it never starts a new document.
+
 ### Level 1: Feature Brief + Plan
 
 Use for small or well-understood changes.
@@ -63,6 +83,17 @@ Discovery must identify:
 - read-only dependencies;
 - contracts that cannot be broken;
 - tests or manual checks that prove behavior.
+
+## Plan Weight Rule
+
+Match the plan's section weight to the change, not to the template. A single-
+workstream change MUST NOT carry `Wave Execution Log`, `Wave Schedule`, or
+`Subagent Launch Spec`; record execution as a one-line note under `Tasks`
+instead. Add wave and subagent sections only when the plan actually defines
+parallel work with non-overlapping write scopes.
+
+When in doubt between two levels, pick the lighter one and promote later. An
+over-built plan for a micro-change is friction, not rigor.
 
 ## Output Rule
 
