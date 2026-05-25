@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.0 — 2026-05-25
+
+- Novo nivel de artefato `Level 0` (micro-change): plano inline com apenas `Goal`, `Tasks`, `Verification`, `Risks`
+- Nova `Plan Weight Rule` em `references/artifact-policy.md`: peso do plano segue o tamanho da mudanca; planos single-workstream omitem `Wave Schedule`/`Subagent Launch Spec`/`Wave Execution Log`
+- `SKILL.md`: opcao micro-change na selecao de artefatos e gate proibindo secoes de wave em plano single-workstream
+- `review-checklist.md` e `workflow-modes.md` alinhados ao Level 0 (review nao cobra secoes ausentes por design)
+- `templates/implementation-plan.md`: nota condicional sobre quais secoes omitir
+
 ## 1.3.0 — 2026-05-22
 
 - Model tiers abstratos (`fast`, `standard`, `high`) para subagents

@@ -112,7 +112,7 @@ Steps:
 7. Run test-quality review with `test-guide` when tests are added or changed behavior needs coverage.
 8. If `test-guide` proposes adding, removing, or rewriting tests, stop and ask for explicit approval before editing tests.
 9. Run `verification-before-completion` before claiming completion.
-10. Set plan status to `done` only with fresh evidence.
+10. Set plan status to `done` only with fresh evidence. Sync the status across all three places — `docs/features.md` index row, the feature brief/PRD frontmatter, and the plan frontmatter — so none lags behind.
 
 If the plan has no launch spec and the work is small, the Coordinator may execute directly without subagents.
 

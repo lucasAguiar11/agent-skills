@@ -146,5 +146,6 @@ Use templates as output shapes, adapting paths only when the user or repository 
 - Do not launch subagents from a launch spec row that lacks `model_tier`; use `references/model-tier-policy.md` defaults when drafting the plan.
 - Do not allow a plan to mutate another feature's owned module without recording the dependency and impact.
 - Do not claim completion without fresh verification evidence.
+- Do not set a feature to `done` (or any status change) in only one place. The status in `docs/features.md` (index), the feature brief/PRD, and the plan frontmatter must all match. A status changed in the brief but stale in the index is a defect — sync all three.
 - Do not finish an implementation review without invoking `test-guide` to audit the tests changed or added by the feature. Present the `keep/improve/remove/missing` classification, ask explicit approval before modifying any test, and do not mark the review as approved while `missing` items of medium or higher severity remain unaddressed.
 - Do not write review output to a separate file. Append `Review Findings` (pre-execute) or `Post-execute Updates` (post-execute) inside the plan being reviewed. Repeat rounds add rows/subsections to the same section — never new `*-review*.md` files.
