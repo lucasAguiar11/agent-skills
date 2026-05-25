@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.5.0 — 2026-05-25
+
+- Nova referencia `references/cross-repo-handoff.md`: quando uma feature depende de outro repo, o flow gera um prompt de triage pronto para colar no outro servico (contexto, contrato a nao quebrar, escopo, decisoes em aberto, restricoes)
+- `triage` e `plan` passam a emitir esse prompt quando a discovery detecta dependencia cross-repo
+- Default Flow ganha passo dedicado para o handoff cross-repo
+- Dependencia cross-repo deve ser registrada no plano (`pending-counterpart`), nunca fechada silenciosamente
+
 ## 1.4.0 — 2026-05-25
 
 - Novo nivel de artefato `Level 0` (micro-change): plano inline com apenas `Goal`, `Tasks`, `Verification`, `Risks`
