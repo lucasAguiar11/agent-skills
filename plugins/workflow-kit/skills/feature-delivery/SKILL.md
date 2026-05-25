@@ -31,12 +31,13 @@ Repository-specific domain rules still live in the project `AGENTS.md`, not in t
 2. Register or update the feature in `docs/features.md`.
 3. Create or update `docs/features/<FEATURE-ID>.md`.
 4. Create an ADR only for structural or hard-to-reverse decisions.
-5. Run the decision gate before finalizing the plan.
-6. Create or update `docs/plans/<FEATURE-ID>-plan.md`.
-7. Review the plan before implementation. The review output lives inside the plan itself — never as a separate `*-review*.md` file.
-8. When work can run in parallel, add `Parallelization`, `Wave Schedule`, and `Subagent Launch Spec` to the plan.
-9. In `execute`, act as Integration Coordinator: resolve model tiers, launch subagents by wave, collect handoffs, update `Wave Execution Log`, and advance only after verification passes.
-10. Do not execute implementation unless the user approves or explicitly asks for execution.
+5. When discovery shows the feature depends on another repo, generate a ready-to-paste triage prompt for that service (`references/cross-repo-handoff.md`) and record the dependency.
+6. Run the decision gate before finalizing the plan.
+7. Create or update `docs/plans/<FEATURE-ID>-plan.md`.
+8. Review the plan before implementation. The review output lives inside the plan itself — never as a separate `*-review*.md` file.
+9. When work can run in parallel, add `Parallelization`, `Wave Schedule`, and `Subagent Launch Spec` to the plan.
+10. In `execute`, act as Integration Coordinator: resolve model tiers, launch subagents by wave, collect handoffs, update `Wave Execution Log`, and advance only after verification passes.
+11. Do not execute implementation unless the user approves or explicitly asks for execution.
 
 ## Review Output Location
 
@@ -119,6 +120,7 @@ Load only the reference needed for the current action:
 - `references/subagent-policy.md`: when and how to suggest or launch subagents.
 - `references/model-tier-policy.md`: abstract tiers (`fast`, `standard`, `high`), defaults by role, escalation, platform model resolution.
 - `references/subagent-handoff.md`: wave execution, handoff blocks, merge rules, Coordinator duties.
+- `references/cross-repo-handoff.md`: when a feature depends on another repo, generate a ready-to-paste triage prompt for that service.
 - `references/review-checklist.md`: review gates before execution.
 
 ## Templates
