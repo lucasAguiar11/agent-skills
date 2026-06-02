@@ -62,6 +62,22 @@ Para cada **lib adicionada ou que teve seu uso modificado** no PR:
 
 Não chame context7 para libs que não foram tocadas no PR — foco apenas no que mudou.
 
+### 3.5. Integridade dos Testes (Test Integrity)
+
+Antes de produzir a revisão, inspecione **as mudanças em arquivos de teste e na config de teste/CI** no diff. O risco aqui é o PR ter ficado verde "movendo a trave" — alterando o teste em vez de corrigir o código. Procure por:
+
+- testes **removidos ou comentados** sem que a feature/comportamento correspondente tenha sido removido;
+- assertions deletadas ou matchers afrouxados (`toEqual` → `toBeDefined`, exato → parcial);
+- `skip` / `only` / `xit` / `it.todo` / early `return` adicionados a um teste que antes rodava;
+- valor esperado alterado para casar com a nova saída — confirme que isso reflete uma **mudança intencional de contrato** descrita no PR, não um ajuste para mascarar bug;
+- enfraquecimento fora do arquivo de teste: `coverageThreshold` reduzido, `testPathIgnorePatterns`/`exclude` adicionado, match pattern estreitado, suite desabilitada no CI.
+
+Para cada mudança de teste, classifique:
+- **legítima** (`feature-driven`/`test-was-wrong`): mapeia para uma mudança de comportamento descrita no PR. Não é finding.
+- **suspeita** (`escape-hatch`): não há mudança de comportamento que justifique. Levante como finding 🔴 e pergunte ao autor o que o teste deveria proteger e por que foi enfraquecido.
+
+Não trate refator legítimo de teste (renomear, deduplicar, mover de camada mantendo a força) como escape-hatch. O gatilho é **perda de força de detecção sem contrato que justifique**.
+
 ### 4. Produza a Revisão
 
 Use exatamente esta estrutura:
