@@ -52,6 +52,10 @@ Relevant docs:
 - Evidence.
 - Open questions.
 
+## Test Integrity (Required for any role that touches code)
+
+Tests that passed before this task are a protected baseline. Do not delete, skip, or weaken a baseline test (or its runner/CI config) to make your change pass. A red test means fix the code, not the test. A baseline test may change only when it maps to this task's documented contract change (`feature-driven`, proven red-green) or is a genuine test bug (`test-was-wrong`, stop for approval first) — either way, report it in the handoff. An unmapped test edit is an `escape-hatch`: stop instead. See `test-guide` Test Integrity Gate.
+
 ## Verification
 
 - Command:
@@ -63,6 +67,7 @@ Relevant docs:
 - Missing dependency or contract.
 - Verification fails twice.
 - Shared contract not agreed when required.
+- A baseline test would need to be deleted, skipped, weakened, or changed without a documented contract mapping (`escape-hatch`).
 
 ## Handoff (Required)
 
@@ -81,9 +86,12 @@ Summary:
 Files changed:
 - path (create|modify|delete)
 
+Test changes:
+- none | <test path>: feature-driven (mapped to task <ref>, red-green proven) | test-was-wrong (approved) | escape-hatch (STOPPED — not applied)
+
 Evidence:
-- command:
-- result:
+- command: (full suite / package)
+- result: (N passed, M skipped — account for skips)
 
 Open questions:
 - ...

@@ -12,9 +12,10 @@ The Integration Coordinator must:
 2. Launch only the workstreams allowed in the current wave.
 3. Wait for all subagents in the wave to finish or stop.
 4. Collect each subagent's handoff block.
-5. Run the wave verification commands from the plan.
-6. Update `Wave Execution Log` in the plan.
-7. Unblock the next wave or stop and ask the user when a stop condition triggers.
+5. Audit the `Test changes` field of every handoff. Any `escape-hatch`, or a `feature-driven` change not mapped to a plan task, or a `test-was-wrong` without prior approval, blocks the wave — stop and ask the user. A baseline test deleted/skipped/weakened in the diff but not reported is a defect; surface it.
+6. Run the wave verification commands from the plan against the full suite, and confirm the skipped-test count is accounted for (no silent growth).
+7. Update `Wave Execution Log` in the plan.
+8. Unblock the next wave or stop and ask the user when a stop condition triggers.
 
 The Coordinator must not declare the feature `done`. Only final verification after all waves completes that transition.
 
