@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.6.0 — 2026-06-02
+
+- Novo `Test Integrity Gate` no `test-guide`: baseline verde protegido, definicao de "enfraquecer" (inclui config-level como `coverageThreshold`, `testPathIgnorePatterns` e CI), e classificacao obrigatoria de toda mudanca de teste em `feature-driven` / `test-was-wrong` / `escape-hatch`
+- Baseline de testes definido concretamente via `git diff` contra a branch base; mudanca `feature-driven` exige prova red-green
+- "Flaky" deixa de ser desculpa: quarentena so com prova e aprovacao; evidencia de conclusao precisa vir da suite completa com skips contabilizados
+- `feature-delivery`: novo Required Gate proibindo apagar/skipar/enfraquecer teste do baseline no `execute`; propagacao da regra para subagents via `subagent-task.md` (secao Test Integrity, campo `Test changes` no handoff, stop condition) e auditoria pelo Coordinator em `subagent-handoff.md`
+- `verification-before-completion`: padrao de Tests exige suite completa e sinaliza filtrar/skipar teste como red flag
+- `pr-review`: nova etapa de Integridade dos Testes detecta testes removidos/skipados/enfraquecidos e config afrouxada no diff, classificando legitimo vs escape-hatch
+
 ## 1.5.0 — 2026-05-25
 
 - Nova referencia `references/cross-repo-handoff.md`: quando uma feature depende de outro repo, o flow gera um prompt de triage pronto para colar no outro servico (contexto, contrato a nao quebrar, escopo, decisoes em aberto, restricoes)
