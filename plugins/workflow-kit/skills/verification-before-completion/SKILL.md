@@ -58,6 +58,7 @@ Skip any step = lying, not verifying
 - Relying on partial verification
 - Thinking "just this once"
 - Tired and wanting work over
+- Editing or deleting a test in the same step it went red, without mapping the change to a planned contract change (moving the goalposts — see `test-guide` Test Integrity Gate)
 - **ANY wording implying success without having run verification**
 
 ## Rationalization Prevention
@@ -77,8 +78,9 @@ Skip any step = lying, not verifying
 
 **Tests:**
 ```
-✅ [Run test command] [See: 34/34 pass] "All tests pass"
+✅ [Run FULL suite] [See: 34/34 pass, 0 skipped] "All tests pass"
 ❌ "Should pass now" / "Looks correct"
+❌ [Run only the 3 tests I touched] — a filtered or skipped test reads as green; account for every skip
 ```
 
 **Regression tests (TDD Red-Green):**
