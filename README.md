@@ -1,10 +1,10 @@
-# Workflow Kit
+# Agent Skills
 
 Marketplace multi-plataforma para **Cursor**, **Claude Code** e **Codex** — skills reutilizaveis para entrega, planejamento, review e execucao em **qualquer projeto**.
 
 Repo: [lucasAguiar11/agent-skills](https://github.com/lucasAguiar11/agent-skills)
 
-- **Marketplace:** `workflow-kit`
+- **Marketplace:** `agent-skills`
 - **Plugins:** `workflow-kit`, `figma-to-code`
 - **Skill orquestradora:** `feature-delivery`
 
@@ -22,8 +22,8 @@ Settings → Plugins → Add marketplace `lucasAguiar11/agent-skills` → Instal
 
 ```text
 /plugin marketplace add lucasAguiar11/agent-skills
-/plugin install workflow-kit@workflow-kit
-/plugin install figma-to-code@workflow-kit
+/plugin install workflow-kit@agent-skills
+/plugin install figma-to-code@agent-skills
 /reload-plugins
 ```
 
@@ -81,12 +81,12 @@ agent-skills/
 ## Atualizar
 
 ```text
-/plugin marketplace update workflow-kit
+/plugin marketplace update agent-skills
 /reload-plugins
 ```
 
 ```bash
-codex plugin marketplace update workflow-kit
+codex plugin marketplace update agent-skills
 ```
 
 ## Licenca

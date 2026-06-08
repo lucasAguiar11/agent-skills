@@ -1,10 +1,10 @@
 {
-  "name": "workflow-kit",
+  "name": "agent-skills",
   "interface": {
-    "displayName": "Workflow Kit"
+    "displayName": "Agent Skills"
   },
   "metadata": {
-    "description": "Skills de entrega, planejamento, review e execucao com subagents para qualquer projeto",
+    "description": "Marketplace de skills reutilizaveis: entrega/planejamento/review com subagents (workflow-kit) e Figma to code (figma-to-code), para qualquer projeto",
     "version": "1.5.0"
   },
   "plugins": [

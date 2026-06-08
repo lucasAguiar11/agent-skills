@@ -1,6 +1,6 @@
 # Publicar
 
-- **Marketplace:** `workflow-kit`
+- **Marketplace:** `agent-skills`
 - **Plugins:** `workflow-kit`, `figma-to-code`
 - **Skill orquestradora:** `feature-delivery`
 
@@ -14,8 +14,8 @@ Settings → Plugins → `lucasAguiar11/agent-skills` → Install `workflow-kit`
 
 ```text
 /plugin marketplace add lucasAguiar11/agent-skills
-/plugin install workflow-kit@workflow-kit
-/plugin install figma-to-code@workflow-kit
+/plugin install workflow-kit@agent-skills
+/plugin install figma-to-code@agent-skills
 /reload-plugins
 ```
 
