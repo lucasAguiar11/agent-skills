@@ -21,6 +21,20 @@
         "review"
       ],
       "category": "workflow"
+    },
+    {
+      "name": "figma-to-code",
+      "source": "./plugins/figma-to-code",
+      "description": "Workflow Figma to code quase pixel perfect, independente de stack, com verificacao visual",
+      "version": "1.0.0",
+      "keywords": [
+        "figma-to-code",
+        "figma",
+        "design-to-code",
+        "pixel-perfect",
+        "design-system"
+      ],
+      "category": "design"
     }
   ]
 }

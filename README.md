@@ -5,7 +5,7 @@ Marketplace multi-plataforma para **Cursor**, **Claude Code** e **Codex** — sk
 Repo: [lucasAguiar11/agent-skills](https://github.com/lucasAguiar11/agent-skills)
 
 - **Marketplace:** `workflow-kit`
-- **Plugin:** `workflow-kit`
+- **Plugins:** `workflow-kit`, `figma-to-code`
 - **Skill orquestradora:** `feature-delivery`
 
 ## Instalar
@@ -23,6 +23,7 @@ Settings → Plugins → Add marketplace `lucasAguiar11/agent-skills` → Instal
 ```text
 /plugin marketplace add lucasAguiar11/agent-skills
 /plugin install workflow-kit@workflow-kit
+/plugin install figma-to-code@workflow-kit
 /reload-plugins
 ```
 
@@ -46,6 +47,8 @@ codex plugin marketplace add lucasAguiar11/agent-skills
 
 ## Skills incluidas
 
+### Plugin `workflow-kit`
+
 - `feature-delivery` (orquestrador)
 - `create-implementation-plan`
 - `update-implementation-plan`
@@ -57,6 +60,10 @@ codex plugin marketplace add lucasAguiar11/agent-skills
 - `commit`
 - `pr-review`
 
+### Plugin `figma-to-code`
+
+- `figma-to-code` — Figma to code quase pixel perfect, independente de stack, com verificacao visual
+
 ## Estrutura
 
 ```text
@@ -64,8 +71,11 @@ agent-skills/
 ├── .agents/plugins/marketplace.json
 ├── .claude-plugin/marketplace.json
 ├── .cursor-plugin/marketplace.json
-└── plugins/workflow-kit/
-    └── skills/
+└── plugins/
+    ├── workflow-kit/
+    │   └── skills/
+    └── figma-to-code/
+        └── skills/
 ```
 
 ## Atualizar
