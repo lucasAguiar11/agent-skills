@@ -1,14 +1,14 @@
 ---
-feature_id: FEAT-0001
+feature_id: FEAT-20260608-tela-bandeja
 status: draft
 owner: TBD
 depends_on: []
 impacts: []
 adr: []
-plan: docs/plans/FEAT-0001-plan.md
+plan: docs/plans/FEAT-20260608-tela-bandeja-plan.md
 ---
 
-# FEAT-0001 - Feature Title
+# FEAT-20260608-tela-bandeja - Feature Title
 
 ## Objective
 

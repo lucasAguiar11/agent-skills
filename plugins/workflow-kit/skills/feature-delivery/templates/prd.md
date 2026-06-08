@@ -1,12 +1,12 @@
 ---
-feature_id: FEAT-0001
+feature_id: FEAT-20260608-tela-bandeja
 status: draft
 owner: TBD
-plan: docs/plans/FEAT-0001-plan.md
+plan: docs/plans/FEAT-20260608-tela-bandeja-plan.md
 adr: []
 ---
 
-# PRD - FEAT-0001 - Product Title
+# PRD - FEAT-20260608-tela-bandeja - Product Title
 
 ## Executive Summary
 

@@ -1,15 +1,15 @@
 ---
-title: "ADR-0001: Decision Title"
+title: "ADR-20260608-historico-global: Decision Title"
 status: "Proposed"
 date: "YYYY-MM-DD"
 authors: "TBD"
-feature_id: FEAT-0001
+feature_id: FEAT-20260608-tela-bandeja
 tags: ["architecture", "decision"]
 supersedes: ""
 superseded_by: ""
 ---
 
-# ADR-0001: Decision Title
+# ADR-20260608-historico-global: Decision Title
 
 ## Status
 

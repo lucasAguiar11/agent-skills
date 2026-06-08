@@ -1,12 +1,12 @@
 ---
-feature_id: FEAT-0001
+feature_id: FEAT-20260608-tela-bandeja
 status: draft
 owner: TBD
-source: docs/features/FEAT-0001.md
+source: docs/features/FEAT-20260608-tela-bandeja.md
 adr: []
 ---
 
-# FEAT-0001 Implementation Plan
+# FEAT-20260608-tela-bandeja Implementation Plan
 
 > Section weight follows the change. For a Level 0 micro-change or any
 > single-workstream plan, keep only `Goal`, `Tasks`, `Verification`, `Risks`
@@ -52,7 +52,7 @@ Forbidden paths:
 
 | Dependency | Type | Notes |
 |---|---|---|
-| FEAT-0000 | contract | Contract must be agreed before implementation. |
+| FEAT-20260607-base-bandeja | contract | Contract must be agreed before implementation. |
 
 Shared contracts for parallel work:
 - PORT-001:
