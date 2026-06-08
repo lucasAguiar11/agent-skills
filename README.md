@@ -1,10 +1,10 @@
-# Agent Skills
+# Skill Forge
 
 Marketplace multi-plataforma para **Cursor**, **Claude Code** e **Codex** — skills reutilizaveis para entrega, planejamento, review e execucao em **qualquer projeto**.
 
 Repo: [lucasAguiar11/agent-skills](https://github.com/lucasAguiar11/agent-skills)
 
-- **Marketplace:** `agent-skills`
+- **Marketplace:** `skill-forge`
 - **Plugins:** `workflow-kit`, `figma-to-code`
 - **Skill orquestradora:** `feature-delivery`
 
@@ -22,8 +22,8 @@ Settings → Plugins → Add marketplace `lucasAguiar11/agent-skills` → Instal
 
 ```text
 /plugin marketplace add lucasAguiar11/agent-skills
-/plugin install workflow-kit@agent-skills
-/plugin install figma-to-code@agent-skills
+/plugin install workflow-kit@skill-forge
+/plugin install figma-to-code@skill-forge
 /reload-plugins
 ```
 
@@ -81,12 +81,12 @@ agent-skills/
 ## Atualizar
 
 ```text
-/plugin marketplace update agent-skills
+/plugin marketplace update skill-forge
 /reload-plugins
 ```
 
 ```bash
-codex plugin marketplace update agent-skills
+codex plugin marketplace update skill-forge
 ```
 
 ## Licenca

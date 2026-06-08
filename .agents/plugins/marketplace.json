@@ -1,7 +1,7 @@
 {
-  "name": "agent-skills",
+  "name": "skill-forge",
   "interface": {
-    "displayName": "Agent Skills"
+    "displayName": "Skill Forge"
   },
   "metadata": {
     "description": "Marketplace de skills reutilizaveis: entrega/planejamento/review com subagents (workflow-kit) e Figma to code (figma-to-code), para qualquer projeto",
