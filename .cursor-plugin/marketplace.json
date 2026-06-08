@@ -12,7 +12,7 @@
       "name": "workflow-kit",
       "source": "./plugins/workflow-kit",
       "description": "Kit de workflow: feature-delivery, planos, review, testes e subagents por wave",
-      "version": "1.5.0",
+      "version": "1.7.0",
       "keywords": [
         "workflow-kit",
         "feature-delivery",
