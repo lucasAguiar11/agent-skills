@@ -25,6 +25,21 @@ If the host loads plugin skills without namespace, `/feature-delivery` and `$fea
 
 Repository-specific domain rules still live in the project `AGENTS.md`, not in this skill.
 
+## Feature ID format
+
+The `<FEATURE-ID>` placeholder used throughout this skill resolves to a **date + slug**, never a sequential counter:
+
+- Feature: `FEAT-YYYYMMDD-<slug>` (e.g. `FEAT-20260608-tela-bandeja`)
+- ADR: `ADR-YYYYMMDD-<slug>` (e.g. `ADR-20260608-historico-global`)
+- `YYYYMMDD` is the artifact's creation date (an absolute calendar date, **never** an incrementing count).
+- `<slug>` is the title in kebab-case, without accents, kept short.
+
+**Why date + slug instead of a sequential counter.** A sequential scheme (`FEAT-0001`, `FEAT-0002`, …) races between git worktrees: each worktree scans the same folder, finds the same highest number, and reserves the same next ID — because worktrees share one `.git` but have separate working trees, so neither sees the other's uncommitted artifact. There is no coordination point. Date + slug has no shared counter to contend for: two worktrees creating features the same day still differ by slug, so IDs never collide.
+
+The rest of this document keeps the `<FEATURE-ID>` placeholder; this section is the single anchor for what that placeholder expands to.
+
+Artifacts that already exist with a sequential ID are **not** renamed. The date + slug format applies only to artifacts created from now on.
+
 ## Default Flow
 
 1. Classify the request and choose the lightest useful artifact set.
@@ -38,6 +53,13 @@ Repository-specific domain rules still live in the project `AGENTS.md`, not in t
 9. When work can run in parallel, add `Parallelization`, `Wave Schedule`, and `Subagent Launch Spec` to the plan.
 10. In `execute`, act as Integration Coordinator: resolve model tiers, launch subagents by wave, collect handoffs, update `Wave Execution Log`, and advance only after verification passes.
 11. Do not execute implementation unless the user approves or explicitly asks for execution.
+
+## Feature Registration
+
+When registering a feature (step 2):
+
+- Each worktree creates and edits only **its own** `docs/features/<FEATURE-ID>.md`. Never touch another worktree's feature file.
+- The row added to the `docs/features.md` table must be inserted **ordered by ID (date)**, not appended as a fixed line at the same shared bottom of the table. Two worktrees that both append to the same trailing position produce overlapping edits on the same line and conflict on merge; inserting in date order means each new row lands at a different position and the index file merges cleanly.
 
 ## Review Output Location
 
