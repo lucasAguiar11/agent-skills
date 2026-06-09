@@ -1,6 +1,6 @@
 {
   "name": "workflow-kit",
-  "version": "1.6.0",
+  "version": "1.8.0",
   "description": "Workflow kit with feature-delivery orchestration, PRD, ADR, implementation plans, wave-based subagents, review and verification gates",
   "author": {
     "name": "lucasAguiar11"
@@ -21,7 +21,10 @@
     "longDescription": "Kit de skills para entrega de features: PRD, ADR, planos, review-plan, test-guide e Integration Coordinator para execucao paralela em qualquer codebase.",
     "developerName": "lucasAguiar11",
     "category": "Productivity",
-    "capabilities": ["Interactive", "Write"],
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
     "defaultPrompt": [
       "Classifique este pedido com /feature-delivery em triage.",
       "Crie o plano de implementacao para esta feature.",

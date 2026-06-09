@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.8.0 — 2026-06-09
+
+- Novo `Post-feature Checkpoint` no `feature-delivery` (`references/post-feature-checkpoint.md`): checagem barata ao fim de toda feature, com acoes que so disparam em limiares (esporadicas por construcao)
+- Check 1 (toda feature): lixo — marcadores esquecidos (`TEMP-`/`TODO`/`FIXME`), declaracoes privadas orfas no diff e duplicacao dentro do diff
+- Check 2 (limiar 3a copia): duplicacao estrutural entre modulos → propor promocao ao layer compartilhado como feature propria
+- Check 3 (limiar ~6 branches): crescimento de hub central (app shell/router/registry) → propor ADR de contrato de feature
+- Check 4 (1a ocorrencia): primeira integracao de dados real → definir camada de dados em ADR unico para todas as features
+- `Default Flow` ganha o passo 11 (checkpoint pos-verificacao, pre-commit/PR) e novo Required Gate: entrega nao conclui sem reportar o checkpoint (clean ou triggered); acao disparada vira proposta, nunca expansao silenciosa de escopo
+- `AGENTS.md` do projeto pode sobrescrever metricas/limiares (secao `Architecture Checkpoint`); os defaults do plugin valem na ausencia
+
 ## 1.6.0 — 2026-06-02
 
 - Novo `Test Integrity Gate` no `test-guide`: baseline verde protegido, definicao de "enfraquecer" (inclui config-level como `coverageThreshold`, `testPathIgnorePatterns` e CI), e classificacao obrigatoria de toda mudanca de teste em `feature-driven` / `test-was-wrong` / `escape-hatch`

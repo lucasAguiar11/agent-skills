@@ -1,6 +1,6 @@
 {
   "name": "figma-to-code",
-  "version": "1.0.0",
+  "version": "1.8.0",
   "description": "Figma to code quase pixel perfect, independente de stack, com extracao via MCP do Figma, spec com proveniencia e loop de verificacao visual",
   "author": {
     "name": "lucasAguiar11"
@@ -20,7 +20,10 @@
     "longDescription": "Workflow em 7 fases para transformar um frame do Figma em codigo: preflight, proveniencia, extracao via MCP, spec com tokens e componentes mapeados ao design system do projeto, implementacao e loop de verificacao visual ate convergir.",
     "developerName": "lucasAguiar11",
     "category": "Productivity",
-    "capabilities": ["Interactive", "Write"],
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
     "defaultPrompt": [
       "Implemente esta tela do Figma quase pixel perfect: <url-do-figma>",
       "Extraia o design deste node do Figma e gere a spec.",

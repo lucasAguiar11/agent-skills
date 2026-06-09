@@ -52,7 +52,8 @@ Artifacts that already exist with a sequential ID are **not** renamed. The date 
 8. Review the plan before implementation. The review output lives inside the plan itself — never as a separate `*-review*.md` file.
 9. When work can run in parallel, add `Parallelization`, `Wave Schedule`, and `Subagent Launch Spec` to the plan.
 10. In `execute`, act as Integration Coordinator: resolve model tiers, launch subagents by wave, collect handoffs, update `Wave Execution Log`, and advance only after verification passes.
-11. Do not execute implementation unless the user approves or explicitly asks for execution.
+11. After verification passes — and before commit/PR — run the Post-feature Checkpoint (`references/post-feature-checkpoint.md`) and report its result, even when clean. Triggered actions become proposals (own feature/ADR), never silent scope expansion.
+12. Do not execute implementation unless the user approves or explicitly asks for execution.
 
 ## Feature Registration
 
@@ -144,6 +145,7 @@ Load only the reference needed for the current action:
 - `references/subagent-handoff.md`: wave execution, handoff blocks, merge rules, Coordinator duties.
 - `references/cross-repo-handoff.md`: when a feature depends on another repo, generate a ready-to-paste triage prompt for that service.
 - `references/review-checklist.md`: review gates before execution.
+- `references/post-feature-checkpoint.md`: post-feature debt checkpoint — garbage (dead code, leftover markers, diff duplication) every feature, plus threshold-gated structural checks (3rd copy, hub growth, first real data integration).
 
 ## Templates
 
@@ -174,3 +176,4 @@ Use templates as output shapes, adapting paths only when the user or repository 
 - Do not delete, skip, or weaken a test that passed before the change in order to make execution green. Tests passing before the change form the protected baseline (see `test-guide` Test Integrity Gate). Any baseline test change must be classified `feature-driven` (mapped to a specific plan task that changes the asserted contract) and proven red-green, or `test-was-wrong` (explicit user approval first). A test edit that cannot be mapped to a planned contract change is an `escape-hatch`: stop, fix the code, and surface it to the user instead of applying it.
 - Do not finish an implementation review without invoking `test-guide` to audit the tests changed or added by the feature. Present the `keep/improve/remove/missing` classification, ask explicit approval before modifying any test, and do not mark the review as approved while `missing` items of medium or higher severity remain unaddressed.
 - Do not write review output to a separate file. Append `Review Findings` (pre-execute) or `Post-execute Updates` (post-execute) inside the plan being reviewed. Repeat rounds add rows/subsections to the same section — never new `*-review*.md` files.
+- Do not declare delivery complete or open a PR without running the Post-feature Checkpoint (`references/post-feature-checkpoint.md`) and reporting its result — clean or triggered. A triggered action is a proposal for its own feature/ADR; executing it inside the current feature's scope is a scope violation.
