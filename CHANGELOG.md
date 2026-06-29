@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.9.0 — 2026-06-29
+
+- `feature-delivery`: nova seção `## Validation` no template de plano — self-check (V-001..V-006) com `status: draft|needs-resolve|clean` e loop "corrige o plano até clean". Mora dentro do plano, nunca em arquivo separado. Novo passo 7 no Default Flow e novo Required Gate (não marca `planned` enquanto não estiver `clean`)
+- `feature-delivery`: nova seção `## Traceability Matrix` no template de plano (REQ → design/task → teste), preenchida de features médias pra cima; linha `gap` = requisito sem teste, bloqueia `clean` (checada por V-006 e pelo gate)
+- `feature-delivery`: ADR ganha frontmatter `scope`; passo 4 do Default Flow varre ADRs anteriores por `scope`/`tags` antes de finalizar, para não re-decidir o que já foi resolvido
+- `subagent-policy`: `Scout` agora cobre **context offload** explicitamente — ler doc grande (plano/PRD/ADR/inventário) e devolver digest compacto, mantendo o thread principal enxuto
+- `feature-delivery`: nova seção `## Libraries` no template de plano (lib + versão + doc ref + motivo) — registra a resolução de doc/versão pra não re-decidir e pegar drift; checada por V-007 no `Validation`
+- `feature-delivery`: **modos auto-guiados** — tabela `Mode preconditions` (plan/review/execute/update) com a ação exata pra rodar quando a pré-condição falta, em vez de o agente improvisar; novo Required Gate reforça o stop
+- `feature-delivery`: `scope` do ADR agora **obrigatório** (non-empty); Required Gate proíbe finalizar ADR sem scope, senão fica invisível pro `adr-correlator`
+- `feature-delivery`: seis **Reader agents** empacotados em `agents/` (Claude Code, auto-discovery) para offload de contexto — cada um lê um doc grande e devolve digest de forma fixa, nunca o arquivo inteiro: `plan-reader` (Goal/Tasks/Validation/Traceability), `plan-detail-reader` (1 Task p/ Worker no execute), `feature-reader` (brief/PRD), `adr-reader` (1 ADR), `adr-correlator` (correlaciona ADRs por scope/tags — pareia com o passo 4), `feature-index-reader` (features relacionadas/deps). Novo papel `Reader` na subagent-policy; passo 4 e flow do SKILL apontam pros readers. Outros hosts (Cursor/Codex/OpenCode) leem inline — readers não portam, o resto do kit sim
+
 ## 1.8.0 — 2026-06-09
 
 - Novo `Post-feature Checkpoint` no `feature-delivery` (`references/post-feature-checkpoint.md`): checagem barata ao fim de toda feature, com acoes que so disparam em limiares (esporadicas por construcao)

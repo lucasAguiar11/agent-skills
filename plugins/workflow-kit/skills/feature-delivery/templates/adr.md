@@ -4,6 +4,7 @@ status: "Proposed"
 date: "YYYY-MM-DD"
 authors: "TBD"
 feature_id: FEAT-20260608-tela-bandeja
+scope: ""  # REQUIRED, non-empty. Area touched, e.g. "auth", "persistence", "video-pipeline". Drives adr-correlator; an empty scope makes the decision invisible to future correlation.
 tags: ["architecture", "decision"]
 supersedes: ""
 superseded_by: ""

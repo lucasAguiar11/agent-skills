@@ -14,7 +14,8 @@ Use subagents for:
 - read-only plan/spec review;
 - verification work that does not mutate code;
 - comparing alternatives or risks in parallel;
-- contract definition before parallel Workers start.
+- contract definition before parallel Workers start;
+- **context offload**: reading a large plan/PRD/ADR/inventory doc and returning a compact digest (frontmatter + only the sections the current step needs), so the parent thread stays lean instead of loading whole files. Use a `Scout` for this; prefer it over reading multi-hundred-line docs inline.
 
 ## Poor Candidates
 
@@ -36,6 +37,7 @@ Avoid subagents when:
 | `Worker` | Implement a bounded slice | plan-defined paths only |
 | `Reviewer` | Check output against PRD/plan/tests | none |
 | `Verifier` | Run checks and report evidence | none |
+| `Reader` | Read one large doc, return a compact digest (context offload) | none |
 | `Coordinator` | Parent agent in `execute`; orchestrates waves, does not own feature slices | plan log sections only |
 
 ## Task Tool Mapping
@@ -52,6 +54,21 @@ Map roles to Task tool `subagent_type` unless the user specifies otherwise. Read
 | CI investigator | `ci-investigator` | yes | `standard` | Single failing PR check diagnosis |
 
 \* Verifier must not mutate code. If a command would modify files, stop and report.
+
+## Bundled Reader Agents (context offload)
+
+The plugin ships six `Reader` agents under `agents/` (Claude Code only — auto-discovered; other hosts read the docs inline). Dispatch them via the Agent tool with the scoped name (e.g. `workflow-kit:plan-reader`) instead of loading a multi-hundred-line doc into the main thread. Each returns a fixed-shape digest, never the whole file.
+
+| Reader | Reads | Returns | Use in |
+|---|---|---|---|
+| `plan-reader` | `docs/plans/<ID>-plan.md` | Goal, Tasks, Decision State, Validation status, Traceability gaps | review, pre-execute, update |
+| `plan-detail-reader` | one `### Task N` of a plan | objective, files, steps, verification, write scope | execute (build Worker prompts) |
+| `feature-reader` | `docs/features/<ID>.md` | problem, scope, requirements, acceptance, open decisions | plan, review |
+| `adr-reader` | one ADR | status, decision, consequences | plan, review (honor a prior decision) |
+| `adr-correlator` | all ADR frontmatter | ranked shortlist by `scope`/`tags` vs current scope | plan step 4 (link, don't re-decide) |
+| `feature-index-reader` | `docs/features.md` | related features, live dependencies, what to inherit | triage, plan |
+
+When to reach for a Reader: the doc is large, you only need part of it, and reading it whole would crowd out context you still need. For small docs (the feature index is usually small, a Level 0 plan is tiny), read inline — a subagent round-trip costs more than it saves.
 
 ## Skill Mapping
 

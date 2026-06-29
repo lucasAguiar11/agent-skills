@@ -45,15 +45,17 @@ Artifacts that already exist with a sequential ID are **not** renamed. The date 
 1. Classify the request and choose the lightest useful artifact set.
 2. Register or update the feature in `docs/features.md`.
 3. Create or update `docs/features/<FEATURE-ID>.md`.
-4. Create an ADR only for structural or hard-to-reverse decisions.
+4. Create an ADR only for structural or hard-to-reverse decisions. Before finalizing, scan existing ADRs by `scope`/`tags` frontmatter (dispatch the `adr-correlator` reader, or `grep -rl 'scope: "auth"' docs/`) and link any related prior decision in the plan's `adr:` frontmatter and `Dependencies` — do not re-decide something already settled.
 5. When discovery shows the feature depends on another repo, generate a ready-to-paste triage prompt for that service (`references/cross-repo-handoff.md`) and record the dependency.
 6. Run the decision gate before finalizing the plan.
-7. Create or update `docs/plans/<FEATURE-ID>-plan.md`.
+7. Create or update `docs/plans/<FEATURE-ID>-plan.md`, then run its `Validation` self-check. Loop fixing the plan until `status: clean` — a plan with any `fail` row is `needs-resolve`, not `planned`.
 8. Review the plan before implementation. The review output lives inside the plan itself — never as a separate `*-review*.md` file.
 9. When work can run in parallel, add `Parallelization`, `Wave Schedule`, and `Subagent Launch Spec` to the plan.
 10. In `execute`, act as Integration Coordinator: resolve model tiers, launch subagents by wave, collect handoffs, update `Wave Execution Log`, and advance only after verification passes.
 11. After verification passes — and before commit/PR — run the Post-feature Checkpoint (`references/post-feature-checkpoint.md`) and report its result, even when clean. Triggered actions become proposals (own feature/ADR), never silent scope expansion.
 12. Do not execute implementation unless the user approves or explicitly asks for execution.
+
+When a plan, feature brief, PRD, or ADR is large and you only need part of it, offload the read to a bundled `Reader` agent (`workflow-kit:plan-reader`, `feature-reader`, `adr-reader`, `adr-correlator`, `plan-detail-reader`, `feature-index-reader`) instead of loading the whole file into context. See `references/subagent-policy.md` (Bundled Reader Agents). Read small docs inline — a Reader round-trip only pays off on large ones.
 
 ## Feature Registration
 
@@ -102,6 +104,18 @@ Infer the mode from the user's request. If ambiguous, default to `triage`.
 - `execute`: execute an approved plan as Integration Coordinator, launching subagents by wave when the plan defines launch specs, respecting ownership, handoff, and verification gates.
 - `update`: update existing artifacts after scope, requirements, or design changes.
 
+### Mode preconditions (self-guiding)
+
+Each mode has an entry condition. When it is not met, do not improvise the missing step — stop and tell the user the exact next action, then wait.
+
+| Mode | Precondition | If missing, stop with |
+|---|---|---|
+| `plan` | feature registered in `docs/features.md` | "No feature registered — run `triage` first to classify and register." |
+| `review` | a plan exists at `docs/plans/<ID>-plan.md` | "No plan to review — run `plan` first." |
+| `execute` | plan `status: approved` AND `Validation` status `clean` | "Plan is not approved/clean — run `plan` until Validation is `clean`, then get user approval." |
+| `execute` (parallel) | plan has `Subagent Launch Spec` + `Wave Schedule` | "Plan is parallel but lacks launch spec — update the plan first." |
+| `update` | the target artifact exists | "Nothing to update — name the artifact or run `plan`/`triage`." |
+
 Read `references/workflow-modes.md` when the mode is unclear or when switching modes.
 
 ## Artifact Selection
@@ -140,7 +154,7 @@ Load only the reference needed for the current action:
 - `references/workflow-modes.md`: mode behavior and stop points.
 - `references/adr-decision-guide.md`: decide whether a change needs an ADR.
 - `references/parallel-work-guide.md`: ownership, write scope, dependency rules.
-- `references/subagent-policy.md`: when and how to suggest or launch subagents.
+- `references/subagent-policy.md`: when and how to suggest or launch subagents; also documents the six bundled `Reader` agents for context offload.
 - `references/model-tier-policy.md`: abstract tiers (`fast`, `standard`, `high`), defaults by role, escalation, platform model resolution.
 - `references/subagent-handoff.md`: wave execution, handoff blocks, merge rules, Coordinator duties.
 - `references/cross-repo-handoff.md`: when a feature depends on another repo, generate a ready-to-paste triage prompt for that service.
@@ -162,7 +176,10 @@ Use templates as output shapes, adapting paths only when the user or repository 
 ## Required Gates
 
 - Do not create an ADR for a trivial or easily reversible choice.
+- Do not finalize an ADR with an empty `scope` frontmatter — an unscoped decision is invisible to `adr-correlator` and will be re-decided later.
+- Do not enter `plan`, `review`, `execute`, or `update` while its precondition (see Modes → Mode preconditions) is unmet — stop and surface the exact next action instead of improvising.
 - Do not implement before there is an approved plan, unless the user explicitly asks for a very small direct change.
+- Do not mark a plan `planned` or send it for review while its `Validation` status is not `clean`, or while the `Traceability Matrix` (medium+ features) has any `gap` row. Fix the plan and re-run the self-check first.
 - Do not assign parallel work without non-overlapping write scopes.
 - Do not launch parallel Workers across layers without a contract-first gate when shared ports/DTOs/enums/migrations are involved.
 - Do not advance to the next wave while any workstream in the current wave is `blocked` or `failed`.

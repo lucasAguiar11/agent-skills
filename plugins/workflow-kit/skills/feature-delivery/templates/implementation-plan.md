@@ -23,6 +23,18 @@ State the implementation outcome.
 - REQ-001:
 - CON-001:
 
+## Traceability Matrix
+
+<!-- Omit for Level 0 micro-changes. Fill from medium features up. One row per REQ. -->
+<!-- Closes the loop REQ → design → test. `Validation` row V-006 checks this. -->
+
+| REQ | Design / Task | Test (file or case) | Status |
+|---|---|---|---|
+| REQ-001 | Task 1 | `path/to.spec.ts::case` | planned |
+
+Status values: `planned` / `covered` / `gap`. A `gap` row is an unverified
+requirement — resolve it (add a test or drop the REQ) before marking the plan `clean`.
+
 ## Decision State
 
 Blocking decisions:
@@ -57,6 +69,15 @@ Forbidden paths:
 Shared contracts for parallel work:
 - PORT-001:
 - DTO-001:
+
+## Libraries
+
+<!-- One row per library the change adds or depends on a specific version of. Omit for Level 0 changes that touch no library. -->
+<!-- Records the resolved doc so the next planner does not re-decide and version drift is caught. `Validation` row V-007 checks this. -->
+
+| Library | Version | Doc ref | Why |
+|---|---|---|---|
+| example | ^1.0.0 | context7 / url | what it's for |
 
 ## Parallelization
 
@@ -121,6 +142,28 @@ Verification:
 
 Stop conditions:
 - Condition that requires user or planner input.
+
+## Validation
+
+> Self-check of THIS plan before it can be `planned` / approved. Re-run after
+> every change to the plan (and after each `update`) until `status: clean`.
+> Lives inside the plan — never a separate `*-validation.md` file.
+
+status: draft  <!-- draft | needs-resolve | clean -->
+
+| # | Check | Result | Note |
+|---|---|---|---|
+| V-001 | Every REQ maps to at least one Task | | |
+| V-002 | Every Task has Verification (command + expected) | | |
+| V-003 | No blocking decision left open (Decision Gate) | | |
+| V-004 | Parallel workstreams have non-overlapping write paths | | |
+| V-005 | Every Worker row in Launch Spec maps to one Task | | |
+| V-006 | Traceability Matrix has no `gap` row | | |
+| V-007 | Every new/version-pinned library has a `Libraries` row with a doc ref | | |
+
+Result values: `pass` / `fail` / `n-a`. While any row is `fail`, status is
+`needs-resolve`: fix the plan, then re-check. Set `status: clean` only when no
+row is `fail`. V-004/V-005 are `n-a` for single-workstream plans.
 
 ## Final Verification
 
