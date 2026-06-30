@@ -27,6 +27,23 @@ codex plugin marketplace add lucasAguiar11/agent-skills
 
 `/plugins` → **workflow-kit** → Install **workflow-kit**
 
+### OpenCode
+
+Clone o repositorio e adicione os caminhos das skills no `opencode.json` do projeto:
+
+```json
+{
+  "skills": {
+    "paths": [
+      "./agent-skills/plugins/workflow-kit/skills",
+      "./agent-skills/plugins/figma-to-code/skills"
+    ]
+  }
+}
+```
+
+Ou use `references` apontando para o repo clonado. Reinicie o OpenCode apos configurar.
+
 ## Release
 
 ```bash
