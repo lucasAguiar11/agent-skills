@@ -145,6 +145,7 @@ Use installed/global workflow skills when available:
 - `verification-before-completion`: verify before claiming completion.
 - `test-guide`: audit test usefulness whenever implementation adds tests or changes domain rules, validation, persistence, archive/status behavior, hierarchy movement, or API contracts.
 - `commit` / `create-pr` / `pr-review`: delivery and review.
+- `supersede-feature`: fold old/superseded features into the one that replaced them — condense their history into the successor brief, mark them `deprecated` with `superseded_by`, and `git rm` their dead plans (ADRs and briefs are kept).
 
 ## References
 
