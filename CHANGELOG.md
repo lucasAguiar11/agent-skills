@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.10.0 — 2026-06-30
+
+- `feature-delivery`: nova skill `supersede-feature` — funde features antigas/superadas na que as substituiu, condensa o historico relevante no brief da sucessora, marca as antigas `deprecated` com `superseded_by`, e remove (`git rm`) os planos mortos (recuperaveis via git history; ADRs e briefs ficam preservados)
+
 ## 1.9.0 — 2026-06-29
 
 - `feature-delivery`: nova seção `## Validation` no template de plano — self-check (V-001..V-006) com `status: draft|needs-resolve|clean` e loop "corrige o plano até clean". Mora dentro do plano, nunca em arquivo separado. Novo passo 7 no Default Flow e novo Required Gate (não marca `planned` enquanto não estiver `clean`)

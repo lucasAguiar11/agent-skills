@@ -91,6 +91,7 @@ Depois de editar o config, **reinicie o OpenCode** para carregar as skills.
 - `create-architectural-decision-record`
 - `commit`
 - `pr-review`
+- `supersede-feature`
 
 **Reader agents** (Claude Code — auto-discovery em `agents/`, context offload): `plan-reader`, `plan-detail-reader`, `feature-reader`, `adr-reader`, `adr-correlator`, `feature-index-reader`. Cada um lê um doc grande e devolve um digest de forma fixa, mantendo o thread principal enxuto. Nos demais hosts (Cursor/Codex/OpenCode) os docs são lidos inline.
 

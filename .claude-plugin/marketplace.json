@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Marketplace de skills reutilizaveis: entrega/planejamento/review com subagents (workflow-kit) e Figma to code (figma-to-code), para qualquer projeto",
-    "version": "1.9.0"
+    "version": "1.10.0"
   },
   "plugins": [
     {
@@ -26,7 +26,7 @@
       "name": "figma-to-code",
       "source": "./plugins/figma-to-code",
       "description": "Workflow Figma to code quase pixel perfect, independente de stack, com verificacao visual",
-      "version": "1.9.0",
+      "version": "1.10.0",
       "keywords": [
         "figma-to-code",
         "figma",
