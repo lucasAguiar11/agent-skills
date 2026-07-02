@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.11.0 — 2026-07-02
+
+- Nova skill `simplify` empacotada no `workflow-kit`: revisão em 3 frentes (reuso, qualidade, eficiência) do diff da feature, com fix direto dos achados. Extraída da skill `/simplify` embutida no Claude Code para funcionar tambem em Cursor e Codex
+- `feature-delivery`: `simplify` entra no fluxo, rodando logo apos a verificacao passar e antes do Post-feature Checkpoint; novo Required Gate proibe pular esse passo
+- Nova secao `## Post-execution Sequence` no `SKILL.md` — ancora unica pra sequencia pos-verificacao (`simplify` → Post-feature Checkpoint → `test-guide` → `verification-before-completion` → sync de status → `done`). `Default Flow` e `references/workflow-modes.md` (`execute`) passam a apontar pra ela em vez de duplicar a lista — corrige um drift onde o Post-feature Checkpoint (1.8.0) nunca tinha sido propagado pro runbook de `execute`
+
 ## 1.10.0 — 2026-06-30
 
 - `feature-delivery`: nova skill `supersede-feature` — funde features antigas/superadas na que as substituiu, condensa o historico relevante no brief da sucessora, marca as antigas `deprecated` com `superseded_by`, e remove (`git rm`) os planos mortos (recuperaveis via git history; ADRs e briefs ficam preservados)
