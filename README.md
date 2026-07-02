@@ -87,6 +87,7 @@ Depois de editar o config, **reinicie o OpenCode** para carregar as skills.
 - `review-plan`
 - `test-guide`
 - `verification-before-completion`
+- `simplify`
 - `prd`
 - `create-architectural-decision-record`
 - `commit`
