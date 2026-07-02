@@ -52,10 +52,20 @@ Artifacts that already exist with a sequential ID are **not** renamed. The date 
 8. Review the plan before implementation. The review output lives inside the plan itself — never as a separate `*-review*.md` file.
 9. When work can run in parallel, add `Parallelization`, `Wave Schedule`, and `Subagent Launch Spec` to the plan.
 10. In `execute`, act as Integration Coordinator: resolve model tiers, launch subagents by wave, collect handoffs, update `Wave Execution Log`, and advance only after verification passes.
-11. After verification passes — and before commit/PR — run the Post-feature Checkpoint (`references/post-feature-checkpoint.md`) and report its result, even when clean. Triggered actions become proposals (own feature/ADR), never silent scope expansion.
+11. Run the Post-execution Sequence (below) before commit/PR.
 12. Do not execute implementation unless the user approves or explicitly asks for execution.
 
 When a plan, feature brief, PRD, or ADR is large and you only need part of it, offload the read to a bundled `Reader` agent (`workflow-kit:plan-reader`, `feature-reader`, `adr-reader`, `adr-correlator`, `plan-detail-reader`, `feature-index-reader`) instead of loading the whole file into context. See `references/subagent-policy.md` (Bundled Reader Agents). Read small docs inline — a Reader round-trip only pays off on large ones.
+
+## Post-execution Sequence
+
+Run in this order, after the plan's (or wave's) verification passes and before commit/PR. This is the single definition — `Default Flow` step 11 and `references/workflow-modes.md`'s `execute` steps point here instead of repeating the list, so a new gate is added once and both call sites pick it up.
+
+1. `simplify` on the feature diff (reuse, quality, efficiency) — `workflow-kit:simplify`, or the platform's own `/simplify` when one is built in.
+2. Post-feature Checkpoint (`references/post-feature-checkpoint.md`) — report its result even when clean. A triggered check becomes a proposal (own feature/ADR), never silent scope expansion.
+3. `test-guide` test-quality review when tests were added or behavior needing coverage changed — stop for explicit user approval before editing any test.
+4. `verification-before-completion` before claiming completion.
+5. Set plan status to `done` only with fresh evidence, and sync status across all three places — `docs/features.md` index row, the feature brief/PRD frontmatter, and the plan frontmatter — so none lags behind.
 
 ## Feature Registration
 
@@ -143,6 +153,7 @@ Use installed/global workflow skills when available:
 
 - `review-plan`: review implementation plans before execution.
 - `verification-before-completion`: verify before claiming completion.
+- `simplify`: clean up the feature diff (reuse, quality, efficiency) after verification passes, before the Post-feature Checkpoint. Bundled with this plugin so it works on Cursor and Codex too, not just Claude Code's own built-in `/simplify`.
 - `test-guide`: audit test usefulness whenever implementation adds tests or changes domain rules, validation, persistence, archive/status behavior, hierarchy movement, or API contracts.
 - `commit` / `create-pr` / `pr-review`: delivery and review.
 - `supersede-feature`: fold old/superseded features into the one that replaced them — condense their history into the successor brief, mark them `deprecated` with `superseded_by`, and `git rm` their dead plans (ADRs and briefs are kept).
@@ -195,3 +206,4 @@ Use templates as output shapes, adapting paths only when the user or repository 
 - Do not finish an implementation review without invoking `test-guide` to audit the tests changed or added by the feature. Present the `keep/improve/remove/missing` classification, ask explicit approval before modifying any test, and do not mark the review as approved while `missing` items of medium or higher severity remain unaddressed.
 - Do not write review output to a separate file. Append `Review Findings` (pre-execute) or `Post-execute Updates` (post-execute) inside the plan being reviewed. Repeat rounds add rows/subsections to the same section — never new `*-review*.md` files.
 - Do not declare delivery complete or open a PR without running the Post-feature Checkpoint (`references/post-feature-checkpoint.md`) and reporting its result — clean or triggered. A triggered action is a proposal for its own feature/ADR; executing it inside the current feature's scope is a scope violation.
+- Do not skip `simplify` between verification passing and the Post-feature Checkpoint. Run it on the feature diff every time, even when the diff looks small — a triggered checkpoint (e.g. duplication) should already be looking at a diff `simplify` has cleaned up.

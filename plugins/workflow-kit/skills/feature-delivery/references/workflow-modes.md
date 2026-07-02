@@ -111,10 +111,7 @@ Steps:
    - update `Wave Execution Log`;
    - stop if any workstream is `blocked` or `failed`.
 6. After the last wave, run `Final Verification`.
-7. Run test-quality review with `test-guide` when tests are added or changed behavior needs coverage.
-8. If `test-guide` proposes adding, removing, or rewriting tests, stop and ask for explicit approval before editing tests.
-9. Run `verification-before-completion` before claiming completion.
-10. Set plan status to `done` only with fresh evidence. Sync the status across all three places — `docs/features.md` index row, the feature brief/PRD frontmatter, and the plan frontmatter — so none lags behind.
+7. Run the Post-execution Sequence (`SKILL.md` → `## Post-execution Sequence`): `simplify` on the diff, Post-feature Checkpoint, `test-guide` (stop for explicit approval before editing tests), `verification-before-completion`, then set status to `done` and sync it across `docs/features.md`, the feature brief/PRD, and the plan frontmatter.
 
 If the plan has no launch spec and the work is small, the Coordinator may execute directly without subagents.
 
