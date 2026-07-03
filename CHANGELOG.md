@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.12.0 — 2026-07-03
+
+- `feature-delivery`: novo passo `AGENTS.md improvements` na `## Post-execution Sequence` (roda após o Post-feature Checkpoint, antes do `test-guide`) — a partir do que a feature aplicou (diff, review findings, decisões), propõe adições duráveis ao `AGENTS.md` do projeto: convenção, comando, gotcha ou regra. Reporta mesmo quando `clean`; proposta vira mudança própria aprovada pelo usuário, nunca entra no commit da feature (novo Required Gate reforça o scope guard)
+- Novo `references/agents-md-improvements.md`: critérios de *quando propor* (smell test + lista do que não qualifica) e de *como é um bom `AGENTS.md`* — enxuto (<~150 linhas, +~20% de custo acima disso), curado por humano e nunca auto-gerado (auto-geração baixa sucesso ~3% e infla custo 20%+), comandos com flags reais, snippet real > prosa, proibição pareada com alternativa, boundaries em três níveis, versões exatas; com fontes (estudo GitHub de 2.500+ repos, Phil Schmid, agents.md)
+- `references/workflow-modes.md` (`execute`): lista inline da Post-execution Sequence sincronizada com o novo passo
+
 ## 1.11.0 — 2026-07-02
 
 - Nova skill `simplify` empacotada no `workflow-kit`: revisão em 3 frentes (reuso, qualidade, eficiência) do diff da feature, com fix direto dos achados. Extraída da skill `/simplify` embutida no Claude Code para funcionar tambem em Cursor e Codex
