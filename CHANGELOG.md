@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.13.0 — 2026-07-06
+
+- Nova skill `investigate-plan` empacotada no `workflow-kit`: versão leve do discovery do `feature-delivery` para pedidos ambíguos que precisam de investigação e de um design decidido com o usuário, mas não do conjunto completo de artefatos (feature brief, ADR, `docs/plans/*.md`). Fluxo: investigar (leitura direta + `Explore` em paralelo por pergunta), gate de design (`advisor()` + só perguntas bloqueantes em lote + espaço pra ideia do usuário), plano via plan mode nativo (não arquivo) pedindo explicitamente checagem de regressão a um agente `Plan`, segundo `advisor()` focado só em regressão, e execução só após aprovação. Sem tracking de status, sem wave/subagent — escala pro `feature-delivery` quando a decisão é estrutural, cross-repo ou paralelizável
+
 ## 1.12.0 — 2026-07-03
 
 - `feature-delivery`: novo passo `AGENTS.md improvements` na `## Post-execution Sequence` (roda após o Post-feature Checkpoint, antes do `test-guide`) — a partir do que a feature aplicou (diff, review findings, decisões), propõe adições duráveis ao `AGENTS.md` do projeto: convenção, comando, gotcha ou regra. Reporta mesmo quando `clean`; proposta vira mudança própria aprovada pelo usuário, nunca entra no commit da feature (novo Required Gate reforça o scope guard)
