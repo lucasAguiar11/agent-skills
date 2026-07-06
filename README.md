@@ -82,6 +82,7 @@ Depois de editar o config, **reinicie o OpenCode** para carregar as skills.
 ### Plugin `workflow-kit`
 
 - `feature-delivery` (orquestrador)
+- `investigate-plan` (investigacao leve: explorar -> gate de design -> plano aprovado, sem artefatos)
 - `create-implementation-plan`
 - `update-implementation-plan`
 - `review-plan`
