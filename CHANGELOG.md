@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.14.0 — 2026-07-07
+
+- Skill `investigate-plan` renomeada para `quick-plan` no `workflow-kit` — nome reflete melhor que é o fluxo de planejamento leve (investigar → gate de design → plano aprovado), sem os artefatos do `feature-delivery`. Conteúdo inalterado.
+
 ## 1.13.0 — 2026-07-06
 
 - Nova skill `investigate-plan` empacotada no `workflow-kit`: versão leve do discovery do `feature-delivery` para pedidos ambíguos que precisam de investigação e de um design decidido com o usuário, mas não do conjunto completo de artefatos (feature brief, ADR, `docs/plans/*.md`). Fluxo: investigar (leitura direta + `Explore` em paralelo por pergunta), gate de design (`advisor()` + só perguntas bloqueantes em lote + espaço pra ideia do usuário), plano via plan mode nativo (não arquivo) pedindo explicitamente checagem de regressão a um agente `Plan`, segundo `advisor()` focado só em regressão, e execução só após aprovação. Sem tracking de status, sem wave/subagent — escala pro `feature-delivery` quando a decisão é estrutural, cross-repo ou paralelizável
