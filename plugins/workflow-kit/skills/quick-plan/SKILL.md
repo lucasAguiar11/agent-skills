@@ -1,5 +1,5 @@
 ---
-name: investigate-plan
+name: quick-plan
 description: Investigate an ambiguous bug/feature request, converge on a design with the user, then hand off a plan for approval — no docs/features.md, ADR, or plan file required. Use when the request has more than one plausible design (e.g. "we have two ways X can happen, what should we do") and a wrong guess would be expensive to unwind. Skip for single-file, unambiguous changes.
 ---
 
