@@ -1,6 +1,6 @@
 {
   "name": "figma-to-code",
-  "version": "1.14.0",
+  "version": "1.15.0",
   "description": "Workflow Figma to code quase pixel perfect, independente de stack, com extracao via MCP do Figma, spec com proveniencia, mapeamento de tokens/componentes e loop de verificacao visual",
   "author": {
     "name": "lucasAguiar11"

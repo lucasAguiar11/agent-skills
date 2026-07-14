@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.15.0 — 2026-07-14
+
+- `pr-review`: separa revisão (chat) de postagem (PR/MR). Ação Final agora exige findings numerados, lista de postagem = subconjunto aprovado explicitamente, Review Summary opt-in (default só inline), prefixos textuais `[Bug]`/`[Melhoria]`/`[Nit]`, e IDs das notes/comments após postar
+- `pr-review`: **nunca usa emoji** (revisão, rascunhos e postagem); tom direto; **preview obrigatório do payload completo** antes de postar + aprovação explícita (editar regenera o preview)
+- `pr-review`: **prioridade de destino** — comentário **inline** no diff é o canal principal; note geral só como fallback (arquivo fora do diff); Review Summary continua opt-in
+- `pr-review`: suporte GitLab via `glab` (detecção por URL; `diff_refs`, discussions posicionadas, `Content-Type: application/json` obrigatório, arquivo fora do diff → note geral, suggestions multi-linha). Etapas 1 e 5 usam "GitHub MCP ou glab, conforme a plataforma"
+
 ## 1.14.0 — 2026-07-07
 
 - Skill `investigate-plan` renomeada para `quick-plan` no `workflow-kit` — nome reflete melhor que é o fluxo de planejamento leve (investigar → gate de design → plano aprovado), sem os artefatos do `feature-delivery`. Conteúdo inalterado.

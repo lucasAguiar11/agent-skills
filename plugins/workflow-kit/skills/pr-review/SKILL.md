@@ -1,27 +1,33 @@
 ---
 name: pr-review
-description: Skill para revisão automatizada de Pull Requests no GitHub. Use sempre que o usuário pedir para revisar um PR, analisar mudanças de código, fazer code review, ou avaliar um pull request. Também se aplica quando o usuário mencionar "revisar PR", "code review", "review PR", "analisa esse PR", "olha esse pull request", ou fornecer um link de PR do GitHub. Inclui análise de padrões da codebase, validação de uso de libs via context7, e geração de comentários prontos para postar no GitHub.
+description: Skill para revisão automatizada de Pull Requests/Merge Requests (GitHub ou GitLab). Use sempre que o usuário pedir para revisar um PR/MR, analisar mudanças de código, fazer code review, ou avaliar um pull/merge request. Também se aplica quando o usuário mencionar "revisar PR", "code review", "review PR", "analisa esse PR", "olha esse pull request", ou fornecer um link de PR/MR. Inclui análise de padrões da codebase, validação de uso de libs via context7, e geração de comentários prontos para postar (somente o subconjunto aprovado pelo usuário).
 ---
 
 # PR Review Skill
 
-Skill para conduzir revisões de Pull Requests de forma estruturada, analisando apenas o diff do PR contra os padrões e convenções existentes na codebase.
+Skill para conduzir revisões de Pull/Merge Requests de forma estruturada, analisando apenas o diff do PR/MR contra os padrões e convenções existentes na codebase.
 
 ## Input
 
 O usuário fornecerá:
-- **PR_URL**: URL do Pull Request no GitHub (ex: `https://github.com/org/repo/pull/123`)
+- **PR_URL** / **MR_URL**: URL do Pull Request (GitHub) ou Merge Request (GitLab)
+  - GitHub: `https://github.com/org/repo/pull/123`
+  - GitLab: `https://git.lab.example.com/group/repo/-/merge_requests/123`
 
 ## Etapas
 
 ### 1. Coleta de Dados e Checkout na Branch do PR
 
-1. Extraia `owner`, `repo` e `pr_number` da URL fornecida.
-2. Use o MCP do GitHub para obter os dados do PR em paralelo:
-   - `pull_request_read` com method `get` — detalhes gerais (título, autor, branch base/head, estado)
-   - `pull_request_read` com method `get_diff` — diff completo
-   - `pull_request_read` com method `get_files` — lista de arquivos alterados
-3. Identifique a branch base e a branch do PR (head ref).
+1. Extraia da URL: plataforma (GitHub vs GitLab), `owner`/`project`, `repo` e `pr_number`/`mr_iid`.
+2. Use **GitHub MCP ou `glab`, conforme a plataforma detectada**, para obter os dados do PR/MR em paralelo:
+   - **GitHub** (`pull_request_read`):
+     - method `get` — detalhes gerais (título, autor, branch base/head, estado)
+     - method `get_diff` — diff completo
+     - method `get_files` — lista de arquivos alterados
+   - **GitLab** (`glab`):
+     - `glab api projects/:id/merge_requests/:iid` — detalhes + `diff_refs`
+     - `glab api projects/:id/merge_requests/:iid/changes` (ou `glab mr diff`) — diff/arquivos
+3. Identifique a branch base e a branch do PR/MR (head ref).
 4. **OBRIGATÓRIO — Checkout na branch do PR**: Antes de qualquer análise de código, faça:
    ```bash
    git fetch origin <head_ref> && git checkout <head_ref>
@@ -74,7 +80,7 @@ Antes de produzir a revisão, inspecione **as mudanças em arquivos de teste e n
 
 Para cada mudança de teste, classifique:
 - **legítima** (`feature-driven`/`test-was-wrong`): mapeia para uma mudança de comportamento descrita no PR. Não é finding.
-- **suspeita** (`escape-hatch`): não há mudança de comportamento que justifique. Levante como finding 🔴 e pergunte ao autor o que o teste deveria proteger e por que foi enfraquecido.
+- **suspeita** (`escape-hatch`): não há mudança de comportamento que justifique. Levante como finding `[Bug]` e pergunte ao autor o que o teste deveria proteger e por que foi enfraquecido.
 
 Não trate refator legítimo de teste (renomear, deduplicar, mover de camada mantendo a força) como escape-hatch. O gatilho é **perda de força de detecção sem contrato que justifique**.
 
@@ -106,8 +112,8 @@ Para cada achado, use este formato:
 #### [Título curto descritivo]
 
 - **Arquivo**: `caminho/do/arquivo.ts` (L{linha_inicio}-L{linha_fim})
-- **Severidade**: 🔴 Bug/Risco | 🟡 Melhoria | 🟢 Nit/Estilo
-- **Descrição**: O que está errado ou pode melhorar, e por quê.
+- **Severidade**: `[Bug]` | `[Melhoria]` | `[Nit]`
+- **Descrição**: O que está errado ou pode melhorar, e por quê. Tom direto, sem rodeios.
 - **Sugestão**:
   ```typescript
   // código sugerido, se aplicável
@@ -120,34 +126,69 @@ Para cada achado, use este formato:
 - Se o código do PR segue os padrões da codebase, diga isso explicitamente — não invente problemas para preencher a revisão.
 - Cada finding deve ser **acionável** — o autor do PR precisa saber exatamente o que fazer.
 - Se um finding depende de contexto que você não tem (ex: regra de negócio), sinalize como **pergunta** em vez de afirmação.
+- **Sem emoji** em título, severidade, tabela, veredicto, rascunhos ou postagem. Sempre texto puro.
 
 ### Tabela Resumo
 
 | Severidade | Item | Descrição |
 |---|---|---|
-| 🔴/🟡/🟢 | Título curto | Descrição em 1 linha |
+| Bug / Melhoria / Nit | Título curto | Descrição em 1 linha |
 
 ### Veredicto
 
-- ✅ **Aprovado** — Nenhum finding 🔴, e os 🟡 são opcionais.
-- ⚠️ **Aprovado com ressalvas** — Sem 🔴, mas há 🟡 que deveriam ser tratados.
-- ❌ **Mudanças necessárias** — Há findings 🔴 que precisam ser resolvidos antes do merge.
+- **Aprovado** — Nenhum finding `[Bug]`, e os `[Melhoria]` são opcionais.
+- **Aprovado com ressalvas** — Sem `[Bug]`, mas há `[Melhoria]` que deveriam ser tratados.
+- **Mudanças necessárias** — Há findings `[Bug]` que precisam ser resolvidos antes do merge.
 
 ---
 
 ### 5. Gere Comentários Prontos para o PR
 
-Simule um code review real no GitHub, gerando comentários prontos para copiar/colar ou postar via MCP.
+Simule um code review real, gerando comentários prontos para copiar/colar ou postar via **GitHub MCP ou `glab`, conforme a plataforma detectada**.
 
-#### Review Summary (comentário geral do PR)
+**Importante:** a revisão completa da etapa 4 é para o USUÁRIO ler no chat. Os comentários desta etapa são rascunhos. **O que vai para o PR/MR é decidido só na Ação Final** (subconjunto aprovado).
 
-Gere um texto em Markdown pronto para colar como **Review Summary** no GitHub, contendo:
-- Resumo do que o PR faz (1-2 frases)
-- Pontos positivos (se houver, em 1 frase)
-- Lista compacta dos findings com severidade
-- Veredicto final: `Approve` | `Request Changes` | `Comment`
+#### Prioridade de destino (obrigatório)
 
-Exemplo:
+A forma **principal** de postagem é o **comentário inline** no arquivo/linha do diff. Tudo o mais é secundário.
+
+| Prioridade | Destino | Quando usar |
+|---|---|---|
+| 1 (principal) | **Inline** no arquivo:linha do diff | Sempre que o finding tiver linha no diff do PR/MR |
+| 2 (fallback) | **Note geral** no PR/MR | Só se a API recusar posição (arquivo fora do diff, seed, config não alterado, etc.) — e no corpo indique `arquivo:função/linha` |
+| 3 (opt-in) | **Review Summary** (comentário geral de resumo) | Só se o usuário pedir explicitamente |
+
+Regras:
+- **Default de postagem = só inline.** Não postar summary nem note geral "por completude".
+- Ancore cada finding em **arquivo + linha do diff** sempre que possível (já na etapa 4 e nos rascunhos).
+- Preferir várias discussions inline a um único comentário longo no topo do PR.
+- Inclua `suggestion` no inline quando a correção for uma mudança concreta de código.
+
+#### Inline Comments (rascunhos) — canal principal
+
+Para cada finding, gere o comentário formatado com prefixos textuais (sem emoji), **pensado para ir inline**:
+
+```
+`<caminho/do/arquivo>` (L<linha_inicio>-L<linha_fim>)
+
+[Bug|Melhoria|Nit] **<título curto>**
+
+<comentário detalhado, direto, sem emoji, explicando o problema e a sugestão>
+
+\```suggestion
+<código sugerido que o autor pode aceitar com um clique>
+\```
+```
+
+- **GitHub**: bloco `suggestion` nativo — aceitável com "Apply suggestion"; poste via pending review + inline comments.
+- **GitLab**: suggestions multi-linha usam a sintaxe ````suggestion:-N+M`; poste via `discussions` com `position`.
+- Use suggestion sempre que a sugestão for uma mudança concreta no código.
+
+#### Review Summary (comentário geral) — opt-in, não prioritário
+
+Gere só como **rascunho opcional** se o usuário pedir summary. **Não** é o canal principal e **não** se posta por default.
+
+Exemplo (sempre textual; **nunca** emoji):
 
 ```markdown
 ## Review Summary
@@ -157,41 +198,74 @@ Este PR implementa o endpoint de webhook para eventos de pagamento, integrando c
 **Pontos positivos:** Boa separação entre controller e service, testes cobrindo os cenários principais.
 
 **Findings:**
-- 🔴 `src/webhook/webhook.service.ts` L45-52 — Race condition no processamento de eventos duplicados
-- 🟡 `src/webhook/webhook.controller.ts` L12 — Validação do payload poderia usar class-validator (padrão do projeto)
-- 🟢 `src/webhook/dto/event.dto.ts` L8 — Typo no nome da propriedade
+- [Bug] `src/webhook/webhook.service.ts` L45-52 — Race condition no processamento de eventos duplicados
+- [Melhoria] `src/webhook/webhook.controller.ts` L12 — Validação do payload poderia usar class-validator (padrão do projeto)
+- [Nit] `src/webhook/dto/event.dto.ts` L8 — Typo no nome da propriedade
 
-**Veredicto:** ❌ Request Changes
+**Veredicto:** Request Changes
 ```
 
-#### Inline Comments
+#### Ação Final — Preview, Aprovação e Postagem
 
-Para cada finding, gere o comentário formatado como apareceria no GitHub:
+A revisão completa (etapa 4) é para o USUÁRIO ler no chat — ela **NÃO** é a lista de postagem.
+O que vai para o PR/MR é decidido em um fluxo separado. **Nunca poste sem preview + aprovação explícita.**
 
-```
-📁 `<caminho/do/arquivo>` (L<linha_inicio>-L<linha_fim>)
+1. **Apresente os findings NUMERADOS** (F1, F2, F3...) e pergunte quais devem ser postados.
+   Indique o destino planejado de cada um (`inline path:line` por padrão; `note geral` só se não der inline).
 
-<emoji_severidade> **<título curto>**
+2. **Lista de postagem = somente os itens que o usuário aprovou explicitamente**, na última
+   forma acordada durante a conversa (severidade, texto e teto de valores podem ter mudado).
+   - Item discutido mas não aprovado → **NÃO** posta.
+   - Item que o usuário mandou "tirar" → **NÃO** posta, mesmo que pareça importante.
+   - **NUNCA** adicione itens além da lista aprovada, nem "aproveite" para incluir nits.
 
-<comentário detalhado explicando o problema e a sugestão>
+3. **Destino default = inline.** Review Summary e note geral só entram se o usuário pedir ou se inline for tecnicamente impossível (e aí avise no preview).
 
-\```suggestion
-<código sugerido que o autor pode aceitar com um clique no GitHub>
-\```
-```
+4. **Formato dos comentários postados** (obrigatório):
+   - **Nunca use emoji** — nem no corpo, nem no título, nem no summary, nem no veredicto.
+   - Use prefixos textuais: `[Bug]`, `[Melhoria]`, `[Nit]`.
+   - Tom **direto e objetivo** (sem floreio, sem "ótimo trabalho!", sem ícones).
 
-O bloco `suggestion` é o formato nativo do GitHub — quando colado num inline review, renderiza como sugestão que pode ser aceita com "Apply suggestion". Use sempre que a sugestão for uma mudança concreta no código.
+5. **Preview obrigatório antes de postar** (bloqueante):
+   - Mostre o **payload completo** do que será enviado, não só a lista de títulos:
+     - Para cada item: destino (**prefira** `[inline] arquivo:linha`; use `[note geral]` só com motivo), texto final do comentário, e se inclui `suggestion`.
+     - Se summary estiver no escopo (opt-in): texto final do summary.
+   - Formato sugerido do preview (uma seção por item):
 
-#### Ação Final
+     ```text
+     PREVIEW DE POSTAGEM (nada foi enviado ainda)
 
-Após apresentar todos os comentários:
+     1. [inline] path/file.ts:42
+        [Bug] Título
+        <corpo completo do comentário>
 
-1. Pergunte: **"Quer que eu poste esses comentários no PR via GitHub MCP?"**
-2. Se o usuário confirmar E o MCP do GitHub estiver disponível, poste automaticamente:
-   - O Review Summary como comentário geral
-   - Cada inline comment no arquivo/linha correspondente
-   - Com o status adequado (APPROVE, REQUEST_CHANGES, ou COMMENT)
-3. Se o MCP do GitHub NÃO estiver disponível, apresente os comentários formatados para o usuário copiar e colar manualmente.
+     2. [note geral] (motivo: arquivo fora do diff)
+        ...
+
+     Confirmar postagem destes N itens? (sim / editar / cancelar)
+     ```
+
+   - **Poste somente** após o usuário responder de forma explícita (ex: "sim", "pode postar", "confirma").
+   - "ok", "beleza" ou silêncio **não** contam se ainda não houve preview com o payload.
+   - Se o usuário editar qualquer texto no preview, regenere o preview e peça confirmação de novo.
+
+6. **Após postar**: liste o que foi criado com os IDs das notes/comments (e se cada um foi inline ou geral), para permitir edição ou deleção rápida se algo saiu errado.
+
+Se a ferramenta de postagem não estiver disponível, apresente os comentários formatados para o usuário copiar e colar manualmente — ainda assim priorizando o formato inline e respeitando a lista aprovada (não despeje todos os findings) e o preview.
+
+#### Plataforma: GitHub vs GitLab
+
+Detecte pela URL do PR/MR (`github.com` vs domínio GitLab, ex: `git.lab.*`):
+
+- **GitHub** → MCP do GitHub: priorize pending review + **inline comments** na linha do diff; summary só se opt-in.
+- **GitLab** → `glab` CLI:
+  - Dados do MR: `glab api projects/:id/merge_requests/:iid` (pegue `diff_refs`).
+  - **Canal principal** — comentário inline: `POST .../discussions` com `position` (`position_type: text`,
+    `base_sha`/`head_sha`/`start_sha` do `diff_refs`, `old_path`, `new_path`, `new_line`).
+  - **IMPORTANTE**: `glab api --input` exige `-H "Content-Type: application/json"` (senão HTTP 415).
+  - Arquivo **FORA** do diff (ex: seed, config) não aceita comentário posicionado →
+    **fallback** note geral (`POST .../notes`) indicando arquivo/função no corpo — e declare o motivo no preview.
+  - Suggestions multi-linha usam a sintaxe ````suggestion:-N+M` do GitLab.
 
 ---
 
@@ -199,6 +273,10 @@ Após apresentar todos os comentários:
 
 - **Escopo**: Analise APENAS o diff do PR. Não comente código pré-existente que não foi tocado.
 - **Idioma**: Responda no mesmo idioma que o usuário usou na solicitação.
+- **Sem emoji**: Nunca use emoji na revisão (chat), nos rascunhos nem no que for postado no PR/MR. Severidade e veredicto são sempre textuais (`[Bug]`, `[Melhoria]`, `[Nit]`, Aprovado, etc.).
+- **Tom direto**: Seja objetivo. Sem floreio, sem celebração, sem ícones decorativos.
+- **Inline primeiro**: o canal principal de postagem é comentário **inline** no diff. Note geral e Review Summary são secundários (fallback / opt-in).
+- **Postagem com preview**: Nunca poste no PR/MR (nem via MCP/`glab`/API) sem mostrar o preview do payload e obter aprovação explícita do usuário.
 - **Context7**: Use apenas para libs que foram adicionadas ou tiveram uso modificado no PR.
 - **Web Search**: Use como fallback quando context7 não estiver disponível ou não retornar resultados úteis.
 - **Neutralidade**: Se não tiver certeza sobre algo (ex: regra de negócio), formule como pergunta, não como crítica.
@@ -217,5 +295,5 @@ Estas regras existem para evitar findings incorretos que minam a credibilidade d
    - Verifique o `datasource` no `schema.prisma` ou o driver no `package.json` antes de afirmar algo sobre o banco.
 4. **Confirme o comportamento de libs via context7/docs antes de afirmar que é bug.** Se um finding depende de como um decorator, validator, ou middleware funciona, valide primeiro. Não suponha.
 5. **Verifique se a lógica que você critica realmente existe no código.** Antes de dizer "esse teste verifica lógica inexistente", leia o código inteiro do use case/service para confirmar. Antes de dizer "falta tratamento de X", confirme que X não é tratado em outro lugar.
-6. **Não extrapole o diff para inferir problemas que não são demonstráveis.** Se o diff não mostra um bug claro e você precisa de 3+ suposições encadeadas para chegar à conclusão, formule como **pergunta**, não como finding 🔴.
-7. **Cada finding 🔴 deve ser reproduzível** — descreva o cenário exato que causa o bug (input → comportamento esperado vs real). Se não consegue descrever o cenário, rebaixe para 🟡.
+6. **Não extrapole o diff para inferir problemas que não são demonstráveis.** Se o diff não mostra um bug claro e você precisa de 3+ suposições encadeadas para chegar à conclusão, formule como **pergunta**, não como finding `[Bug]`.
+7. **Cada finding `[Bug]` deve ser reproduzível** — descreva o cenário exato que causa o bug (input → comportamento esperado vs real). Se não consegue descrever o cenário, rebaixe para `[Melhoria]`.
