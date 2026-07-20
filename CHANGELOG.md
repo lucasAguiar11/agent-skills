@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.16.1 — 2026-07-20
+
+- `feature-delivery`: fallback cross-host do `task-validator` — em hosts sem descoberta de bundled agents (Cursor, Codex, ou agent não registrado), o Coordinator lança um subagente genérico com o conteúdo de `agents/task-validator.md` embutido como instruções; validação nunca é pulada por indisponibilidade do agent nomeado
+
 ## 1.16.0 — 2026-07-20
 
 - `feature-delivery`: novo agente bundled `task-validator` (papel `Validator`, o "QA por tarefa") — validação adversarial de cada workstream concluído no `execute`: default `refuted`, re-executa a verificação (nunca aceita output colado do Worker), acusa arquivo fora do escopo de escrita e teste enfraquecido/omitido. `refuted` = workstream `failed` → retry único do Worker com os findings; refutou de novo, para e pergunta. Testado fim a fim com defeito plantado (bug escondido atrás de teste verde) — o validador pegou
