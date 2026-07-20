@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.16.0 — 2026-07-20
+
+- `feature-delivery`: novo agente bundled `task-validator` (papel `Validator`, o "QA por tarefa") — validação adversarial de cada workstream concluído no `execute`: default `refuted`, re-executa a verificação (nunca aceita output colado do Worker), acusa arquivo fora do escopo de escrita e teste enfraquecido/omitido. `refuted` = workstream `failed` → retry único do Worker com os findings; refutou de novo, para e pergunta. Testado fim a fim com defeito plantado (bug escondido atrás de teste verde) — o validador pegou
+- `feature-delivery`: **Team Board** — snapshot em tabela GFM impresso pelo Coordinator a cada evento (início de wave, veredito de QA, fechamento, bloqueio): workstream, papel, tarefa, progresso real por checkboxes e status; rodapé com waves, bloqueios, próximo gate e tokens gastos (wave + acumulado, via `subagent_tokens`). Cada board é copiado pro `Wave Execution Log`. Formato tabela (não ASCII art) por resiliência de renderização no terminal
+- `feature-delivery`: nova seção `## Team Model` no `SKILL.md` — mapeia papéis de time (PM, techlead, devs, QA, CI, code review, coordenador) para os estágios do fluxo; papel é estágio com contrato de entrada/saída, nunca persona
+- `feature-delivery`: nomenclatura de lançamento de subagentes — `description` no formato `<Role> <WS> · <task> · wave <n>[ · retry <m>]` (ex.: `DEV A · slugify · wave 1`), papéis do vocabulário do Team Board; proibido label genérico
+- `feature-delivery`: nova seção `## Token Economy` no `subagent-policy.md` — prompt do subagente = só Task block + linha do launch spec (nunca o plano inteiro), Validator em tier `fast` quando o check é mecânico, sem Worker → sem Validator, um Validator por workstream, `validated` é final, trabalho pequeno fica inline
+- `feature-delivery`: **aprovação única** (step 12) — pedido de execução upfront ("implementa X") vale como aprovação: planeja, auto-revisa e executa sem re-perguntar; o plano auto-aprova quando `Validation: clean` e sem decisão `blocking`. Só para em: decisão blocking, plano que não fecha limpo, ou QA refutando o mesmo workstream 2x. Pedido só de plano continua parando pra aprovação
+- `workflow-kit`: novo `README.md` do plugin — apresentação do fluxo completo (time, diagrama fim a fim, loop de execução, Team Board, aprovação única, economia de tokens, garantias)
+
 ## 1.15.0 — 2026-07-14
 
 - `pr-review`: separa revisão (chat) de postagem (PR/MR). Ação Final agora exige findings numerados, lista de postagem = subconjunto aprovado explicitamente, Review Summary opt-in (default só inline), prefixos textuais `[Bug]`/`[Melhoria]`/`[Nit]`, e IDs das notes/comments após postar

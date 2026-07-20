@@ -51,11 +51,27 @@ Artifacts that already exist with a sequential ID are **not** renamed. The date 
 7. Create or update `docs/plans/<FEATURE-ID>-plan.md`, then run its `Validation` self-check. Loop fixing the plan until `status: clean` — a plan with any `fail` row is `needs-resolve`, not `planned`.
 8. Review the plan before implementation. The review output lives inside the plan itself — never as a separate `*-review*.md` file.
 9. When work can run in parallel, add `Parallelization`, `Wave Schedule`, and `Subagent Launch Spec` to the plan.
-10. In `execute`, act as Integration Coordinator: resolve model tiers, launch subagents by wave, collect handoffs, update `Wave Execution Log`, and advance only after verification passes.
+10. In `execute`, act as Integration Coordinator: resolve model tiers, launch subagents by wave, collect handoffs, run adversarial task validation (`workflow-kit:task-validator`, one per completed Worker workstream), update `Wave Execution Log`, print the Team Board (`references/subagent-handoff.md`), and advance only after validation and verification pass.
 11. Run the Post-execution Sequence (below) before commit/PR.
-12. Do not execute implementation unless the user approves or explicitly asks for execution.
+12. **Single-approval rule.** An upfront execution request ("implement X", "executa", "faz a feature") is the approval — plan, self-review, and execute in one continuous flow without re-asking. Only stop for the user when: (a) the decision gate finds a `blocking` decision, (b) plan `Validation` cannot reach `status: clean`, or (c) a Validator refutes the same workstream twice. When the user asked only for a plan, stop after step 8 and wait for approval before executing.
 
 When a plan, feature brief, PRD, or ADR is large and you only need part of it, offload the read to a bundled `Reader` agent (`workflow-kit:plan-reader`, `feature-reader`, `adr-reader`, `adr-correlator`, `plan-detail-reader`, `feature-index-reader`) instead of loading the whole file into context. See `references/subagent-policy.md` (Bundled Reader Agents). Read small docs inline — a Reader round-trip only pays off on large ones.
+
+## Team Model
+
+The flow maps to a delivery team. Use this framing when the user thinks in team roles; each "role" is a stage with an input/output contract, never a persona:
+
+| Team role | Flow equivalent | Where |
+|---|---|---|
+| PM / Manager | the user + feature brief/PRD | triage, decision gate |
+| Techlead | Planner + plan review | plan, `review-plan` |
+| Devs | Workers by wave | execute |
+| QA per task | Validator (`task-validator`) — adversarial, tries to refute each completed task | execute, per workstream |
+| CI | Verifier (verification commands) | wave verification |
+| Code review | Post-execution Sequence (`simplify`, `pr-review`, `test-guide`) | after last wave |
+| Delivery coordinator | Integration Coordinator (parent agent) | execute |
+
+During execute, the Coordinator prints the **Team Board** (`references/subagent-handoff.md` → Team Board) at wave transitions so the user can follow who is doing what and which gate is next.
 
 ## Post-execution Sequence
 

@@ -13,9 +13,10 @@ The Integration Coordinator must:
 3. Wait for all subagents in the wave to finish or stop.
 4. Collect each subagent's handoff block.
 5. Audit the `Test changes` field of every handoff. Any `escape-hatch`, or a `feature-driven` change not mapped to a plan task, or a `test-was-wrong` without prior approval, blocks the wave — stop and ask the user. A baseline test deleted/skipped/weakened in the diff but not reported is a defect; surface it.
-6. Run the wave verification commands from the plan against the full suite, and confirm the skipped-test count is accounted for (no silent growth).
-7. Update `Wave Execution Log` in the plan.
-8. Unblock the next wave or stop and ask the user when a stop condition triggers.
+6. Launch one `task-validator` (bundled agent, `workflow-kit:task-validator`) per `completed` Worker workstream, in parallel. Pass the Task block (fetch via `plan-detail-reader`) and that workstream's handoff. The validator is adversarial and independent — it re-runs verification itself and defaults to `refuted`. A `refuted` verdict marks the workstream `failed` (see Merge Rules); the wave does not advance on the Worker's word alone.
+7. Run the wave verification commands from the plan against the full suite, and confirm the skipped-test count is accounted for (no silent growth).
+8. Update `Wave Execution Log` in the plan and print the Team Board (below).
+9. Unblock the next wave or stop and ask the user when a stop condition triggers.
 
 The Coordinator must not declare the feature `done`. Only final verification after all waves completes that transition.
 
@@ -47,6 +48,7 @@ When launching a subagent through the Task tool:
 4. Resolve `model_tier` from the launch-spec row using `references/model-tier-policy.md`; pass `model` to Task when the host supports it.
 5. Launch all subagents for the current wave in a **single message with multiple Task calls** when parallel execution is allowed.
 6. Pass the workstream id, wave number, model tier (and resolved model if applicable), allowed write paths, forbidden paths, verification commands, and stop conditions explicitly.
+7. Name the launch (the Task/Agent `description` shown in the host's progress tree) as `<Role> <WS> · <task short title> · wave <n>`, appending `· retry <m>` on retries — e.g. `DEV A · slugify · wave 1`, `QA B · word_count · wave 1 · retry 1`. Role vocabulary from the Team Board (`DEV`, `QA`, `CI`, `TL`, `SCOUT`). Never use generic labels ("agent", "subagent", "task").
 
 Do not launch parallel Workers with overlapping write paths. Prefer sequential execution or split the plan first.
 
@@ -91,12 +93,41 @@ After a wave completes:
 | Two Workers touched the same file | Mark wave `blocked`; require sequential fix or replan |
 | Reviewer found high-severity issue | Append to `Review Findings` or `Post-execute Updates`; do not mark wave done |
 | Verifier failed | Mark wave `failed`; retry once if plan allows; otherwise stop |
+| Validator refuted a workstream | Mark that workstream `failed`; relaunch the Worker with the validator's `Findings` as input, once; if refuted again, stop and ask the user |
 | Contract dependency unresolved | Mark wave `blocked`; launch Planner or ask user |
 | Model slug rejected by host | Retry with platform default; record fallback in execution log |
 
 When retrying a failed Worker after domain or contract issues, escalate `model_tier` to `high` per `references/model-tier-policy.md`.
 
 When using git worktrees or branches per workstream, merge sequentially in dependency order and run verification after each merge.
+
+## Team Board
+
+A compact status snapshot the Coordinator prints in chat at these events: wave start, each validation verdict, wave close, and any block. It maps the execution to team roles so the user can see who is doing what and which gate is next, without reading the plan.
+
+Format — plain GFM markdown (tables render reliably in every host terminal; do not use ASCII box art, which breaks on alignment and width):
+
+```md
+**<FEATURE-ID>** — Wave <n>/<total> `▓▓▓▓▓▓░░░ <pct>%`
+
+| WS | Role | Task | Progress | Status |
+|---|---|---|---|---|
+| A | DEV | <task title> | `██████████` 5/5 | validated |
+| B | DEV | <task title> | `████████░░` 4/5 | validating |
+| — | QA | refute Task 2 | — | running tests |
+
+Waves: `[x]──[>]──[ ]` · Blocked: 0 · Gate: <next exit condition>
+Tokens: <wave>k wave · <total>k feature
+```
+
+Rules:
+
+- `Progress` counts the Task block's step checkboxes (done/total) as reported in handoffs — real data, never estimated.
+- Overall `<pct>` = completed-and-validated tasks / total tasks.
+- Status vocabulary: `queued`, `executing`, `validating`, `validated`, `refuted`, `blocked`, `failed`, `done`.
+- Role vocabulary maps to `subagent-policy.md` roles: `DEV` = Worker, `QA` = Validator, `CI` = Verifier, `TL` = Planner/Reviewer.
+- `Tokens`: sum the `subagent_tokens` reported in each agent's tool result — current wave and feature running total. Real numbers only; omit the line when the host does not report usage.
+- Copy each printed board into the plan's `Wave Execution Log` (same table), so the plan file keeps the visual timeline.
 
 ## Plan Updates During Execute
 

@@ -9,7 +9,7 @@ Infer the mode from the request.
 | `triage` | Optional Scouts for docs/code/contracts | yes, read-only |
 | `plan` | Scout discovery, then Planner artifacts | partial |
 | `review` | Reviewer structural + Reviewer tests | yes, read-only |
-| `execute` | Coordinator + Workers/Verifiers by wave | yes, by wave |
+| `execute` | Coordinator + Workers/Validators/Verifiers by wave | yes, by wave |
 | `update` | Scout impact scan, then Planner diff | usually serial |
 
 Read `references/subagent-policy.md` for role mapping, `references/model-tier-policy.md` for model tiers, and `references/subagent-handoff.md` for launch/handoff rules.
@@ -93,13 +93,13 @@ Output location: append the findings to the plan being reviewed (`docs/plans/<FE
 
 ## execute
 
-Use only when the user explicitly asks to execute or implement.
+Use when the user explicitly asks to execute or implement — including an upfront request that triggered planning in the same flow (single-approval rule, `SKILL.md` step 12): in that case the plan self-review passing and the decision gate finding no `blocking` decision **are** the approval; set the plan to `approved` and continue without asking again.
 
 The parent agent is the **Integration Coordinator**. Read `references/subagent-handoff.md` before launching work.
 
 Steps:
 
-1. Read the approved plan and confirm status is `approved` or `in_progress`.
+1. Read the plan and confirm status is `approved` or `in_progress` (or auto-approve per the single-approval rule above).
 2. Verify ownership, stop conditions, `Wave Schedule`, and `Subagent Launch Spec`.
 3. Set plan status to `in_progress` if not already.
 4. Run optional wave 0 work: contract confirmation, discovery, or pre-review.
@@ -107,8 +107,9 @@ Steps:
    - resolve `model_tier` per launch-spec row and pass `model` when supported;
    - launch eligible subagents in parallel;
    - collect handoff blocks;
+   - launch one `task-validator` per completed Worker workstream (adversarial validation — `references/subagent-handoff.md`);
    - run wave verification;
-   - update `Wave Execution Log`;
+   - update `Wave Execution Log` and print the Team Board;
    - stop if any workstream is `blocked` or `failed`.
 6. After the last wave, run `Final Verification`.
 7. Run the Post-execution Sequence (`SKILL.md` → `## Post-execution Sequence`): `simplify` on the diff, Post-feature Checkpoint, AGENTS.md improvements (propose durable `AGENTS.md` additions, apply only as their own change), `test-guide` (stop for explicit approval before editing tests), `verification-before-completion`, then set status to `done` and sync it across `docs/features.md`, the feature brief/PRD, and the plan frontmatter.

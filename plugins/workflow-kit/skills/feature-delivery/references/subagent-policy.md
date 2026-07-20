@@ -37,6 +37,7 @@ Avoid subagents when:
 | `Worker` | Implement a bounded slice | plan-defined paths only |
 | `Reviewer` | Check output against PRD/plan/tests | none |
 | `Verifier` | Run checks and report evidence | none |
+| `Validator` | Adversarially validate one completed Worker workstream against its Task block; defaults to refuting | none |
 | `Reader` | Read one large doc, return a compact digest (context offload) | none |
 | `Coordinator` | Parent agent in `execute`; orchestrates waves, does not own feature slices | plan log sections only |
 
@@ -51,9 +52,10 @@ Map roles to Task tool `subagent_type` unless the user specifies otherwise. Read
 | Worker | `generalPurpose` | no | `standard` | Bounded implementation slice |
 | Reviewer | `generalPurpose` | yes | `standard` | Plan/spec/test review |
 | Verifier | `shell` | yes* | `fast` | Run lint/test/build commands |
+| Validator | `workflow-kit:task-validator` | yes* | `standard` | Adversarial per-task check; re-runs verification, never trusts pasted output |
 | CI investigator | `ci-investigator` | yes | `standard` | Single failing PR check diagnosis |
 
-\* Verifier must not mutate code. If a command would modify files, stop and report.
+\* Verifier and Validator must not mutate code. If a command would modify files, stop and report.
 
 ## Bundled Reader Agents (context offload)
 
@@ -69,6 +71,20 @@ The plugin ships six `Reader` agents under `agents/` (Claude Code only — auto-
 | `feature-index-reader` | `docs/features.md` | related features, live dependencies, what to inherit | triage, plan |
 
 When to reach for a Reader: the doc is large, you only need part of it, and reading it whole would crowd out context you still need. For small docs (the feature index is usually small, a Level 0 plan is tiny), read inline — a subagent round-trip costs more than it saves.
+
+The plugin also ships one non-Reader bundled agent: `task-validator` (the `Validator` role above). Dispatched by the Coordinator during `execute`, one per completed Worker workstream — see `references/subagent-handoff.md`.
+
+## Token Economy
+
+Every subagent costs a full context spin-up (~30k+ tokens even for a trivial task), so the levers are fewer launches and smaller prompts — never weaker checks:
+
+- **Prompt = Task block + launch-spec row, nothing more.** Never paste the whole plan, brief, or another workstream's context into a subagent prompt; fetch bounded detail via `plan-detail-reader`.
+- **Validator tier:** drop to `fast` when the check is mechanical (run the verification command + diff-vs-scope scan); keep `standard` when it must judge test coverage or semantics.
+- **Skip the Validator when there is no Worker claim to distrust** — the Coordinator executed the task directly inline. Wave verification and final verification still cover it.
+- **One Validator per workstream, never per step or per file.**
+- **Small work stays inline.** A task the Coordinator can do in a few edits does not justify a Worker + Validator pair (see Poor Candidates); the pair is for parallel or riskier slices.
+- **No re-validation without a retry.** A `validated` verdict is final for that wave; do not relaunch validators for reassurance.
+- The Team Board's `Tokens` line (`subagent-handoff.md`) keeps the running spend visible to the user — sum of `subagent_tokens` from agent results.
 
 ## Skill Mapping
 
