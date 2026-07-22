@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "Marketplace de skills reutilizaveis: entrega/planejamento/review com subagents (workflow-kit) e Figma to code (figma-to-code), para qualquer projeto",
-    "version": "1.16.1"
+    "version": "1.17.0"
   },
   "plugins": [
     {
       "name": "workflow-kit",
       "source": "./plugins/workflow-kit",
       "description": "Kit de workflow: feature-delivery, planos, review, testes e subagents por wave",
-      "version": "1.16.1",
+      "version": "1.17.0",
       "keywords": [
         "workflow-kit",
         "feature-delivery",
@@ -26,7 +26,7 @@
       "name": "figma-to-code",
       "source": "./plugins/figma-to-code",
       "description": "Workflow Figma to code quase pixel perfect, independente de stack, com verificacao visual",
-      "version": "1.16.1",
+      "version": "1.17.0",
       "keywords": [
         "figma-to-code",
         "figma",

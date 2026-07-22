@@ -80,7 +80,7 @@ Every subagent costs a full context spin-up (~30k+ tokens even for a trivial tas
 
 - **Prompt = Task block + launch-spec row, nothing more.** Never paste the whole plan, brief, or another workstream's context into a subagent prompt; fetch bounded detail via `plan-detail-reader`.
 - **Validator tier:** drop to `fast` when the check is mechanical (run the verification command + diff-vs-scope scan); keep `standard` when it must judge test coverage or semantics.
-- **Skip the Validator when there is no Worker claim to distrust** — the Coordinator executed the task directly inline. Wave verification and final verification still cover it.
+- **The Validator trigger is a substantive diff, not the existence of a Worker.** Trivial inline work (a few lines, no domain/persistence/contract change) skips validation — inline verification and the Post-execution Sequence cover it. Substantive work gets one `task-validator` even when the Coordinator executed it inline (see `workflow-modes.md` → execute) — "no one grades their own work" must hold wherever it matters.
 - **One Validator per workstream, never per step or per file.**
 - **Small work stays inline.** A task the Coordinator can do in a few edits does not justify a Worker + Validator pair (see Poor Candidates); the pair is for parallel or riskier slices.
 - **No re-validation without a retry.** A `validated` verdict is final for that wave; do not relaunch validators for reassurance.

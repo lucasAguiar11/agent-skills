@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.17.0 — 2026-07-22
+
+- `feature-delivery`: gatilho do Validator desacoplado da existência de Worker — o critério é **diff substantivo**, não "houve subagente". Entrega inline do Coordinator que toca domínio, persistência, API/contratos ou diff não-trivial ganha um `task-validator` sobre a própria entrega (Task block + self-handoff) antes da `Final Verification`, com o mesmo tratamento de `refuted` (corrige, re-valida 1x, senão para). Diff trivial segue sem validação — verificação inline + pós-execução cobrem. Fecha o buraco onde planos single-workstream substantivos passavam sem QA adversarial ("ninguém se auto-avalia" agora vale nos dois caminhos)
+
 ## 1.16.1 — 2026-07-20
 
 - `feature-delivery`: fallback cross-host do `task-validator` — em hosts sem descoberta de bundled agents (Cursor, Codex, ou agent não registrado), o Coordinator lança um subagente genérico com o conteúdo de `agents/task-validator.md` embutido como instruções; validação nunca é pulada por indisponibilidade do agent nomeado
