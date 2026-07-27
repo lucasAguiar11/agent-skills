@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.19.0 — 2026-07-27
+
+- `comment-docs`: modos Post-execution (só arquivos do **diff da feature**) vs standalone; fronteira explícita com `simplify`; posição do header (topo, preferencialmente antes de use-directives); exemplos neutros em `keep-vs-remove.md`
+- `feature-delivery` Post-execution Sequence: após `simplify`, roda `comment-docs` no diff da feature (headers + strip narrativo), depois checkpoint → AGENTS.md improvements → `test-guide` → `verification-before-completion`. Required Gate: não pular `comment-docs` nem usar `simplify` como substituto. `workflow-modes.md` e README do plugin sincronizados
+
+## 1.18.0 — 2026-07-27
+
+- Nova skill `comment-docs` no `workflow-kit`: padroniza documentação de módulo (header curto com papel/gotcha) e limpa comentários narrativos (`// GET /path`, banners de seção, JSDoc que só repete o nome). Mantém invariantes (escala, ordem, legado). Inclui `references/keep-vs-remove.md` e bloco de política para `AGENTS.md` (`references/agents-policy.md`). Gate de tipos/build do projeto; sem mudança de lógica
+
 ## 1.17.0 — 2026-07-22
 
 - `feature-delivery`: gatilho do Validator desacoplado da existência de Worker — o critério é **diff substantivo**, não "houve subagente". Entrega inline do Coordinator que toca domínio, persistência, API/contratos ou diff não-trivial ganha um `task-validator` sobre a própria entrega (Task block + self-handoff) antes da `Final Verification`, com o mesmo tratamento de `refuted` (corrige, re-valida 1x, senão para). Diff trivial segue sem validação — verificação inline + pós-execução cobrem. Fecha o buraco onde planos single-workstream substantivos passavam sem QA adversarial ("ninguém se auto-avalia" agora vale nos dois caminhos)

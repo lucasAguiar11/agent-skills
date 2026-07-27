@@ -16,7 +16,7 @@ O princípio central: **cada papel é um estágio com contrato de entrada/saída
 | **Devs** | Workers (agentes em paralelo) | Implementam uma fatia cada, dentro do escopo de escrita permitido |
 | **QA** | Validators (agentes adversariais) | Tentam **refutar** cada entrega — re-executam tudo, não confiam em ninguém |
 | **CI** | Verifier | Roda a suíte completa de verificação da wave |
-| **Code review** | Sequência pós-execução | `simplify`, `pr-review`, `test-guide`, verificação final |
+| **Code review** | Sequência pós-execução | `simplify`, `comment-docs`, `pr-review`, `test-guide`, verificação final |
 
 ## Fluxo fim a fim
 
@@ -42,8 +42,8 @@ O princípio central: **cada papel é um estágio com contrato de entrada/saída
  6. EXECUTE ───────── loop por wave (detalhado abaixo)
         │
         ▼
- 7. PÓS-EXECUÇÃO ──── simplify → checkpoint → test-guide →
-        │              verification-before-completion
+ 7. PÓS-EXECUÇÃO ──── simplify → comment-docs → checkpoint →
+        │              test-guide → verification-before-completion
         ▼
  8. DONE ──────────── status sincronizado: índice + brief + plano
 ```

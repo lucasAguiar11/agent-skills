@@ -1,6 +1,6 @@
 {
   "name": "workflow-kit",
-  "version": "1.17.0",
+  "version": "1.19.0",
   "description": "Workflow kit with feature-delivery orchestration, PRD, ADR, implementation plans, wave-based subagents, review and verification gates",
   "author": {
     "name": "lucasAguiar11"
@@ -12,7 +12,8 @@
     "planning",
     "subagents",
     "review-plan",
-    "test-guide"
+    "test-guide",
+    "comment-docs"
   ],
   "skills": "./skills",
   "interface": {
