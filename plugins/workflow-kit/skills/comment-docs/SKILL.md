@@ -93,6 +93,10 @@ Regras do header:
 1. Liste arquivos do diff da feature (`git diff` / `git diff --cached` / range da branch vs base).
 2. Considere só source tocado (não lockfiles, não artefatos gerados).
 3. Aplique inventário + limpeza + headers **apenas nesses arquivos**.
+3b. **O alvo primário são os comentários que a feature acabou de escrever** — as linhas `+` do diff,
+   não só o arquivo. Rode o passo 2.1 (auto-review) antes de declarar limpo: uma passada que só
+   procura banner/`// GET /path` no arquivo inteiro dá "limpo" enquanto a feature enche o diff de
+   paráfrase nova.
 4. Política em `AGENTS.md`: se já existir o bloco header+why, **não** reescrever. Se faltar, **propor** (ou aplicar só se o usuário pediu política) — na Post-execution preferir *propor* para não competir com o passo AGENTS.md improvements; se o bloco for a política canônica e o arquivo já está aberto por este passo, pode inserir o bloco mínimo de `references/agents-policy.md` quando o repo ainda não tem **nenhuma** regra de comentários.
 5. Não varrer o monorepo inteiro.
 
@@ -133,6 +137,40 @@ rg -c "^\s*//|/\*\*" --glob '*.{ts,tsx,js,jsx}' <paths> | sort -t: -k2 -nr | hea
 Não apague cegamente. Comentários mistos (HTTP + gotcha na mesma linha) → **reescrever** só o gotcha.
 Pragmas (`eslint-disable`, `@ts-expect-error`, `biome-ignore`, `prettier-ignore`) **nunca** entram no strip — removê-los muda o build.
 
+Os greps acima acham ruído **mecânico**. Eles não acham paráfrase — e paráfrase é o que uma feature
+recém-escrita produz. Zero hits aqui **não** é "limpo": é só o fim do passo mecânico.
+
+### 2.1 Auto-review: os comentários que você mesmo escreveu
+
+Comentário que o autor acabou de escrever passa no teste único por um motivo falso: o autor ainda tem
+o porquê na cabeça e o lê no texto. **Julgue como se outra pessoa tivesse escrito, sem contexto.**
+
+```bash
+# 1. Comentários ADICIONADOS pelo diff — a lista real a auditar (modo A)
+git diff -U0 | rg "^\+\s*(//|\*|/\*)" | sort | uniq -c | sort -rn
+
+# 2. Justificativa repetida: mesma frase em 2+ lugares do diff
+git diff -U0 | rg -o "^\+\s*//\s*(.{15,60})" -r '$1' | sort | uniq -c | sort -rn | rg -v "^\s+1 "
+
+# 3. Comentário colado numa linha que já diz a mesma coisa (paráfrase)
+git diff -U0 -U1 | rg -B0 -A1 "^\+\s*//"
+```
+
+Três sinais de descarte, aplicados nessa ordem:
+
+1. **Repetição** — a mesma justificativa aparece em N lugares (`FEAT-XXXX: <mesma frase>` no schema, na
+   entity, no port, no DTO, no use case). Fica **uma**, no ponto menos dedutível; as outras saem.
+   Justificativa repetida não é ênfase, é ruído multiplicado.
+2. **Paráfrase da linha seguinte** — `// rascunho não vira contrato` sobre `if (status !== 'approved') throw`,
+   `// ADMIN-only` sobre `@Roles(Role.ADMIN)`, `// idempotente` sobre um early-return óbvio. O código
+   já diz; o comentário só traduz.
+3. **Só o ID da feature** — `// FEAT-20260727: …` que, tirado o ID, não sobra invariante nenhuma.
+   Rastreabilidade é trabalho do git/plano, não do código.
+
+Teste final por comentário sobrevivente: **nomeie o motivo em uma palavra** (escala, ordem,
+exclusividade, idempotência, legado, writer único, acoplamento, intenção). Não conseguiu nomear em uma
+palavra? Não é gotcha — é narração, apaga.
+
 ### 3. Limpeza mecânica segura
 
 Automatize **somente**:
@@ -163,6 +201,9 @@ Ondas (standalone / repos grandes):
 2. `git diff` — **sem** mudança de lógica/comportamento; só comentários e (se aplicável) política em AGENTS.md.
 3. Re-checar o escopo: zero banners de seção e zero `// METHOD /path` puro nos arquivos tocados; headers presentes onde faltavam.
    Cada comentário sobrevivente passa no teste único — se você não sabe dizer o motivo dele em uma palavra, ele ainda não devia estar lá.
+   Rodar de novo o passo 2.1 sobre o diff final: nenhuma justificativa repetida, nenhuma paráfrase da
+   linha seguinte, nenhum comentário cujo conteúdo seja só o ID da feature. Declarar "limpo" só depois
+   desse re-check — "os greps mecânicos não acharam nada" não é evidência de limpeza.
    Confirmar que nenhum pragma sumiu: `git diff -U0 | rg "^-.*(eslint-disable|ts-expect-error|biome-ignore|prettier-ignore)"` deve vir vazio.
 4. Resumir: modo, arquivos, o que saiu, gotchas preservados, AGENTS.md, resultado do gate.
 
@@ -189,6 +230,9 @@ chore: limpar comentários narrativos e padronizar headers de módulo
 - Inventar `@module` / `@file` se o repo não usa
 - Full-repo scan na Post-execution de uma feature
 - Pular `comment-docs` na Post-execution porque “o simplify já limpou comentários” — papéis diferentes
+- Declarar “limpo” com base só nos greps mecânicos, sem o auto-review do passo 2.1
+- Poupar os comentários que você mesmo acabou de escrever — é onde mora a paráfrase, justamente porque
+  o autor ainda tem o porquê na cabeça
 
 ## Saída esperada
 

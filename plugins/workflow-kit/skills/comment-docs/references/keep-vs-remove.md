@@ -31,7 +31,19 @@ export function getUser(id: UUID): User { ... }
 
 // TODO: melhorar isso depois
 // antes usava fetch direto, migrado em 03/2024
+
+// Gate de aprovação (FEAT-20260727): rascunho não vira contrato.
+if (simulation.status !== 'approved') throw new BusinessRuleException(...)
+
+// Aprovação: ADMIN-only
+@Roles(Role.ADMIN)
+
+/** Gate de associação (FEAT-1234): draft (rascunho) vs approved (liberada). */
+status?: SimulationStatus
 ```
+
+As três últimas são a mesma feature narrando a si mesma: paráfrase da linha seguinte, e a terceira
+ainda repetida em 4 arquivos. Uma feature recém-escrita produz esse tipo, não banner de seção.
 
 ## Manter / reescrever (gotcha)
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.21.0 — 2026-07-27
+
+- `comment-docs`: novo passo **2.1 Auto-review** — os greps mecânicos (banner, `// GET /path`, TODO, `@param`) só acham ruído mecânico; paráfrase é o que uma feature recém-escrita produz, e zero hits deixava de ser "limpo". O passo audita as linhas `+` do diff com três sinais de descarte: **justificativa repetida** (mesma frase em N arquivos → fica uma, no ponto menos dedutível), **paráfrase da linha seguinte** (`// ADMIN-only` sobre `@Roles(Role.ADMIN)`), e **comentário que é só o ID da feature**
+- `comment-docs`: viés de autoria vira regra explícita — comentário que o próprio autor acabou de escrever passa no teste único por motivo falso (ele ainda tem o porquê na cabeça); julgar como se outra pessoa tivesse escrito. Novos anti-padrões: declarar "limpo" só com os greps mecânicos, e poupar os próprios comentários
+- `comment-docs`: Post-execution passa a mirar **os comentários que a feature escreveu** (linhas `+`), não só os arquivos tocados; verificação final re-roda o 2.1 sobre o diff resultante. `keep-vs-remove.md` ganhou os três exemplos reais de paráfrase de feature
+
 ## 1.20.0 — 2026-07-27
 
 - `comment-docs`: default passa a ser **remover**. Novo teste único ("apague o comentário — alguém escreve um bug? Não → apaga") como regra dominante no `SKILL.md`, em `keep-vs-remove.md` e no bloco de política de `agents-policy.md`; manter exige motivo nomeável em uma palavra (escala, ordem, exclusividade, idempotência, legado, writer único)
