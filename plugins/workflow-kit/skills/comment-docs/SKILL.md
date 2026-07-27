@@ -31,12 +31,26 @@ Funciona em qualquer codebase. Idioma do header = idioma do projeto.
 
 ## Princípio
 
+**Teste único, aplicado a cada comentário:**
+
+> Apague o comentário mentalmente. Alguém escreve um bug agora?
+> **Não → apaga.** Sim → fica, condensado.
+
+O default é **remover**. Manter é exceção e precisa de um motivo dizível em uma palavra:
+escala, ordem, exclusividade, idempotência, legado, writer único. Se você não consegue
+nomear o motivo, não é gotcha — é narração.
+
 | Manter | Remover |
 |--------|---------|
 | Header de módulo (`/** papel + gotcha */`) | `// GET /path → …` espelhando action/endpoint |
 | JSDoc de export/campo com **invariante** (escala, ordem, null semântico, legado) | Banners `// --- Seção ---`, `// ===== … =====`, `// ───` |
 | Gotchas de uso (writer único, idempotência, exclusividade de campos) | JSDoc de hook/wrapper que só repete a action/service |
 | Comentário de UI/intenção restrita se for *why* | Comentário que parafraseia o identificador |
+| **Pragmas e diretivas** — `eslint-disable`, `@ts-expect-error`, `biome-ignore`, `prettier-ignore`, `@deprecated`, licença exigida (não são prosa: têm efeito) | `@param` / `@returns` que só repete nome e tipo já declarados |
+| | Comentário inline que narra a linha seguinte (`// itera`, `// valida`, `// early return`) |
+| | Histórico no código (`// antes usava X`, `// adicionado em 03/2024`) — git guarda isso |
+| | Marcador de estrutura óbvia (`// props`, `// state`, `// handlers`) |
+| | `TODO` / `FIXME` sem dono nem link de issue — apagar ou virar issue |
 | | Código morto comentado (`// const`, `// import`, blocos desligados) — **apagar**, não comentar |
 
 Referência rápida: `references/keep-vs-remove.md`.
@@ -106,11 +120,18 @@ rg -n "^\s*//\s*(GET|POST|PUT|PATCH|DELETE)\s+/" --glob '*.{ts,tsx,js,jsx}' <pat
 # Banners de seção
 rg -n "^\s*//\s*[-=─═]{3,}" --glob '*.{ts,tsx,js,jsx}' <paths>
 
-# Densidade por arquivo
+# JSDoc que só repete tipo/nome
+rg -n "^\s*\*\s*@(param|returns)\s" --glob '*.{ts,tsx,js,jsx}' <paths>
+
+# TODO/FIXME sem dono nem issue
+rg -n "//\s*(TODO|FIXME)" --glob '*.{ts,tsx,js,jsx}' <paths>
+
+# Densidade por arquivo — atacar primeiro os acima de ~1 comentário/25 linhas
 rg -c "^\s*//|/\*\*" --glob '*.{ts,tsx,js,jsx}' <paths> | sort -t: -k2 -nr | head -40
 ```
 
 Não apague cegamente. Comentários mistos (HTTP + gotcha na mesma linha) → **reescrever** só o gotcha.
+Pragmas (`eslint-disable`, `@ts-expect-error`, `biome-ignore`, `prettier-ignore`) **nunca** entram no strip — removê-los muda o build.
 
 ### 3. Limpeza mecânica segura
 
@@ -141,6 +162,8 @@ Ondas (standalone / repos grandes):
 1. Gate de tipos/build do projeto — leia `AGENTS.md` / scripts do `package.json` etc. Rode o gate real do repo.
 2. `git diff` — **sem** mudança de lógica/comportamento; só comentários e (se aplicável) política em AGENTS.md.
 3. Re-checar o escopo: zero banners de seção e zero `// METHOD /path` puro nos arquivos tocados; headers presentes onde faltavam.
+   Cada comentário sobrevivente passa no teste único — se você não sabe dizer o motivo dele em uma palavra, ele ainda não devia estar lá.
+   Confirmar que nenhum pragma sumiu: `git diff -U0 | rg "^-.*(eslint-disable|ts-expect-error|biome-ignore|prettier-ignore)"` deve vir vazio.
 4. Resumir: modo, arquivos, o que saiu, gotchas preservados, AGENTS.md, resultado do gate.
 
 ### 6. Commit

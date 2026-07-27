@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.20.0 — 2026-07-27
+
+- `comment-docs`: default passa a ser **remover**. Novo teste único ("apague o comentário — alguém escreve um bug? Não → apaga") como regra dominante no `SKILL.md`, em `keep-vs-remove.md` e no bloco de política de `agents-policy.md`; manter exige motivo nomeável em uma palavra (escala, ordem, exclusividade, idempotência, legado, writer único)
+- `comment-docs`: lista de ruído completada — `@param`/`@returns` que só repete tipo já declarado, comentário inline narrando a linha seguinte, histórico/changelog no código, marcadores de estrutura (`// props`, `// handlers`), `TODO`/`FIXME` sem dono nem issue. Inventário ganhou buscas pra esses casos e prioriza arquivos acima de ~1 comentário/25 linhas
+- `comment-docs`: pragmas (`eslint-disable`, `@ts-expect-error`, `biome-ignore`, `prettier-ignore`, `@deprecated`, licença) viram categoria explícita de manter-sempre — têm efeito no build, nunca entram no strip; verificação inclui `git diff | rg` que deve vir vazio
+
 ## 1.19.0 — 2026-07-27
 
 - `comment-docs`: modos Post-execution (só arquivos do **diff da feature**) vs standalone; fronteira explícita com `simplify`; posição do header (topo, preferencialmente antes de use-directives); exemplos neutros em `keep-vs-remove.md`

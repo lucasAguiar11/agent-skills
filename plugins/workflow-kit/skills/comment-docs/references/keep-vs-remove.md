@@ -17,6 +17,20 @@ export async function getResourceDetail(...) { ... }
 // Auth (401)
 // Not Found (404)
 // Mapeamento direto
+
+// props
+// handlers
+// itera sobre os itens
+for (const item of items) { ... }
+
+/**
+ * @param id - o id
+ * @returns o usuário
+ */
+export function getUser(id: UUID): User { ... }
+
+// TODO: melhorar isso depois
+// antes usava fetch direto, migrado em 03/2024
 ```
 
 ## Manter / reescrever (gotcha)
@@ -39,9 +53,17 @@ rate: Decimal
 parentId?: UUID | null
 
 // Único ponto de escrita da URL: filtros + paginação no mesmo replaceState.
+
+// eslint-disable-next-line react-hooks/exhaustive-deps -- ref estável, refetch manual
+// @ts-expect-error lib sem types; shape validado em runtime pelo Zod acima
 ```
 
-## Checklist mental (1 frase)
+Pragmas têm efeito no build/lint. Não são prosa e não entram no strip, mesmo sem motivo escrito.
 
-> Se o código e os nomes já dizem o mesmo, o comentário sobra.  
-> Se apagar muda o risco de bug futuro (escala, ordem, exclusividade, legado), fica.
+## Teste único
+
+> Apague o comentário. Alguém escreve um bug agora?  
+> **Não → apaga.** Sim → fica, em 1 linha.
+
+Manter exige um motivo em uma palavra: escala, ordem, exclusividade, idempotência,
+legado, writer único. Sem motivo nomeável, é narração — sai.
