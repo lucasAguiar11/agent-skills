@@ -4,7 +4,7 @@
     "displayName": "Skill Forge"
   },
   "metadata": {
-    "description": "Marketplace de skills reutilizaveis: entrega/planejamento/review com subagents (workflow-kit) e Figma to code (figma-to-code), para qualquer projeto",
+    "description": "Marketplace de skills reutilizaveis: entrega/planejamento/review (workflow-kit), Figma to code, e brass-tacks (output style always-on)",
     "version": "1.21.0"
   },
   "plugins": [
@@ -29,6 +29,20 @@
       "source": {
         "source": "local",
         "path": "./plugins/figma-to-code"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "brass-tacks",
+      "description": "Output style always-on: acao primeiro, passos numerados, ingles simples, sem preambulo (hooks SessionStart)",
+      "version": "1.0.0",
+      "source": {
+        "source": "local",
+        "path": "./plugins/brass-tacks"
       },
       "policy": {
         "installation": "AVAILABLE",

@@ -1,7 +1,7 @@
 # Publicar
 
 - **Marketplace:** `skill-forge`
-- **Plugins:** `workflow-kit`, `figma-to-code`
+- **Plugins:** `workflow-kit`, `figma-to-code`, `brass-tacks`
 - **Skill orquestradora:** `feature-delivery`
 
 ## Instalar
@@ -16,8 +16,11 @@ Settings → Plugins → `lucasAguiar11/agent-skills` → Install `workflow-kit`
 /plugin marketplace add lucasAguiar11/agent-skills
 /plugin install workflow-kit@skill-forge
 /plugin install figma-to-code@skill-forge
+/plugin install brass-tacks@skill-forge
 /reload-plugins
 ```
+
+`brass-tacks` injeta o estilo de saida em toda sessao (hooks SessionStart + skill `/brass-tacks`). Confie o plugin para os hooks rodarem.
 
 ### Codex
 

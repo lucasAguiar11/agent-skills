@@ -5,7 +5,7 @@ Marketplace multi-plataforma para **Cursor**, **Claude Code**, **Codex** e **Ope
 Repo: [lucasAguiar11/agent-skills](https://github.com/lucasAguiar11/agent-skills)
 
 - **Marketplace:** `skill-forge`
-- **Plugins:** `workflow-kit`, `figma-to-code`
+- **Plugins:** `workflow-kit`, `figma-to-code`, `brass-tacks`
 - **Skill orquestradora:** `feature-delivery`
 
 ## Instalar
@@ -24,6 +24,7 @@ Settings → Plugins → Add marketplace `lucasAguiar11/agent-skills` → Instal
 /plugin marketplace add lucasAguiar11/agent-skills
 /plugin install workflow-kit@skill-forge
 /plugin install figma-to-code@skill-forge
+/plugin install brass-tacks@skill-forge
 /reload-plugins
 ```
 
@@ -102,6 +103,12 @@ Depois de editar o config, **reinicie o OpenCode** para carregar as skills.
 
 - `figma-to-code` — Figma to code quase pixel perfect, independente de stack, com verificacao visual
 
+### Plugin `brass-tacks`
+
+- Output style always-on (hooks `SessionStart` + `UserPromptSubmit` once): acao primeiro, passos numerados, linguagem simples
+- Skill `/brass-tacks`; desliga com `stop brass tacks mode`
+- Baseado em [SkytheWitcher/brass-tacks](https://github.com/SkytheWitcher/brass-tacks)
+
 ## Fluxo (feature-delivery)
 
 O orquestrador escolhe o menor conjunto de artefatos para a mudança e avança por portões verificáveis. Os passos pesados (waves, subagents) só aparecem quando há trabalho paralelo real; um micro-change usa só `Goal / Tasks / Verification / Risks`.
@@ -150,7 +157,11 @@ agent-skills/
     ├── workflow-kit/
     │   ├── agents/        # Reader agents (Claude Code)
     │   └── skills/
-    └── figma-to-code/
+    ├── figma-to-code/
+    │   └── skills/
+    └── brass-tacks/
+        ├── hooks/           # SessionStart + UserPromptSubmit
+        ├── hooks-handlers/
         └── skills/
 ```
 

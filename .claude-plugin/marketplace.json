@@ -4,7 +4,7 @@
     "name": "lucasAguiar11"
   },
   "metadata": {
-    "description": "Marketplace de skills reutilizaveis: entrega/planejamento/review com subagents (workflow-kit) e Figma to code (figma-to-code), para qualquer projeto",
+    "description": "Marketplace de skills reutilizaveis: entrega/planejamento/review (workflow-kit), Figma to code, e brass-tacks (output style always-on)",
     "version": "1.21.0"
   },
   "plugins": [
@@ -35,6 +35,20 @@
         "design-system"
       ],
       "category": "design"
+    },
+    {
+      "name": "brass-tacks",
+      "source": "./plugins/brass-tacks",
+      "description": "Output style always-on: acao primeiro, passos numerados, ingles simples, sem preambulo (hooks SessionStart)",
+      "version": "1.0.0",
+      "keywords": [
+        "brass-tacks",
+        "output-style",
+        "adhd",
+        "brevity",
+        "plain-language"
+      ],
+      "category": "productivity"
     }
   ]
 }
