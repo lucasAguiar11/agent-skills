@@ -1,0 +1,31 @@
+{
+  "description": "Always-on brass-tacks output style: next action first, plain English, no preamble",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks-handlers/session-start.sh\"",
+            "timeout": 10,
+            "statusMessage": "Loading brass-tacks output style",
+            "additionalContextLimit": 0
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks-handlers/user-prompt-submit.sh\"",
+            "timeout": 10,
+            "statusMessage": "brass-tacks style (once)",
+            "additionalContextLimit": 0
+          }
+        ]
+      }
+    ]
+  }
+}

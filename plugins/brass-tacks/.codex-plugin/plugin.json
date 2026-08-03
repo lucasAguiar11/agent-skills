@@ -1,0 +1,33 @@
+{
+  "name": "brass-tacks",
+  "version": "1.0.0",
+  "description": "Always-on ADHD-friendly output style: next action first, numbered steps, plain English. Injected at session start via hooks.",
+  "author": {
+    "name": "lucasAguiar11"
+  },
+  "keywords": [
+    "brass-tacks",
+    "output-style",
+    "adhd",
+    "brevity",
+    "plain-language"
+  ],
+  "license": "MIT",
+  "skills": "./skills",
+  "hooks": "./hooks/hooks.json",
+  "interface": {
+    "displayName": "Brass Tacks",
+    "shortDescription": "Output style always-on: acao primeiro, passos numerados, sem preambulo",
+    "longDescription": "Injeta o estilo brass-tacks em toda sessao via SessionStart/UserPromptSubmit: next action first, numbered steps, plain English. Desliga com 'stop brass tacks mode'.",
+    "developerName": "lucasAguiar11",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive"
+    ],
+    "defaultPrompt": [
+      "Responda no estilo brass-tacks.",
+      "stop brass tacks mode"
+    ],
+    "brandColor": "#0F766E"
+  }
+}

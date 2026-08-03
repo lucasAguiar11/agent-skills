@@ -1,0 +1,17 @@
+{
+  "name": "brass-tacks",
+  "version": "1.0.0",
+  "description": "Always-on ADHD-friendly output style: next action first, numbered steps, plain English. Injected at session start via hooks.",
+  "author": {
+    "name": "lucasAguiar11"
+  },
+  "keywords": [
+    "brass-tacks",
+    "output-style",
+    "adhd",
+    "brevity",
+    "plain-language"
+  ],
+  "license": "MIT",
+  "skills": "./skills"
+}
