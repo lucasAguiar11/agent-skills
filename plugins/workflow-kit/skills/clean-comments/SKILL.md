@@ -1,19 +1,20 @@
 ---
-name: comment-docs
+name: clean-comments
 description: >
-  Limpa comentários narrativos e padroniza documentação de módulo: header curto
-  no topo (papel/gotcha), JSDoc só para contrato/invariante, remove `// GET /path`,
-  banners de seção e JSDoc que só repete o nome. Formaliza/atualiza a política em
-  AGENTS.md se faltar. Roda no fim da entrega de feature (Post-execution) no diff
-  da feature, ou standalone com inventário maior. Use when: "limpar comentários",
-  "header de módulo", "comentários em excesso", "código sem comentários óbvios",
-  "strip comments", "documentar módulos", ou `/comment-docs`.
+  Limpa comentários ruído do código: remove `// GET /path`, banners de seção,
+  JSDoc que só repete o nome, paráfrase da linha seguinte, TODO sem dono e
+  código morto comentado. Mantém só gotcha/invariante e header curto de módulo
+  (papel + why). Default = remover. Roda no fim da entrega de feature
+  (Post-execution) no diff da feature, ou standalone. Use when: "limpar
+  comentários", "comentários em excesso", "código sem comentários óbvios",
+  "strip comments", "clean comments", ou `/clean-comments`. Alias legado:
+  `/comment-docs`.
 ---
 
-# /comment-docs — Documentação de módulo (header + why)
+# /clean-comments — Limpar comentários (default: remover)
 
-Padroniza comentários no código-fonte: **um header por arquivo** com o essencial,
-JSDoc só onde há contrato/gotcha, e remoção de narração que repete o óbvio.
+Apaga narração que repete o óbvio. Mantém só o que evita bug: gotcha, invariante,
+header curto de módulo. **Não** é skill de “documentar módulos” — é skill de limpar.
 
 Funciona em qualquer codebase. Idioma do header = idioma do projeto.
 
@@ -22,12 +23,12 @@ Funciona em qualquer codebase. Idioma do header = idioma do projeto.
 | Skill | Papel |
 |-------|--------|
 | `simplify` | Diff da feature: reuso, qualidade, eficiência; também apaga comentário WHAT óbvio |
-| **`comment-docs`** | Headers de módulo + strip de ruído narrativo (`// GET /path`, banners, JSDoc espelho) |
-| `feature-delivery` Post-execution | Após `simplify`, roda `comment-docs` **só nos arquivos do diff da feature** |
+| **`clean-comments`** | Strip de ruído narrativo + header mínimo se faltar (`// GET /path`, banners, JSDoc espelho) |
+| `feature-delivery` Post-execution | Após `simplify`, roda `clean-comments` **só nos arquivos do diff da feature** |
 
 - **Não substitui** `simplify` (não faz review de reuso/eficiência).
 - **Não é** inventário full-repo na Post-execution — isso seria caro e fora de escopo da feature.
-- Standalone (`/comment-docs` sem feature): inventário maior é permitido; o usuário pode restringir paths.
+- Standalone (`/clean-comments` sem feature): inventário maior é permitido; o usuário pode restringir paths.
 
 ## Princípio
 
@@ -100,7 +101,7 @@ Regras do header:
 4. Política em `AGENTS.md`: se já existir o bloco header+why, **não** reescrever. Se faltar, **propor** (ou aplicar só se o usuário pediu política) — na Post-execution preferir *propor* para não competir com o passo AGENTS.md improvements; se o bloco for a política canônica e o arquivo já está aberto por este passo, pode inserir o bloco mínimo de `references/agents-policy.md` quando o repo ainda não tem **nenhuma** regra de comentários.
 5. Não varrer o monorepo inteiro.
 
-### B) Standalone (`/comment-docs`)
+### B) Standalone (`/clean-comments`)
 
 1. Paths do usuário, ou inventário em hotspots da árvore de app (`src/`, `app/`, `lib/`, `packages/*/src`, …).
 2. Pode ser multi-onda (types → services → hooks → UI opcional).
@@ -179,13 +180,15 @@ Automatize **somente**:
 
 Após strip, colapse 3+ newlines em 2. **Não** use regex para apagar todo JSDoc.
 
-### 4. Headers e JSDoc
+### 4. O que sobra (gotchas + header mínimo)
+
+Prioridade: **menos comentário**. Header e JSDoc só se o arquivo ainda precisa de um why.
 
 Para cada arquivo no escopo:
 
-1. **Adicionar/atualizar** `/** … */` de módulo se faltar ou for só label de seção.
-2. **Remover** JSDoc de export que só renomeia a função/tipo ou repete o path da API.
-3. **Condensar** gotchas de campo: 1 linha quando bastar; multi-linha só para invariante densa.
+1. **Remover** JSDoc de export que só renomeia a função/tipo ou repete o path da API.
+2. **Condensar** gotchas de campo: 1 linha quando bastar; multi-linha só para invariante densa.
+3. **Adicionar/atualizar** `/** … */` de módulo **só se faltar** e o papel/gotcha não for óbvio pelo path+exports — ou se o header atual for só label de seção.
 4. **Mover** gotcha de função para o header do módulo se for o único motivo do arquivo existir (evita header + JSDoc duplicado).
 5. Conferir JSDoc **colado no campo certo** (não no símbolo anterior).
 
@@ -214,11 +217,11 @@ Só se o usuário pedir. Na Post-execution, o commit da feature (skill `commit`)
 Mensagens típicas (standalone):
 
 ```
-docs: padronizar headers de módulo e limpar comentários narrativos
+chore: limpar comentários narrativos
 ```
 
 ```
-chore: limpar comentários narrativos e padronizar headers de módulo
+chore: strip narrative comments on feature diff
 ```
 
 ## Anti-padrões
@@ -229,7 +232,7 @@ chore: limpar comentários narrativos e padronizar headers de módulo
 - Duplicar a mesma prosa no header do service e no hook que o chama
 - Inventar `@module` / `@file` se o repo não usa
 - Full-repo scan na Post-execution de uma feature
-- Pular `comment-docs` na Post-execution porque “o simplify já limpou comentários” — papéis diferentes
+- Pular `clean-comments` na Post-execution porque “o simplify já limpou comentários” — papéis diferentes
 - Declarar “limpo” com base só nos greps mecânicos, sem o auto-review do passo 2.1
 - Poupar os comentários que você mesmo acabou de escrever — é onde mora a paráfrase, justamente porque
   o autor ainda tem o porquê na cabeça
