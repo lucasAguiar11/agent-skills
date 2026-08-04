@@ -68,7 +68,7 @@ The flow maps to a delivery team. Use this framing when the user thinks in team 
 | Devs | Workers by wave | execute |
 | QA per task | Validator (`task-validator`) — adversarial, tries to refute each completed task | execute, per workstream |
 | CI | Verifier (verification commands) | wave verification |
-| Code review | Post-execution Sequence (`simplify`, `comment-docs`, `pr-review`, `test-guide`) | after last wave |
+| Code review | Post-execution Sequence (`simplify`, `clean-comments`, `pr-review`, `test-guide`) | after last wave |
 | Delivery coordinator | Integration Coordinator (parent agent) | execute |
 
 During execute, the Coordinator prints the **Team Board** (`references/subagent-handoff.md` → Team Board) at wave transitions so the user can follow who is doing what and which gate is next.
@@ -78,12 +78,13 @@ During execute, the Coordinator prints the **Team Board** (`references/subagent-
 Run in this order, after the plan's (or wave's) verification passes and before commit/PR. This is the single definition — `Default Flow` step 11 and `references/workflow-modes.md`'s `execute` steps point here instead of repeating the list, so a new gate is added once and both call sites pick it up.
 
 1. `simplify` on the feature diff (reuse, quality, efficiency) — `workflow-kit:simplify`, or the platform's own `/simplify` when one is built in.
-2. `comment-docs` on the **feature diff files only** (module headers + strip narrative comments) — `workflow-kit:comment-docs`. Does not full-scan the repo; does not replace `simplify`. Prefer leaving `AGENTS.md` policy proposals to the next step when the repo already has comment rules.
+2. `clean-comments` on the **feature diff files only** (strip narrative comments; keep only gotchas + minimal module header) — `workflow-kit:clean-comments`. Does not full-scan the repo; does not replace `simplify`. Prefer leaving `AGENTS.md` policy proposals to the next step when the repo already has comment rules.
 3. Post-feature Checkpoint (`references/post-feature-checkpoint.md`) — report its result even when clean. A triggered check becomes a proposal (own feature/ADR), never silent scope expansion.
 4. AGENTS.md improvements (`references/agents-md-improvements.md`) — from what the feature applied, propose durable additions to the project `AGENTS.md`. Report even when clean. Proposals are their own change for the user to approve, never written into the feature's commit.
 5. `test-guide` test-quality review when tests were added or behavior needing coverage changed — stop for explicit user approval before editing any test.
 6. `verification-before-completion` before claiming completion.
 7. Set plan status to `done` only with fresh evidence, and sync status across all three places — `docs/features.md` index row, the feature brief/PRD frontmatter, and the plan frontmatter — so none lags behind.
+8. **External Wait** (optional, after commit/PR if the user wants it) — poll an **external** target (CI on the PR, deploy smoke, remote check) until success, fail, or timeout. Host-agnostic: prefer CLI `--watch` (`gh pr checks --watch`, `gh run watch`); otherwise the host's recurring prompt/scheduler (e.g. Grok `/loop`). Never runs inside waves or before local verification is green. Full contract: `references/external-wait.md`. Skip when there is no external target or the user declines.
 
 ## Feature Registration
 
@@ -171,8 +172,8 @@ Use installed/global workflow skills when available:
 
 - `review-plan`: review implementation plans before execution.
 - `verification-before-completion`: verify before claiming completion.
-- `simplify`: clean up the feature diff (reuse, quality, efficiency) after verification passes, before `comment-docs` and the Post-feature Checkpoint. Bundled with this plugin so it works on Cursor and Codex too, not just Claude Code's own built-in `/simplify`.
-- `comment-docs`: after `simplify`, standardize module headers and strip narrative comments on the feature diff files only (not a full-repo scan). Bundled with this plugin.
+- `simplify`: clean up the feature diff (reuse, quality, efficiency) after verification passes, before `clean-comments` and the Post-feature Checkpoint. Bundled with this plugin so it works on Cursor and Codex too, not just Claude Code's own built-in `/simplify`.
+- `clean-comments`: after `simplify`, strip narrative comments on the feature diff files only (not a full-repo scan). Keeps gotchas/invariants; optional minimal module header. Bundled with this plugin.
 - `test-guide`: audit test usefulness whenever implementation adds tests or changes domain rules, validation, persistence, archive/status behavior, hierarchy movement, or API contracts.
 - `commit` / `create-pr` / `pr-review`: delivery and review.
 - `supersede-feature`: fold old/superseded features into the one that replaced them — condense their history into the successor brief, mark them `deprecated` with `superseded_by`, and `git rm` their dead plans (ADRs and briefs are kept).
@@ -192,6 +193,7 @@ Load only the reference needed for the current action:
 - `references/review-checklist.md`: review gates before execution.
 - `references/post-feature-checkpoint.md`: post-feature debt checkpoint — garbage (dead code, leftover markers, diff duplication) every feature, plus threshold-gated structural checks (3rd copy, hub growth, first real data integration).
 - `references/agents-md-improvements.md`: post-feature knowledge capture — from what the feature applied, propose durable additions to the project `AGENTS.md` (convention, command, gotcha, rule). Propose, never apply inside the feature's commit.
+- `references/external-wait.md`: optional post-PR/deploy poll (CI, smoke) — host-agnostic contract; prefer CLI `--watch`, else scheduler/`/loop`.
 
 ## Templates
 
@@ -228,4 +230,5 @@ Use templates as output shapes, adapting paths only when the user or repository 
 - Do not declare delivery complete or open a PR without running the Post-feature Checkpoint (`references/post-feature-checkpoint.md`) and reporting its result — clean or triggered. A triggered action is a proposal for its own feature/ADR; executing it inside the current feature's scope is a scope violation.
 - Do not run the AGENTS.md improvements step as a silent edit. Proposals from `references/agents-md-improvements.md` are reported (clean or listed) and applied only as their own user-approved change — writing them into the feature's commit is a scope violation.
 - Do not skip `simplify` between verification passing and the Post-feature Checkpoint. Run it on the feature diff every time, even when the diff looks small — a triggered checkpoint (e.g. duplication) should already be looking at a diff `simplify` has cleaned up.
-- Do not skip `comment-docs` after `simplify` in the Post-execution Sequence. Scope it to the feature diff files only (headers + narrative-comment strip). Do not treat `simplify`'s "unnecessary comments" pass as a substitute — `comment-docs` owns module headers and HTTP/banner narration cleanup.
+- Do not skip `clean-comments` after `simplify` in the Post-execution Sequence. Scope it to the feature diff files only (narrative-comment strip first). Do not treat `simplify`'s "unnecessary comments" pass as a substitute — `clean-comments` owns HTTP/banner/paraphrase cleanup.
+- Do not run External Wait inside plan/execute waves or before local verification is green. It is optional and only after commit/PR (or deploy) when an external target exists. Prefer blocking CLI `--watch` over timer loops; cancel the wait on success, fail, or timeout. Do not change code during the wait. Full rules: `references/external-wait.md`.

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.23.0 — 2026-08-04
+
+- `feature-delivery`: passo opcional **External Wait** após commit/PR (ou deploy) — poll host-agnóstico de CI/smoke até success/fail/timeout. Preferir CLI `--watch` (`gh pr checks --watch`); senão scheduler do host (ex. Grok `/loop`). Não roda dentro de waves nem antes do verde local. Reference: `references/external-wait.md`. Post-execution step 8, gate em Required Gates, README e `workflow-modes.md` sincronizados
+
+## 1.22.0 — 2026-08-04
+
+- Rename skill `comment-docs` → **`clean-comments`**: nome e copy focam em **limpar** comentários ruído (default = remover), não em "documentar módulos". Header de módulo continua como exceção mínima (papel + gotcha), não o produto principal
+- `feature-delivery` Post-execution, README e marketplaces sincronizados: `/clean-comments` e `workflow-kit:clean-comments`. Alias legado na description: `/comment-docs`
+
 ## 1.21.0 — 2026-07-27
 
 - `comment-docs`: novo passo **2.1 Auto-review** — os greps mecânicos (banner, `// GET /path`, TODO, `@param`) só acham ruído mecânico; paráfrase é o que uma feature recém-escrita produz, e zero hits deixava de ser "limpo". O passo audita as linhas `+` do diff com três sinais de descarte: **justificativa repetida** (mesma frase em N arquivos → fica uma, no ponto menos dedutível), **paráfrase da linha seguinte** (`// ADMIN-only` sobre `@Roles(Role.ADMIN)`), e **comentário que é só o ID da feature**
