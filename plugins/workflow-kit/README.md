@@ -39,16 +39,20 @@ O princípio central: **cada papel é um estágio com contrato de entrada/saída
  5. DECISION GATE ─── decisão blocking? → PARA e pergunta ao PM
         │              senão → auto-aprova (aprovação única)
         ▼
- 6. EXECUTE ───────── loop por wave (detalhado abaixo)
+ 6. ISSUE SYNC ────── (opcional) espelha as tarefas do plano no tracker
+        │              do time. Só com opt-in explícito e plano clean.
+        │              Fluxo contínuo não para: vira sugestão no fim
+        ▼
+ 7. EXECUTE ───────── loop por wave (detalhado abaixo)
         │
         ▼
- 7. PÓS-EXECUÇÃO ──── simplify → clean-comments → checkpoint →
+ 8. PÓS-EXECUÇÃO ──── simplify → clean-comments → checkpoint →
         │              test-guide → verification-before-completion
         ▼
- 8. DONE ──────────── status sincronizado: índice + brief + plano
+ 9. DONE ──────────── status sincronizado: índice + brief + plano
         │
         ▼
- 9. EXTERNAL WAIT ─── (opcional) poll CI/deploy até green/red/timeout
+10. EXTERNAL WAIT ─── (opcional) poll CI/deploy até green/red/timeout
                        host-agnóstico: gh --watch ou scheduler/loop
 ```
 

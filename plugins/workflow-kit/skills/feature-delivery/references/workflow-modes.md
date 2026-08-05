@@ -78,6 +78,10 @@ Check:
 
 For Level 0 / single-workstream plans, skip the parallelization checks (launch spec, wave order) — their absence is correct by design (see Plan Weight Rule in `references/artifact-policy.md`). Do not report missing wave/subagent sections as findings.
 
+Once the plan reaches `Validation: clean` and has 3+ `Task` blocks, offer to mirror the decomposition into the team's issue tracker (`references/issue-tracker-sync.md`). Offer, do not act: creating issues is outward-facing and needs explicit opt-in. If the brief's `issues:` frontmatter already records numbers, the sync updates those issues instead of creating a second set.
+
+**Inside a continuous execution flow, suggest — never ask.** When the user asked for implementation upfront (single-approval rule), a blocking question about the tracker is the interruption that rule removes. Do not stop, do not wait for an answer: keep executing, and add one line to the closing report offering the sync (`Plan has N tasks — want them mirrored to <tracker>? Say the word and I sync.`). The user picks it up after delivery or ignores it. Ask up front only when the user stopped at the plan, or raised issues/tracker themselves.
+
 Prefer parallel Reviewer subagents when reviews are independent:
 
 | Workstream | Role | Skill | Scope |
@@ -93,7 +97,7 @@ Output location: append the findings to the plan being reviewed (`docs/plans/<FE
 
 ## execute
 
-Use when the user explicitly asks to execute or implement — including an upfront request that triggered planning in the same flow (single-approval rule, `SKILL.md` step 12): in that case the plan self-review passing and the decision gate finding no `blocking` decision **are** the approval; set the plan to `approved` and continue without asking again.
+Use when the user explicitly asks to execute or implement — including an upfront request that triggered planning in the same flow (single-approval rule, `SKILL.md` → `Default Flow`, last step): in that case the plan self-review passing and the decision gate finding no `blocking` decision **are** the approval; set the plan to `approved` and continue without asking again.
 
 The parent agent is the **Integration Coordinator**. Read `references/subagent-handoff.md` before launching work.
 

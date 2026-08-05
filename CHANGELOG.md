@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.24.0 — 2026-08-05
+
+- `feature-delivery`: novo passo opcional **Issue Tracker Sync** — espelha a decomposição do plano no tracker do time (GitHub/GitLab/Jira, host-agnóstico). Story existente vira parent, brief vira epic, cada `Task` do plano vira sub-issue. Os artefatos em `docs/` seguem como fonte da verdade; o issue carrega ponteiro (`repo → caminho`) e checkbox, nunca conteúdo colado. Reference: `references/issue-tracker-sync.md`
+- `feature-delivery`: bloco `issues:` no frontmatter do brief (`templates/feature-brief.md`) — local canônico e único dos números de issue (`tracker`, `parent`, `epic`, `tasks`). É a âncora da idempotência: número presente → atualiza; `Task` que sumiu do plano → fecha como `not planned` e sai da lista. Sem esse campo o sync criava um segundo conjunto de issues a cada rodada
+- `feature-delivery`: sync roda **depois** de `Parallelization`/`Wave Schedule` (Default Flow passo 10, era 9) — o `Depends on` de cada sub-issue é lido dessas seções; espelhar antes criava todo issue sem dependência
+- `feature-delivery`: gate do sync com quatro estados — `Yes` (usuário pediu + plano clean), `Offer` (pergunta, só quando o usuário parou no plano), `Suggest` (fluxo contínuo de execução: não interrompe, oferece em uma linha no relatório final), `No`/`Skip`. Pedido explícito do usuário sobrepõe o limite de 3+ `Task`. O slot tardio cria issues já concluídos — registro do que foi entregue, não quadro de trabalho; a oferta diz isso e leva a evidência do `Wave Execution Log`
+- `feature-delivery`: referências cruzadas corrigidas — `workflow-modes.md` apontava para "SKILL.md step 12" (a regra de aprovação única virou 13), agora aponta sem número; o counterpart cross-repo recebe prompt de triagem (`cross-repo-handoff.md`), não issue aberto por nós. README do plugin sincronizado (fluxo em 10 passos)
+
 ## 1.23.0 — 2026-08-04
 
 - `feature-delivery`: passo opcional **External Wait** após commit/PR (ou deploy) — poll host-agnóstico de CI/smoke até success/fail/timeout. Preferir CLI `--watch` (`gh pr checks --watch`); senão scheduler do host (ex. Grok `/loop`). Não roda dentro de waves nem antes do verde local. Reference: `references/external-wait.md`. Post-execution step 8, gate em Required Gates, README e `workflow-modes.md` sincronizados
