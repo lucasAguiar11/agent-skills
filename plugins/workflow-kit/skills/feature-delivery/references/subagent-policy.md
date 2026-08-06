@@ -95,7 +95,7 @@ Prefer these skills inside subagent prompts when the role matches:
 | Scout | `explore-codebase`, docs V1 listed in plan |
 | Planner | `prd`, `create-implementation-plan`, `create-architectural-decision-record`, `update-implementation-plan` |
 | Worker | `nestjs-best-practices`, `prisma-expert` when relevant |
-| Reviewer | `review-plan`, `test-guide`, `pr-review` |
+| Reviewer | `review-plan`, `test-guide`, `code-review-and-quality` |
 | Verifier | `verification-before-completion`, `test-guide` diagnose-only |
 
 ## Required Task Fields

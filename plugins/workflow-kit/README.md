@@ -16,7 +16,7 @@ O princípio central: **cada papel é um estágio com contrato de entrada/saída
 | **Devs** | Workers (agentes em paralelo) | Implementam uma fatia cada, dentro do escopo de escrita permitido |
 | **QA** | Validators (agentes adversariais) | Tentam **refutar** cada entrega — re-executam tudo, não confiam em ninguém |
 | **CI** | Verifier | Roda a suíte completa de verificação da wave |
-| **Code review** | Sequência pós-execução | `simplify`, `clean-comments`, `pr-review`, `test-guide`, verificação final |
+| **Code review** | Sequência pós-execução | `simplify`, `clean-comments`, `code-review-and-quality`, `test-guide`, verificação final |
 
 ## Fluxo fim a fim
 

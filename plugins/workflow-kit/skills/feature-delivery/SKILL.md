@@ -69,7 +69,7 @@ The flow maps to a delivery team. Use this framing when the user thinks in team 
 | Devs | Workers by wave | execute |
 | QA per task | Validator (`task-validator`) — adversarial, tries to refute each completed task | execute, per workstream |
 | CI | Verifier (verification commands) | wave verification |
-| Code review | Post-execution Sequence (`simplify`, `clean-comments`, `pr-review`, `test-guide`) | after last wave |
+| Code review | Post-execution Sequence (`simplify`, `clean-comments`, `code-review-and-quality`, `test-guide`) | after last wave |
 | Delivery coordinator | Integration Coordinator (parent agent) | execute |
 
 During execute, the Coordinator prints the **Team Board** (`references/subagent-handoff.md` → Team Board) at wave transitions so the user can follow who is doing what and which gate is next.
@@ -176,7 +176,8 @@ Use installed/global workflow skills when available:
 - `simplify`: clean up the feature diff (reuse, quality, efficiency) after verification passes, before `clean-comments` and the Post-feature Checkpoint. Bundled with this plugin so it works on Cursor and Codex too, not just Claude Code's own built-in `/simplify`.
 - `clean-comments`: after `simplify`, strip narrative comments on the feature diff files only (not a full-repo scan). Keeps gotchas/invariants; optional minimal module header. Bundled with this plugin.
 - `test-guide`: audit test usefulness whenever implementation adds tests or changes domain rules, validation, persistence, archive/status behavior, hierarchy movement, or API contracts.
-- `commit` / `create-pr` / `pr-review`: delivery and review.
+- `commit` / `create-pr`: delivery.
+- `code-review-and-quality`: multi-axis review (correctness, readability, architecture, security, performance) of a PR/MR **or** a local diff with no PR open. Reports findings; it does not apply fixes — `simplify` owns that, within its own mandate. Formerly `pr-review`.
 - `supersede-feature`: fold old/superseded features into the one that replaced them — condense their history into the successor brief, mark them `deprecated` with `superseded_by`, and `git rm` their dead plans (ADRs and briefs are kept).
 
 ## References
