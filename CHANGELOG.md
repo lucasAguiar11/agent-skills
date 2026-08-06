@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.25.0 — 2026-08-06
+
+- Skill `pr-review` renomeada para **`code-review-and-quality`** e promovida a code review multi-eixo. O nome antigo mentia: a skill era boa em revisar, mas só rodava com URL de PR — metade do valor de um review acontece antes de virar PR (código de outro agente, branch local). Alias legado `pr-review` fica na description
+- `code-review-and-quality`: **dois modos** — A (PR/MR remoto: coleta via GitHub MCP/`glab`, checkout, geração e postagem de comentários com preview, tudo como era) e B (diff local: mesma régua de julgamento, sem coleta de plataforma e sem postagem). A régua não muda entre eles; muda de onde vem o diff e para onde vai o resultado
+- `code-review-and-quality`: núcleo novo dos **cinco eixos** (correção, legibilidade/simplicidade, arquitetura, segurança, performance) como etapa 3.6, com padrão de aprovação explícito ("aprove o que melhora a saúde do código, mesmo imperfeito") e ordenação por alavancagem — um problema estrutural **é** a revisão, não fica enterrado embaixo de dez nits
+- `code-review-and-quality`: **Remédios Estruturais** — ao apontar problema de estrutura, proponha o movimento nomeado (trocar cadeia de `if` por dispatcher, mover lógica de feature pra fora de módulo compartilhado, apagar wrapper pass-through). Revisão que só diz "isso está complexo" deixa o autor adivinhando
+- `code-review-and-quality`: seções novas de **tamanho da mudança** (~100/~300/~1000 linhas, estratégias de split, arquivo grande é sinal mesmo com diff pequeno), **código morto** (identifique, liste, pergunte antes de apagar), **disciplina de dependências** (changelog antes do número da versão, uma dependência por mudança, diff do lockfile) e **honestidade** (sem "LGTM" carimbado, quantifique o problema, aceite override)
+- `code-review-and-quality`: `references/security-checklist.md` e `references/performance-checklist.md` — fronteiras de confiança, injeção, IDOR/mass assignment, segredos, XSS, sessão/token, upload, supply chain; N+1, índice, paginação, `await` em loop, hot path, re-render, e como medir cada um. Ambos exigem cenário concreto (segurança) ou "onde/quanto/impacto" (performance) antes de virar `[Bug]`, e trazem tabela de falso positivo comum
+- `code-review-and-quality`: severidade continua com três níveis (`[Bug]`/`[Melhoria]`/`[Nit]`) — a tabela `Critical`/`Required`/`Optional`/`FYI` entra só como mapeamento. Duas taxonomias na mesma revisão confundem o autor. Nova regra anti-falso-positivo (nº 8): **formato diferente não é finding** — mesma informação em outra forma não vira nem `[Nit]`
+- `simplify`: fronteira explícita no topo — a skill *aplica* correção dentro dos três eixos; julgamento de correção, segurança, arquitetura e performance é de `code-review-and-quality`, que aponta e não edita. Título passa de "Code Review and Cleanup" para "Cleanup Pass" (não é code review)
+- `feature-delivery`, `subagent-policy.md` e READMEs sincronizados com o novo nome. A sequência pós-execução **não** ganhou passo novo: `code-review-and-quality` roda sob demanda, não em toda feature
+
+## 1.24.1 — 2026-08-06
+
+- `simplify`: nova seção **Out of Scope (Do Not Change)** — o mandato são os três eixos (reuso, qualidade, eficiência); reescrita cosmética não é finding. Proibido destructure+remount do mesmo objeto (`const { a, b } = body; execute({ a, b })`) quando `execute(body)` ou o field map existente já funciona, reformatar call site por "limpeza" (`async` vs `.then`, rename por gosto, reordenar campos) e inventar estilo local quando um call site vizinho já mostra o padrão do projeto. Se a única diferença após o edit é o mesmo dado em outro formato, fica como o autor escreveu. Só muda com duplicação real, risco de bug (campo omitido, mapping errado, drift quando o DTO ganha campo) ou pedido explícito do usuário — e aí seguindo o padrão do call site irmão, sem criar uma terceira forma
+- `simplify`: as três passadas de review recebem as regras de Out of Scope junto com o diff — rodando como subagentes sem elas, reportavam remount cosmético como finding
+
 ## 1.24.0 — 2026-08-05
 
 - `feature-delivery`: novo passo opcional **Issue Tracker Sync** — espelha a decomposição do plano no tracker do time (GitHub/GitLab/Jira, host-agnóstico). Story existente vira parent, brief vira epic, cada `Task` do plano vira sub-issue. Os artefatos em `docs/` seguem como fonte da verdade; o issue carrega ponteiro (`repo → caminho`) e checkbox, nunca conteúdo colado. Reference: `references/issue-tracker-sync.md`
