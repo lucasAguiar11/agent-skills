@@ -82,7 +82,9 @@ Once the plan reaches `Validation: clean` and has 3+ `Task` blocks, offer to mir
 
 **Inside a continuous execution flow, suggest — never ask.** When the user asked for implementation upfront (single-approval rule), a blocking question about the tracker is the interruption that rule removes. Do not stop, do not wait for an answer: keep executing, and add one line to the closing report offering the sync (`Plan has N tasks — want them mirrored to <tracker>? Say the word and I sync.`). The user picks it up after delivery or ignores it. Ask up front only when the user stopped at the plan, or raised issues/tracker themselves.
 
-Prefer parallel Reviewer subagents when reviews are independent:
+Prefer one bundled Reviewer when the same snapshot feeds all review checks.
+Split Reviewer subagents only when their evidence sources, write scopes, or
+approval gates differ:
 
 | Workstream | Role | Skill | Scope |
 |---|---|---|---|
@@ -104,19 +106,20 @@ The parent agent is the **Integration Coordinator**. Read `references/subagent-h
 Steps:
 
 1. Read the plan and confirm status is `approved` or `in_progress` (or auto-approve per the single-approval rule above).
-2. Verify ownership, stop conditions, `Wave Schedule`, and `Subagent Launch Spec`.
+2. Verify ownership, stop conditions, `Wave Schedule`, `Subagent Launch Spec`, and the selected cost profile/override scope.
 3. Set plan status to `in_progress` if not already.
 4. Run optional wave 0 work: contract confirmation, discovery, or pre-review.
 5. For each wave:
-   - resolve `model_tier` per launch-spec row and pass `model` when supported;
+   - resolve `model_tier`, cost profile, and override scope per launch spec and pass `model` only to roles covered by that scope;
    - launch eligible subagents in parallel;
    - collect handoff blocks;
    - launch one `task-validator` per completed Worker workstream (adversarial validation — `references/subagent-handoff.md`);
-   - run wave verification;
+   - wait for events instead of polling `list_agents`;
+   - run focused wave verification; reserve the full suite/build for final verification unless the plan opts in to full checks per wave;
    - update `Wave Execution Log` and print the Team Board;
    - stop if any workstream is `blocked` or `failed`.
 6. After the last wave, run `Final Verification`.
-7. Run the Post-execution Sequence (`SKILL.md` → `## Post-execution Sequence`): `simplify` on the diff, `clean-comments` on the feature diff files only (strip narrative comments; keep gotchas), Post-feature Checkpoint, AGENTS.md improvements (propose durable `AGENTS.md` additions, apply only as their own change), `test-guide` (stop for explicit approval before editing tests), `verification-before-completion`, then set status to `done` and sync it across `docs/features.md`, the feature brief/PRD, and the plan frontmatter.
+7. Run the Post-execution Sequence (`SKILL.md` → `## Post-execution Sequence`): one review bundle with `simplify`, `clean-comments` on the feature diff files only (strip narrative comments; keep gotchas), `code-review-and-quality`, and `test-guide` when triggered; then Post-feature Checkpoint, AGENTS.md improvements (propose durable `AGENTS.md` additions, apply only as their own change), `verification-before-completion`, and status sync across `docs/features.md`, the feature brief/PRD, and the plan frontmatter.
 8. Optional **External Wait** after commit/PR (or deploy) when the user wants CI/smoke watched — `references/external-wait.md`. Prefer `gh … --watch`; else host scheduler/`/loop`. Skip if no external target.
 
 If the plan has no launch spec and the work is small, the Coordinator may execute directly without subagents. When that inline delivery is **substantive** — touches domain rules, persistence, API/contracts, or a non-trivial diff — launch one `task-validator` on the Coordinator's own delivery before `Final Verification`: pass the plan's Task block plus a self-handoff (files changed, steps done, evidence), and treat `refuted` like any Validator refusal (fix findings, re-validate once, then stop and ask). Trivial diffs (a few lines, no domain/persistence/contract impact) skip this — inline verification and the Post-execution Sequence cover them.

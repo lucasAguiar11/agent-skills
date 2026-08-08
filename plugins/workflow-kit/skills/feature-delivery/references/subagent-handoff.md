@@ -4,6 +4,24 @@ Use this reference when launching subagents from an approved plan or when a suba
 
 The parent agent in `execute` mode acts as **Integration Coordinator**. It orchestrates waves, merges outcomes, records evidence, and decides whether the next wave may start. It does not implement feature slices unless no Worker is available or the user asked for direct execution.
 
+## Wait Protocol
+
+Use event-driven waiting whenever the host provides it. The Coordinator should
+not turn a running wave into a timer loop.
+
+1. Launch the eligible workstreams in one batch.
+2. Wait for an agent event or the host's wave-wait primitive.
+3. On wake-up, collect statuses and handoffs once. Call `list_agents` only at a
+   wave boundary, after a timeout, or when a stop condition is suspected.
+4. If the host has no event primitive, use exponential backoff instead of fixed
+   polling: 30s, 60s, 120s, then the host maximum. Emit progress only when a
+   status changes or a timeout is reached.
+5. Do not interrupt a healthy Worker because it has been quiet. Interrupt only
+   after the timeout policy is exhausted or the host reports failure.
+
+The Team Board is an event log, not a heartbeat. Do not print a new board just
+to show that time passed.
+
 ## Coordinator Responsibilities
 
 The Integration Coordinator must:
@@ -14,7 +32,10 @@ The Integration Coordinator must:
 4. Collect each subagent's handoff block.
 5. Audit the `Test changes` field of every handoff. Any `escape-hatch`, or a `feature-driven` change not mapped to a plan task, or a `test-was-wrong` without prior approval, blocks the wave — stop and ask the user. A baseline test deleted/skipped/weakened in the diff but not reported is a defect; surface it.
 6. Launch one `task-validator` (bundled agent, `workflow-kit:task-validator`) per `completed` Worker workstream, in parallel. On hosts without bundled-agent discovery (Cursor, Codex, or when the agent is not registered), launch a general-purpose subagent with the full contents of `agents/task-validator.md` embedded as its instructions — never skip validation because the named agent is unavailable. Pass the Task block (fetch via `plan-detail-reader`) and that workstream's handoff. The validator is adversarial and independent — it re-runs verification itself and defaults to `refuted`. A `refuted` verdict marks the workstream `failed` (see Merge Rules); the wave does not advance on the Worker's word alone.
-7. Run the wave verification commands from the plan against the full suite, and confirm the skipped-test count is accounted for (no silent growth).
+7. Run the wave verification profile from the plan. Use focused checks during
+   intermediate waves and reserve the full suite/build for the final gate unless
+   the plan explicitly opts into full verification per wave. Confirm skipped
+   tests are accounted for (no silent growth).
 8. Update `Wave Execution Log` in the plan and print the Team Board (below).
 9. Unblock the next wave or stop and ask the user when a stop condition triggers.
 
@@ -45,7 +66,7 @@ When launching a subagent through the Task tool:
 1. Build the prompt from `templates/subagent-task.md`.
 2. Copy bounded context from the plan task section and the matching launch-spec row.
 3. Set `readonly: true` for Scout, Reviewer, and read-only Verifier work.
-4. Resolve `model_tier` from the launch-spec row using `references/model-tier-policy.md`; pass `model` to Task when the host supports it.
+4. Resolve `model_tier`, cost profile, and override scope using `references/model-tier-policy.md`; pass `model` to Task only for roles covered by that scope.
 5. Launch all subagents for the current wave in a **single message with multiple Task calls** when parallel execution is allowed.
 6. Pass the workstream id, wave number, model tier (and resolved model if applicable), allowed write paths, forbidden paths, verification commands, and stop conditions explicitly.
 7. Name the launch (the Task/Agent `description` shown in the host's progress tree) as `<Role> <WS> · <task short title> · wave <n>`, appending `· retry <m>` on retries — e.g. `DEV A · slugify · wave 1`, `QA B · word_count · wave 1 · retry 1`. Role vocabulary from the Team Board (`DEV`, `QA`, `CI`, `TL`, `SCOUT`). Never use generic labels ("agent", "subagent", "task").
@@ -117,7 +138,8 @@ Format — plain GFM markdown (tables render reliably in every host terminal; do
 | — | QA | refute Task 2 | — | running tests |
 
 Waves: `[x]──[>]──[ ]` · Blocked: 0 · Gate: <next exit condition>
-Tokens: <wave>k wave · <total>k feature
+Cost: <profile> · Model scope: <workers|wave|all>
+Tokens: <wave>k wave · <total>k feature | unavailable
 ```
 
 Rules:
@@ -126,7 +148,8 @@ Rules:
 - Overall `<pct>` = completed-and-validated tasks / total tasks.
 - Status vocabulary: `queued`, `executing`, `validating`, `validated`, `refuted`, `blocked`, `failed`, `done`.
 - Role vocabulary maps to `subagent-policy.md` roles: `DEV` = Worker, `QA` = Validator, `CI` = Verifier, `TL` = Planner/Reviewer.
-- `Tokens`: sum the `subagent_tokens` reported in each agent's tool result — current wave and feature running total. Real numbers only; omit the line when the host does not report usage.
+- `Cost`: report the selected profile and model scope once per board.
+- `Tokens`: sum the `subagent_tokens` reported in each agent's tool result — current wave and feature running total. Real numbers only; print `unavailable` when the host does not report usage. Never launch another agent just to estimate cost.
 - Copy each printed board into the plan's `Wave Execution Log` (same table), so the plan file keeps the visual timeline.
 
 ## Plan Updates During Execute

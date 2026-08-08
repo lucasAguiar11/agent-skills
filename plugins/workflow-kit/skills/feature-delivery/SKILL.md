@@ -52,7 +52,7 @@ Artifacts that already exist with a sequential ID are **not** renamed. The date 
 8. Review the plan before implementation. The review output lives inside the plan itself — never as a separate `*-review*.md` file.
 9. When work can run in parallel, add `Parallelization`, `Wave Schedule`, and `Subagent Launch Spec` to the plan.
 10. Optionally mirror the decomposition into the team's issue tracker (`references/issue-tracker-sync.md`) — only after `Validation: clean` and after step 9 (the issue bodies read `Depends on` from `Parallelization`/`Wave Schedule`), and only with explicit opt-in. Raise the subject on your own initiative only when the plan has 3+ `Task` blocks; a direct user request overrides that threshold. Inside a continuous execution flow, never stop to ask — carry the offer as one line in the closing report. The artifacts stay the source of truth; the tracker holds pointers.
-11. In `execute`, act as Integration Coordinator: resolve model tiers, launch subagents by wave, collect handoffs, run adversarial task validation (`workflow-kit:task-validator`, one per completed Worker workstream), update `Wave Execution Log`, print the Team Board (`references/subagent-handoff.md`), and advance only after validation and verification pass.
+11. In `execute`, act as Integration Coordinator: resolve model tiers and cost profile, launch subagents by wave, collect handoffs, run adversarial task validation (`workflow-kit:task-validator`, one per completed substantive Worker workstream), wait for events instead of polling, update `Wave Execution Log`, print the Team Board (`references/subagent-handoff.md`), and advance only after validation and verification pass.
 12. Run the Post-execution Sequence (below) before commit/PR.
 13. **Single-approval rule.** An upfront execution request ("implement X", "executa", "faz a feature") is the approval — plan, self-review, and execute in one continuous flow without re-asking. Only stop for the user when: (a) the decision gate finds a `blocking` decision, (b) plan `Validation` cannot reach `status: clean`, or (c) a Validator refutes the same workstream twice. When the user asked only for a plan, stop after step 8 and wait for approval before executing.
 
@@ -69,20 +69,48 @@ The flow maps to a delivery team. Use this framing when the user thinks in team 
 | Devs | Workers by wave | execute |
 | QA per task | Validator (`task-validator`) — adversarial, tries to refute each completed task | execute, per workstream |
 | CI | Verifier (verification commands) | wave verification |
-| Code review | Post-execution Sequence (`simplify`, `clean-comments`, `code-review-and-quality`, `test-guide`) | after last wave |
+| Code review | Post-execution review bundle (`simplify`, `clean-comments`, `code-review-and-quality`, `test-guide` when triggered) | after last wave |
 | Delivery coordinator | Integration Coordinator (parent agent) | execute |
 
 During execute, the Coordinator prints the **Team Board** (`references/subagent-handoff.md` → Team Board) at wave transitions so the user can follow who is doing what and which gate is next.
+
+## Cost and latency policy
+
+The default execution profile is `balanced`. Select `economy` when the user
+asks for speed, lower cost, or fewer tokens; select `quality` only when the
+user asks for it or a recovery requires it.
+
+- A user-selected model applies to Workers by default. It does not silently
+  upgrade shell Verifiers, Readers, or mechanical Validators.
+- Use `Override scope: wave` or `Override scope: all` only when the user makes
+  that scope explicit. Resolve the role's minimum tier before applying the
+  preference, so pricing, migration, contract, and security Workers remain
+  `high`.
+- Prefer `fork_turns: none` and pass only the Task block plus launch row. Use a
+  Reader for large documents instead of inheriting the parent conversation.
+- Wait for agent events. Do not poll the agent tree or send timer-based status
+  messages. The Team Board is printed only at state transitions.
+- Run focused wave checks and reserve the full suite/build for final
+  verification unless the plan explicitly opts into full checks per wave.
+
+The plan may record the selection once:
+
+```md
+Model preference: <model slug>
+Override scope: workers
+Reasoning effort: inherit
+Cost profile: economy
+```
 
 ## Post-execution Sequence
 
 Run in this order, after the plan's (or wave's) verification passes and before commit/PR. This is the single definition — `Default Flow` step 12 and `references/workflow-modes.md`'s `execute` steps point here instead of repeating the list, so a new gate is added once and both call sites pick it up.
 
-1. `simplify` on the feature diff (reuse, quality, efficiency) — `workflow-kit:simplify`, or the platform's own `/simplify` when one is built in.
-2. `clean-comments` on the **feature diff files only** (strip narrative comments; keep only gotchas + minimal module header) — `workflow-kit:clean-comments`. Does not full-scan the repo; does not replace `simplify`. Prefer leaving `AGENTS.md` policy proposals to the next step when the repo already has comment rules.
+1. Run one post-execution review bundle when the same diff is in scope: `simplify` (reuse, quality, efficiency), `clean-comments` on the **feature diff files only**, `code-review-and-quality`, and `test-guide` when tests or behavior boundaries changed. Keep their outputs in separate sections, but do not launch one agent per section by default. Split the bundle only when write scopes, evidence sources, or approval gates differ. `workflow-kit:simplify`, `workflow-kit:clean-comments`, `workflow-kit:code-review-and-quality`, and `workflow-kit:test-guide` remain the underlying rules.
+2. Do not full-scan the repository for comments. Keep only gotchas and minimal module headers. Leave `AGENTS.md` policy proposals to the next step when the repository already has comment rules.
 3. Post-feature Checkpoint (`references/post-feature-checkpoint.md`) — report its result even when clean. A triggered check becomes a proposal (own feature/ADR), never silent scope expansion.
 4. AGENTS.md improvements (`references/agents-md-improvements.md`) — from what the feature applied, propose durable additions to the project `AGENTS.md`. Report even when clean. Proposals are their own change for the user to approve, never written into the feature's commit.
-5. `test-guide` test-quality review when tests were added or behavior needing coverage changed — stop for explicit user approval before editing any test.
+5. If `test-guide` was not part of the review bundle, run its test-quality review when tests were added or behavior needing coverage changed — stop for explicit user approval before editing any test.
 6. `verification-before-completion` before claiming completion.
 7. Set plan status to `done` only with fresh evidence, and sync status across all three places — `docs/features.md` index row, the feature brief/PRD frontmatter, and the plan frontmatter — so none lags behind.
 8. **External Wait** (optional, after commit/PR if the user wants it) — poll an **external** target (CI on the PR, deploy smoke, remote check) until success, fail, or timeout. Host-agnostic: prefer CLI `--watch` (`gh pr checks --watch`, `gh run watch`); otherwise the host's recurring prompt/scheduler (e.g. Grok `/loop`). Never runs inside waves or before local verification is green. Full contract: `references/external-wait.md`. Skip when there is no external target or the user declines.
@@ -224,6 +252,10 @@ Use templates as output shapes, adapting paths only when the user or repository 
 - Do not execute parallel work from an approved plan that lacks `Subagent Launch Spec` and `Wave Schedule`; update the plan first.
 - Do not add `Wave Execution Log`, `Wave Schedule`, or `Subagent Launch Spec` to a single-workstream plan. Record execution as a one-line note under `Tasks`; add those sections only when the plan defines actual parallel work.
 - Do not launch subagents from a launch spec row that lacks `model_tier`; use `references/model-tier-policy.md` defaults when drafting the plan.
+- Require an `Execution Profile` on parallel plans; default it to `balanced`, `workers`, and inherited reasoning when the user did not choose a cost or model preference.
+- Do not apply a user-selected model to every role unless the plan records `Override scope: all`; Workers are the default scope.
+- Do not poll `list_agents` or emit timer-based Team Boards while a wave is healthy; use the host's event wait and report state changes only.
+- Do not launch one post-execution agent per review gate when the same diff, evidence, and approval boundary can be handled by one review bundle.
 - Do not allow a plan to mutate another feature's owned module without recording the dependency and impact.
 - Do not claim completion without fresh verification evidence.
 - Do not set a feature to `done` (or any status change) in only one place. The status in `docs/features.md` (index), the feature brief/PRD, and the plan frontmatter must all match. A status changed in the brief but stale in the index is a defect — sync all three.

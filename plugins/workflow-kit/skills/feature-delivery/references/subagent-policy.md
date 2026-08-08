@@ -79,11 +79,15 @@ The plugin also ships one non-Reader bundled agent: `task-validator` (the `Valid
 Every subagent costs a full context spin-up (~30k+ tokens even for a trivial task), so the levers are fewer launches and smaller prompts — never weaker checks:
 
 - **Prompt = Task block + launch-spec row, nothing more.** Never paste the whole plan, brief, or another workstream's context into a subagent prompt; fetch bounded detail via `plan-detail-reader`.
+- **Model preference scope:** a user-selected model applies to Workers by default. Do not copy it to shell Verifiers, Readers, or mechanical Validators unless the user explicitly selected `Override scope: all`.
 - **Validator tier:** drop to `fast` when the check is mechanical (run the verification command + diff-vs-scope scan); keep `standard` when it must judge test coverage or semantics.
 - **The Validator trigger is a substantive diff, not the existence of a Worker.** Trivial inline work (a few lines, no domain/persistence/contract change) skips validation — inline verification and the Post-execution Sequence cover it. Substantive work gets one `task-validator` even when the Coordinator executed it inline (see `workflow-modes.md` → execute) — "no one grades their own work" must hold wherever it matters.
 - **One Validator per workstream, never per step or per file.**
 - **Small work stays inline.** A task the Coordinator can do in a few edits does not justify a Worker + Validator pair (see Poor Candidates); the pair is for parallel or riskier slices.
 - **No re-validation without a retry.** A `validated` verdict is final for that wave; do not relaunch validators for reassurance.
+- **One post-execution review bundle:** when simplify, clean-comments, code-review-and-quality, and test-guide target the same diff, use one Reviewer pass with separate sections in its handoff. Split into multiple agents only when write scopes, evidence sources, or approval gates differ.
+- **Event-driven waiting:** after launching a wave, wait for agent events or the host's wave-wait primitive. Do not poll `list_agents` on a timer or emit progress messages just to keep the session alive.
+- **Context inheritance:** prefer `fork_turns: none` for Workers, Validators, Reviewers, and Verifiers. Pass the bounded Task block and launch row; inherit history only when a Reader explicitly needs it.
 - The Team Board's `Tokens` line (`subagent-handoff.md`) keeps the running spend visible to the user — sum of `subagent_tokens` from agent results.
 
 ## Skill Mapping
@@ -108,6 +112,7 @@ Every subagent task — suggested or launched — must include:
 - workstream id;
 - wave number;
 - model tier (`fast`, `standard`, `high`) or explicit model override when the user requested one;
+- cost profile and model override scope when the plan has a user model preference;
 - allowed write paths;
 - read-only paths;
 - forbidden paths;
@@ -135,11 +140,11 @@ If parallel work is not expected, omit `Wave Schedule` and `Subagent Launch Spec
 ```md
 ## Subagent Launch Spec
 
-| Workstream | Role | subagent_type | model_tier | Wave | Depends on | Task ref | Allowed write paths | readonly |
-|---|---|---|---|---|---|---|---|---|
-| A | Worker | generalPurpose | standard | 1 | none | Task 1 | `src/modules/auth/**` | no |
-| B | Scout | explore | fast | 0 | none | discovery-auth | none | yes |
-| C | Reviewer | generalPurpose | standard | 3 | A,B | review-plan | none | yes |
+| Workstream | Role | subagent_type | model_tier | cost_profile | model_override_scope | Wave | Depends on | Task ref | Allowed write paths | readonly |
+|---|---|---|---|---|---|---|---|---|---|---|
+| A | Worker | generalPurpose | standard | economy | workers | 1 | none | Task 1 | `src/modules/auth/**` | no |
+| B | Scout | explore | fast | economy | — | 0 | none | discovery-auth | none | yes |
+| C | Reviewer | generalPurpose | standard | economy | — | 3 | A,B | review-plan | none | yes |
 ```
 
 Rules:
@@ -148,6 +153,9 @@ Rules:
 - Every Worker row must map to exactly one task section in the plan.
 - Every row must include `model_tier`. Use `references/model-tier-policy.md` for defaults and escalation.
 - Optional `model_override` column: explicit host model slug when already chosen.
+- Optional `cost_profile` column: `economy` | `balanced` | `quality`.
+- Optional `model_override_scope` column: `workers` (default), `wave`, or `all`.
+- Optional `reasoning_effort` column: inherit from the tier unless a row has a documented reason to override it.
 - `Depends on` must match `Parallelization` and `Wave Schedule`.
 - Do not assign the same write path to two Workers in the same wave.
 
@@ -182,10 +190,11 @@ When the user approves execution, convert suggestions into `Subagent Launch Spec
 
 1. Read `Subagent Launch Spec` and `Wave Schedule`.
 2. Confirm contract-first gate when parallel Workers cross layers.
-3. Resolve `model_tier` per row using `references/model-tier-policy.md`; pass `model` when the host supports it.
+3. Resolve `model_tier`, cost profile, and override scope per row using `references/model-tier-policy.md`; pass `model` and `reasoning_effort` only when the host supports them and the role is covered by the scope.
 4. Launch all subagents for the current wave in parallel when allowed.
-5. Wait for handoff blocks; update `Wave Execution Log`.
-6. Run wave verification before advancing.
-7. Stop the feature on blocked/failed wave unless the user directs otherwise.
+5. Wait for handoff blocks with an event-driven wait. If the host has no event primitive, use exponential backoff and inspect the agent tree only after a timeout.
+6. Run the wave's focused verification profile before advancing; reserve the full suite and build for the final gate unless the plan opts into full verification per wave.
+7. Update `Wave Execution Log` and print the Team Board only at wave start, handoff/verdict, wave close, or block.
+8. Stop the feature on blocked/failed wave unless the user directs otherwise.
 
 Do not let Workers declare the feature complete. Only the Coordinator runs final verification and closure.
