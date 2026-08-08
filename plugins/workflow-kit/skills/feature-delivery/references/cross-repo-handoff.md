@@ -6,6 +6,20 @@ dependency must not survive as a loose paragraph in the plan. The originating
 side generates a ready-to-paste triage prompt for the other service, so the
 counterpart feature starts with full context and the two sides stay coherent.
 
+## Fast counterpart start
+
+When the handoff contains the exact route, payload, errors, decisions, and
+verification evidence, the counterpart must not rediscover the originating
+repository. Run only:
+
+1. contract confirmation against the handoff;
+2. a local impact scan for consumers, adapters, and tests;
+3. a short list of decisions that belong to the counterpart repository.
+
+Use full discovery only when the handoff is incomplete, stale, or the local
+impact scan finds an unlisted integration. Record `handoff: complete` or
+`handoff: incomplete` in the plan so the time saved is visible and reversible.
+
 ## When to generate
 
 In `triage` or `plan`, the moment discovery shows the change requires work in
@@ -36,8 +50,9 @@ and embed everything the counterpart needs so it does NOT have to re-discover:
    the other repo's domain (route shape, storage, cron cadence, auth).
 5. **Constraints** — reuse existing patterns, do not duplicate integrations,
    keep the same `feature_id` linkage, register in that repo's `docs/features.md`.
-6. **Instruction to triage first** — tell the counterpart to run triage +
-   discovery before planning, and to report the plan before implementing.
+6. **Instruction to triage first** — tell the counterpart to confirm the
+   handoff and run a local impact scan before planning. Do not repeat discovery
+   in the originating repository. Report the plan before implementing.
 
 ## Prompt skeleton
 
@@ -65,7 +80,8 @@ Originating: <THIS-REPO> <FEATURE-ID> — <one line>. <Why the other repo is inv
 - Same feature_id linkage; register in docs/features.md.
 - Envelope/error conventions of this repo.
 
-Run triage + discovery first, then show me the plan before implementing.
+Confirm the handoff and run a local impact scan first, then show me the plan
+before implementing. Repeat full discovery only if the handoff is incomplete.
 ```
 
 ## After generating
