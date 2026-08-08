@@ -58,6 +58,7 @@ Completion, and Test Quality.
 - Parallel work has non-overlapping write scopes.
 - Parallel plans include `Wave Schedule` and `Subagent Launch Spec`.
 - Every launch-spec row includes `model_tier`; risk-heavy workstreams use `high` per `references/model-tier-policy.md`.
+- Parallel plans record one `cost_profile` and `model_override_scope`; a user-selected model is not copied to roles outside that scope.
 - Wave order matches task and contract dependencies.
 - Each task maps to a workstream when subagents will be used.
 - Each task has expected output.

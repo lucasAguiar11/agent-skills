@@ -49,6 +49,16 @@ Open questions:
 Approval required before execution:
 - User approval of this plan.
 
+## Execution Profile
+
+<!-- Record once per plan. Do not copy a user model preference into every launch row. -->
+
+Model preference: <host model slug or none>
+Override scope: workers  <!-- workers | wave | all -->
+Reasoning effort: inherit  <!-- inherit or host-supported explicit value -->
+Cost profile: balanced  <!-- economy | balanced | quality -->
+Verification profile: focused-waves, full-final
+
 ## Ownership
 
 Allowed write paths:
@@ -103,9 +113,9 @@ Required when more than one workstream exists or any row has `Can run parallel =
 
 Required when the plan is parallelizable. Omit for strictly sequential single-agent work.
 
-| Workstream | Role | subagent_type | model_tier | Wave | Depends on | Task ref | Allowed write paths | readonly |
-|---|---|---|---|---|---|---|---|---|
-| A | Worker | generalPurpose | standard | 1 | none | Task 1 | `src/example/**` | no |
+| Workstream | Role | subagent_type | model_tier | cost_profile | model_override_scope | Wave | Depends on | Task ref | Allowed write paths | readonly |
+|---|---|---|---|---|---|---|---|---|---|---|
+| A | Worker | generalPurpose | standard | balanced | workers | 1 | none | Task 1 | `src/example/**` | no |
 
 ## Wave Execution Log
 
@@ -113,7 +123,7 @@ Append during `execute`. Leave placeholder rows empty before execution.
 
 | Wave | Workstream | Status | Evidence | Notes |
 |---|---|---|---|---|
-| 1 | A | pending | | model: resolved at launch |
+| 1 | A | pending | | profile: recorded above; model: resolved at launch |
 
 Status values: `pending`, `in_progress`, `completed`, `blocked`, `failed`.
 

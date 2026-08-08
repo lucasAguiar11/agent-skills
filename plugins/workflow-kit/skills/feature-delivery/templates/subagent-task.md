@@ -2,7 +2,7 @@
 
 ## Role
 
-Scout | Planner | Worker | Reviewer | Verifier
+Scout | Planner | Worker | Reviewer | Validator | Verifier | Reader
 
 ## Workstream
 
@@ -17,6 +17,18 @@ Example: 1
 fast | standard | high
 
 Resolve at launch using `references/model-tier-policy.md`. Optional explicit `model_override` when the user or plan already named a host model.
+
+## Cost Profile
+
+economy | balanced | quality
+
+## Model Override Scope
+
+workers | wave | all (default: `workers` for a user-level model preference)
+
+## Reasoning Effort
+
+low | medium | high (normally inherited from the model tier)
 
 ## Objective
 
@@ -107,5 +119,8 @@ Use when the parent agent launches this task through the Task tool:
 - subagent_type: explore | generalPurpose | shell | ci-investigator
 - model_tier: fast | standard | high
 - model: optional resolved slug when host supports explicit model selection
+- model_override_scope: workers | wave | all
+- reasoning_effort: low | medium | high
 - readonly: yes | no
+- fork_turns: none by default; inherit only when the task explicitly needs parent context
 - run_in_background: prefer false for Workers unless user asked for background execution

@@ -2,7 +2,13 @@
 
 Use abstract **model tiers** in plans and launch specs. The Integration Coordinator resolves each tier to a concrete model slug for the host platform when launching subagents.
 
+The tier is the safety floor for a role. A user-selected model is a preference,
+not permission to spend the most expensive reasoning budget on every role.
+
 Tiers optimize cost and latency without sacrificing quality on high-risk work.
+For `economy`, resolve each tier to the cheapest host-supported model that
+meets that role's minimum. Do not guess cost from a model name; if the host
+does not expose a catalog, use its tier default and record the fallback.
 
 ## Tiers
 
@@ -13,6 +19,46 @@ Tiers optimize cost and latency without sacrificing quality on high-risk work.
 | `high` | Deep reasoning, cross-cutting risk, recovery | Critical Workers, domain-heavy review, failed-wave retry |
 
 Do not treat `fast` as "cheap Worker." Workers that mutate code default to `standard` unless the slice is trivial and low-risk.
+
+## Cost profiles
+
+Use the lightest profile that still covers the risk. `economy` is the default
+when the user asks for speed, lower cost, or fewer tokens. `balanced` is the
+default when no cost preference is stated. `quality` is explicit or reserved
+for a risk-heavy recovery.
+
+| Profile | Scout / Reader | Worker | Validator | Reviewer | Verifier |
+|---|---|---|---|---|---|
+| `economy` | `fast` | `standard`, raised by risk trigger | `fast` for mechanical checks, otherwise `standard` | `standard` | `fast` (or shell with no model) |
+| `balanced` | `fast` | `standard`, raised by risk trigger | `standard` | `standard` | `fast` (or shell with no model) |
+| `quality` | `standard` | `high` for the feature | `standard` or `high` for semantic risk | `high` | `fast` (or shell with no model) |
+
+Never lower a risk-triggered Worker below `high`. A shell Verifier does not
+need a reasoning-heavy model just because the Worker does.
+
+## User model requests
+
+When the user names a model or says “use model X”, record one preference in the
+plan instead of copying it to every launch row:
+
+```md
+Model preference: <model slug>
+Override scope: workers
+Reasoning effort: inherit
+Cost profile: economy
+```
+
+`Override scope` values:
+
+- `workers` (default): apply the requested model only to code-mutating Workers;
+- `wave`: apply it to Workers and semantic Validators/Reviewers in that wave;
+- `all`: apply it to every subagent, including Readers and shell Verifiers.
+
+Use `all` only when the user explicitly asks for every agent. A row-level
+`model_override` still wins for that row. If no scope is recorded, interpret a
+user-level model request as `workers` for backward-compatible cost control.
+If the user names a reasoning level too, apply it only within the selected
+scope; otherwise inherit the profile's effort for the role.
 
 ## Default Tier by Role
 
@@ -47,6 +93,13 @@ The Coordinator may escalate tier at launch time:
 1. `fast` → `standard` when the Scout must synthesize architecture or trade-offs, not just list files.
 2. `standard` → `high` when risk triggers appear during the wave or prior handoff was `blocked`.
 3. Never downgrade below the plan's `model_tier` without updating the plan in `update` mode or user approval.
+
+4. A cost profile may choose a cheaper tier for a role only when it remains at
+   or above the role's minimum and no risk trigger is violated.
+
+5. Resolve a user model request after applying the role minimum. A requested
+   model never turns a `shell` Verifier into a reasoning-heavy launch unless
+   `Override scope: all` is explicit.
 
 If the host rejects an explicit model slug, launch with platform default for that `subagent_type` and record the fallback in `Wave Execution Log`.
 
@@ -88,7 +141,11 @@ When Codex cannot set model per subagent, state tier in the task prompt header: 
 
 When a plan includes `Subagent Launch Spec`, every row must include `model_tier`.
 
-Optional `model_override` column: explicit slug or host model name when the planner or user already chose one.
+Optional launch columns:
+
+- `model_override`: explicit slug or host model name for this row;
+- `model_override_scope`: `workers` | `wave` | `all` when the plan has one user-level preference;
+- `reasoning_effort`: `low` | `medium` | `high`, normally inherited from the tier.
 
 Coordinator launch checklist:
 
@@ -97,6 +154,8 @@ Coordinator launch checklist:
 3. Resolve slug via platform table above.
 4. Pass `model` to Task when supported.
 5. Record resolved model or fallback in `Wave Execution Log` notes.
+6. Record the selected cost profile and override scope once per wave, not once
+   in every child prompt.
 
 ## Examples
 

@@ -74,7 +74,7 @@ Every parallelizable implementation plan should include these sections:
 | B | Worker | `src/domain/auth/**` | `src/application/**` | auth contract | yes |
 ```
 
-Add `model_tier` per workstream in `Subagent Launch Spec` (for example Scout `fast`, Worker `standard`, domain-critical Worker `high`).
+Add `model_tier` per workstream in `Subagent Launch Spec` (for example Scout `fast`, Worker `standard`, domain-critical Worker `high`). Record `cost_profile` and `model_override_scope` once in the plan's `Execution Profile`; repeat them in launch rows only when a row intentionally differs.
 
 ### Wave Schedule
 
@@ -98,7 +98,7 @@ Rules:
 
 ### Subagent Launch Spec
 
-See `references/subagent-policy.md` for the launch table format. Every row must include `model_tier`; see `references/model-tier-policy.md` for defaults and escalation.
+See `references/subagent-policy.md` for the launch table format. Every row must include `model_tier`; see `references/model-tier-policy.md` for defaults, cost profiles, and escalation. A user-level model preference defaults to `model_override_scope: workers`.
 
 ### Wave Execution Log
 
