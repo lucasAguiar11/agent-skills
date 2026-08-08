@@ -126,10 +126,15 @@ do plano    │  algum fail? → status: needs-resolve  │
             └───────────────────────────────────────┘◄─┘
    │        só vira `planned`/aprovável com status: clean (sem gap, libs com doc ref)
 review   → findings dentro do plano; pós-execute inclui test-guide (keep/improve/remove/missing)
-execute  → Integration Coordinator: waves, handoffs, verificação por wave
+execute  → Integration Coordinator: waves, handoffs, verificação focada por wave
    │        precondição: plano `approved` + Validation `clean`
 checkpoint → Post-feature Checkpoint (lixo + checagens por limiar) antes de commit/PR
 ```
+
+Por padrão, `feature-delivery` usa o perfil `balanced`. Para reduzir custo e
+latência, use `Cost profile: economy`: modelos solicitados pelo usuário ficam
+restritos a Workers, Readers/Verifiers usam o tier mínimo, a espera é orientada
+por eventos e a suíte completa fica para a verificação final.
 
 **Portões de validação do plano:**
 

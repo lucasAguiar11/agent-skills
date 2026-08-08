@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- `feature-delivery`: adiciona perfis `economy`/`balanced`/`quality`, escopo de override de modelo e resolução por papel para não aplicar um modelo caro a Verifiers, Readers e Validators mecânicos
+- `feature-delivery`: espera orientada a eventos, backoff quando necessário, verificações focadas por wave e bundle de revisão pós-execução para reduzir polling, contexto herdado e launches redundantes
+- `feature-delivery`: handoff cross-repo completo passa a usar confirmação de contrato + impacto local, evitando redescoberta do repositório de origem
+
 ## 1.25.0 — 2026-08-06
 
 - Skill `pr-review` renomeada para **`code-review-and-quality`** e promovida a code review multi-eixo. O nome antigo mentia: a skill era boa em revisar, mas só rodava com URL de PR — metade do valor de um review acontece antes de virar PR (código de outro agente, branch local). Alias legado `pr-review` fica na description

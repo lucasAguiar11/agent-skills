@@ -15,8 +15,8 @@ O princípio central: **cada papel é um estágio com contrato de entrada/saída
 | **Techlead** | Planner (agente) | Quebra a feature em tarefas com escopo, verificação e ownership |
 | **Devs** | Workers (agentes em paralelo) | Implementam uma fatia cada, dentro do escopo de escrita permitido |
 | **QA** | Validators (agentes adversariais) | Tentam **refutar** cada entrega — re-executam tudo, não confiam em ninguém |
-| **CI** | Verifier | Roda a suíte completa de verificação da wave |
-| **Code review** | Sequência pós-execução | `simplify`, `clean-comments`, `code-review-and-quality`, `test-guide`, verificação final |
+| **CI** | Verifier | Roda a verificação focada da wave e a suíte completa no fechamento |
+| **Code review** | Um bundle pós-execução | `simplify`, `clean-comments`, `code-review-and-quality`, `test-guide` quando acionado, verificação final |
 
 ## Fluxo fim a fim
 
@@ -46,8 +46,8 @@ O princípio central: **cada papel é um estágio com contrato de entrada/saída
  7. EXECUTE ───────── loop por wave (detalhado abaixo)
         │
         ▼
- 8. PÓS-EXECUÇÃO ──── simplify → clean-comments → checkpoint →
-        │              test-guide → verification-before-completion
+ 8. PÓS-EXECUÇÃO ──── bundle de review → checkpoint →
+        │              verification-before-completion
         ▼
  9. DONE ──────────── status sincronizado: índice + brief + plano
         │
@@ -82,7 +82,8 @@ O princípio central: **cada papel é um estágio com contrato de entrada/saída
 ║       │      findings (1x) → re-valida     ║
 ║       │      refutou de novo? → PARA       ║
 ║       ▼                                    ║
-║  CI: verificação da wave (suíte completa)  ║
+║  CI: verificação focada da wave             ║
+║      suíte completa no fechamento           ║
 ║              │                             ║
 ║              ▼                             ║
 ║  Team Board impresso + log no plano        ║
@@ -94,7 +95,7 @@ O princípio central: **cada papel é um estágio com contrato de entrada/saída
 
 ## Visibilidade: o Team Board
 
-A cada evento (início de wave, veredito de QA, fechamento, bloqueio) o coordenador imprime:
+Em cada transição de estado (início de wave, veredito de QA, fechamento, bloqueio) o coordenador imprime:
 
 **FEAT-20260720-checkout** — Wave 2/3 `▓▓▓▓▓▓░░░ 67%`
 
@@ -105,12 +106,22 @@ A cada evento (início de wave, veredito de QA, fechamento, bloqueio) o coordena
 | — | QA | refutar Task 2 | — | running tests |
 
 Waves: `[x]──[>]──[ ]` · Bloqueios: 0 · Gate: validação da Task 2
+Cost: economy · Model scope: workers
 Tokens: 108k wave · 216k feature
 
 - **Progresso é dado real** — checkboxes das tarefas reportados nos handoffs, nunca estimativa.
-- **Tokens sempre visíveis** — soma real do custo de cada agente, por wave e acumulado.
+- **Tokens quando o host informa** — soma real do custo de cada agente, por wave e acumulado; quando não houver telemetria, mostra `unavailable`.
 - Cada board é copiado para o `Wave Execution Log` do plano — o arquivo guarda a linha do tempo.
 - Na árvore do terminal, cada agente aparece nomeado: `DEV A · slugify · wave 1`, `QA B · word_count · wave 1 · retry 1`.
+
+## Custo e latência
+
+- `economy` usa Workers em `standard`, Validators mecânicos em `fast`, Reviewers em `standard` e Verifiers `shell` (sem modelo) ou `fast`.
+- `balanced` é o padrão quando o usuário não escolhe custo; `quality` é reservado para risco alto ou pedido explícito.
+- Um modelo solicitado pelo usuário vale para Workers por padrão. Use `Override scope: wave` ou `all` somente quando essa abrangência for explícita.
+- O Coordinator espera eventos. Não faz polling de `list_agents` nem imprime heartbeat.
+- Workers recebem apenas o bloco da Task e a linha do launch spec. Prefira `fork_turns: none`.
+- A revisão pós-execução pode ser um único bundle com seções de `simplify`, `clean-comments`, `code-review-and-quality` e `test-guide` quando acionado; separar agentes só quando houver gates ou escopos diferentes.
 
 ## Aprovação única
 
@@ -131,6 +142,7 @@ Cada subagente custa ~30k+ tokens só de spin-up. As alavancas são menos lança
 
 - Prompt do agente = só o bloco da tarefa + linha do launch spec. Nunca o plano inteiro.
 - Documentos grandes são lidos por agentes Reader que devolvem digest compacto.
+- `fork_turns: none` é o padrão para não copiar o histórico inteiro para cada agente.
 - QA em modelo rápido quando o check é mecânico; padrão quando julga cobertura/semântica.
 - Trabalho pequeno fica inline com o coordenador — sem par Dev+QA para meia dúzia de edits.
 - Um validator por entrega, nunca por step; `validated` é final, sem re-validar por segurança.
