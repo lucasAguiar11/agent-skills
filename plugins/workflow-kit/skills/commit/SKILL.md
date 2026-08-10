@@ -84,4 +84,3 @@ Nunca commitar:
 - `.env`, `.env.*`
 - `settings.local.json`
 - Arquivos com credenciais/tokens
-- `PLAN.md` ou documentos de planejamento interno
