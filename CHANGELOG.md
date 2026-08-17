@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 1.25.1 — 2026-08-17
+
+- `feature-delivery`: presets `fast-contract`, `standard` e `full` escolhem o menor fluxo que preserva a evidência necessária; o novo `fast-contract` usa Contract Snapshot, um Worker, um Validator, checks focados e build final
+- `feature-delivery`: decisão de produto/contrato encontrada pelo Validator agora é marcada como `decision_required`, pergunta uma única vez ao usuário e retoma a mesma task sem reiniciar discovery ou plan review
+- `fast-contract`: revisão ampla só por pedido ou risco não coberto pelo Validator; limpeza de comentários e auditoria de testes rodam somente quando o diff as aciona
 - `feature-delivery`: adiciona perfis `economy`/`balanced`/`quality`, escopo de override de modelo e resolução por papel para não aplicar um modelo caro a Verifiers, Readers e Validators mecânicos
 - `feature-delivery`: espera orientada a eventos, backoff quando necessário, verificações focadas por wave e bundle de revisão pós-execução para reduzir polling, contexto herdado e launches redundantes
 - `feature-delivery`: handoff cross-repo completo passa a usar confirmação de contrato + impacto local, evitando redescoberta do repositório de origem

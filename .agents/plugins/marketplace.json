@@ -5,13 +5,13 @@
   },
   "metadata": {
     "description": "Marketplace de skills reutilizaveis: entrega/planejamento/review (workflow-kit), Figma to code, e brass-tacks (output style always-on)",
-    "version": "1.25.0"
+    "version": "1.25.1"
   },
   "plugins": [
     {
       "name": "workflow-kit",
       "description": "Kit de workflow: feature-delivery, planos, review, testes e subagents por wave",
-      "version": "1.25.0",
+      "version": "1.25.1",
       "source": {
         "source": "local",
         "path": "./plugins/workflow-kit"
