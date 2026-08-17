@@ -119,9 +119,22 @@ Tokens: 108k wave · 216k feature
 - `economy` usa Workers em `standard`, Validators mecânicos em `fast`, Reviewers em `standard` e Verifiers `shell` (sem modelo) ou `fast`.
 - `balanced` é o padrão quando o usuário não escolhe custo; `quality` é reservado para risco alto ou pedido explícito.
 - Um modelo solicitado pelo usuário vale para Workers por padrão. Use `Override scope: wave` ou `all` somente quando essa abrangência for explícita.
+
 - O Coordinator espera eventos. Não faz polling de `list_agents` nem imprime heartbeat.
 - Workers recebem apenas o bloco da Task e a linha do launch spec. Prefira `fork_turns: none`.
 - A revisão pós-execução pode ser um único bundle com seções de `simplify`, `clean-comments`, `code-review-and-quality` e `test-guide` quando acionado; separar agentes só quando houver gates ou escopos diferentes.
+
+## Presets de workflow
+
+| Preset | Uso | Cerimônia |
+|---|---|---|
+| `fast-contract` | Consumidor de contrato HTTP/evento já comprovado | Snapshot, Worker, Validator, checks focados e build final |
+| `standard` | Feature bem entendida sem decisão estrutural | Brief + plano compacto |
+| `full` | Contrato, persistência, auth, migration, Figma, shell/design system ou ownership compartilhado | Artefatos e waves completos |
+
+## Integração com contrato já publicado
+
+Para um único consumidor de API/evento com contrato já verificado, use o preset **`fast-contract`**: snapshot curto do contrato, um Worker, um Validator, testes focados e um build final. Ele não cria PRD, ADR, plano, waves ou sync de tracker sem necessidade. A revisão ampla fica por pedido ou risco não coberto pelo Validator; comentários e testes só disparam suas passadas quando o diff os toca. Auth, migration, contrato novo, persistência, shell/design system ou ownership compartilhado promovem o trabalho para `standard` ou `full`.
 
 ## Aprovação única
 

@@ -2,6 +2,8 @@
 
 Infer the mode from the request.
 
+Before choosing a mode, select a preset from `workflow-presets.md`. `fast-contract` normally enters `triage` then `execute`; `standard` and `full` use the normal mode pipeline.
+
 ## Mode Pipeline and Subagents
 
 | Mode | Default subagent use | Parallelism |
@@ -38,6 +40,12 @@ Optional subagents:
 | contracts | Scout | Identify API/persistence/integration boundaries |
 
 Launch Scouts in parallel only when paths are read-only. Stop after recommendation unless the user asks to create files.
+
+### `fast-contract` exit
+
+When triage verifies a published contract and the change fits the `fast-contract` preset, skip `plan` mode. Record the compact contract snapshot and continue directly to `execute` when the user requested implementation. Do not create feature artifacts solely to satisfy this preset.
+
+The coordinator still runs one Validator for substantive work. A `decision_required` finding stops for one user answer, then resumes the same task with one retry. It does not restart triage or plan review unless the answer promotes the work to the standard flow.
 
 ## plan
 
@@ -101,13 +109,15 @@ Output location: append the findings to the plan being reviewed (`docs/plans/<FE
 
 Use when the user explicitly asks to execute or implement — including an upfront request that triggered planning in the same flow (single-approval rule, `SKILL.md` → `Default Flow`, last step): in that case the plan self-review passing and the decision gate finding no `blocking` decision **are** the approval; set the plan to `approved` and continue without asking again.
 
+For the `fast-contract` preset, the Contract Snapshot replaces the plan and its approval/validation fields. It must include source, request/response/error mapping, write scope, focused verification, final build, and the user's execution request. This preset has one Worker, one Validator, no waves, and no plan status updates.
+
 The parent agent is the **Integration Coordinator**. Read `references/subagent-handoff.md` before launching work.
 
 Steps:
 
-1. Read the plan and confirm status is `approved` or `in_progress` (or auto-approve per the single-approval rule above).
-2. Verify ownership, stop conditions, `Wave Schedule`, `Subagent Launch Spec`, and the selected cost profile/override scope.
-3. Set plan status to `in_progress` if not already.
+1. Read the plan and confirm status is `approved` or `in_progress` (or auto-approve per the single-approval rule above). For the `fast-contract` preset, verify the Contract Snapshot instead.
+2. Verify ownership, stop conditions, `Wave Schedule`, `Subagent Launch Spec`, and the selected cost profile/override scope. Contracted work verifies its one task and worker scope only.
+3. Set plan status to `in_progress` if not already. Contracted work records progress in its task header/issue instead.
 4. Run optional wave 0 work: contract confirmation, discovery, or pre-review.
 5. For each wave:
    - resolve `model_tier`, cost profile, and override scope per launch spec and pass `model` only to roles covered by that scope;

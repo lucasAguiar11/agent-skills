@@ -4,6 +4,18 @@ Use the smallest set of artifacts that makes the work clear and parallelizable.
 
 ## Artifact Levels
 
+### Preset `fast-contract`: Contract Snapshot + Task (existing integration)
+
+Use when a verified contract already exists and the change is one consumer module plus adapter/host wiring and tests. This preset is not a weaker safety standard.
+
+Required record:
+
+- Contract source, request/response/error mapping, allowed paths, focused verification, and final build command in the task header or existing issue.
+
+Do not create a PRD, ADR, feature index row, separate brief, wave schedule, launch spec, or tracker mirror unless the repository requires it. Run one Worker and one Validator for substantive work; run the full build once after the final validated diff. On the final diff, run `simplify`; run comment cleanup and test review only when their trigger applies; run broad code review only by request or when the Validator did not cover a material risk.
+
+Promote to Level 1+ when a new contract, migration, auth/authorization rule, persistence decision, shared UI boundary, or cross-feature ownership change appears.
+
 ### Level 0: Inline Plan (micro-change)
 
 Use for a change that touches one logic path, has no blocking decision, no

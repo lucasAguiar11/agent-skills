@@ -42,9 +42,9 @@ Artifacts that already exist with a sequential ID are **not** renamed. The date 
 
 ## Default Flow
 
-1. Classify the request and choose the lightest useful artifact set.
-2. Register or update the feature in `docs/features.md`.
-3. Create or update `docs/features/<FEATURE-ID>.md`.
+1. Select the `fast-contract`, `standard`, or `full` preset, then choose the lightest useful artifact set. See `references/workflow-presets.md`.
+2. For `standard` or `full`, register or update the feature in `docs/features.md`.
+3. For `standard` or `full`, create or update `docs/features/<FEATURE-ID>.md`.
 4. Create an ADR only for structural or hard-to-reverse decisions. Before finalizing, scan existing ADRs by `scope`/`tags` frontmatter (dispatch the `adr-correlator` reader, or `grep -rl 'scope: "auth"' docs/`) and link any related prior decision in the plan's `adr:` frontmatter and `Dependencies` — do not re-decide something already settled.
 5. When discovery shows the feature depends on another repo, generate a ready-to-paste triage prompt for that service (`references/cross-repo-handoff.md`) and record the dependency.
 6. Run the decision gate before finalizing the plan.
@@ -55,6 +55,37 @@ Artifacts that already exist with a sequential ID are **not** renamed. The date 
 11. In `execute`, act as Integration Coordinator: resolve model tiers and cost profile, launch subagents by wave, collect handoffs, run adversarial task validation (`workflow-kit:task-validator`, one per completed substantive Worker workstream), wait for events instead of polling, update `Wave Execution Log`, print the Team Board (`references/subagent-handoff.md`), and advance only after validation and verification pass.
 12. Run the Post-execution Sequence (below) before commit/PR.
 13. **Single-approval rule.** An upfront execution request ("implement X", "executa", "faz a feature") is the approval — plan, self-review, and execute in one continuous flow without re-asking. Only stop for the user when: (a) the decision gate finds a `blocking` decision, (b) plan `Validation` cannot reach `status: clean`, or (c) a Validator refutes the same workstream twice. When the user asked only for a plan, stop after step 8 and wait for approval before executing.
+
+## Preset: `fast-contract`
+
+Use this preset instead of the Default Flow when all conditions hold:
+
+- The consumed HTTP/event contract is already published and verified from current source, official docs, or a representative live response.
+- The change stays within one consumer feature plus its adapter/host wiring and tests.
+- It does not add or change persistence, authentication/authorization, a public contract, a migration, shell/workspace, design system, or a second owned feature module.
+- The user asked to implement, or explicitly approves execution after the snapshot below.
+
+Repository `AGENTS.md` rules win. If they require feature artifacts, keep the smallest required artifact set; this track never bypasses a repository safety rule.
+
+### Contract snapshot
+
+Record these items in the task header or existing issue, not in a new PRD/ADR/plan by default:
+
+1. Contract source and retrieval date.
+2. Inputs, outputs, state/error mapping, and one representative request.
+3. Allowed write paths and read-only dependencies.
+4. Focused verification command plus one final build command.
+
+### Execution
+
+1. Run one bounded Worker, or work inline when the diff is trivial.
+2. Run one Validator for a substantive diff. Do not add a Planner, Reader, or wave schedule to this track.
+3. If the Validator finds an implementation defect, retry the Worker once with those findings.
+4. If it finds a product or contract decision, stop once and ask the user one concrete question. After the answer, update the contract snapshot and retry the same Worker once. Do not restart discovery, regenerate artifacts, or re-run plan review unless the answer changes the track eligibility.
+5. Run focused tests and compile after the Worker. Run the full build once after the final validated diff. Do not repeat a successful command unless source, configuration, or dependencies changed.
+6. Run `simplify` inline on the final diff. Run `clean-comments` only when the diff adds comments. Run `test-guide` only when behavior, persistence, validation, or tests changed. Run `code-review-and-quality` only when the user asks, the Validator did not cover a material risk, or the track was promoted to high risk. Do not launch a second reviewer by default.
+
+Promote to the `standard` or `full` preset when discovery reveals a condition above is false or when a validator exposes a missing or contradictory contract.
 
 When a plan, feature brief, PRD, or ADR is large and you only need part of it, offload the read to a bundled `Reader` agent (`workflow-kit:plan-reader`, `feature-reader`, `adr-reader`, `adr-correlator`, `plan-detail-reader`, `feature-index-reader`) instead of loading the whole file into context. See `references/subagent-policy.md` (Bundled Reader Agents). Read small docs inline — a Reader round-trip only pays off on large ones.
 
@@ -171,6 +202,7 @@ Each mode has an entry condition. When it is not met, do not improvise the missi
 | `plan` | feature registered in `docs/features.md` | "No feature registered — run `triage` first to classify and register." |
 | `review` | a plan exists at `docs/plans/<ID>-plan.md` | "No plan to review — run `plan` first." |
 | `execute` | plan `status: approved` AND `Validation` status `clean` | "Plan is not approved/clean — run `plan` until Validation is `clean`, then get user approval." |
+| `execute` (contracted) | Contract Snapshot complete and user requested implementation | "Contract Snapshot is incomplete — verify the existing contract, write the four snapshot items, then execute." |
 | `execute` (parallel) | plan has `Subagent Launch Spec` + `Wave Schedule` | "Plan is parallel but lacks launch spec — update the plan first." |
 | `update` | the target artifact exists | "Nothing to update — name the artifact or run `plan`/`triage`." |
 
@@ -179,6 +211,8 @@ Read `references/workflow-modes.md` when the mode is unclear or when switching m
 ## Artifact Selection
 
 Use the smallest artifact set that gives enough clarity:
+
+Start with `references/workflow-presets.md`. The preset selects the delivery shape; the levels below select the artifact weight inside the `standard` and `full` presets.
 
 - Micro change (one logic path, no blocking decision/migration/contract change): inline plan (Level 0 — `Goal`, `Tasks`, `Verification`, `Risks` only).
 - Small change: feature brief + plan.
@@ -213,6 +247,7 @@ Use installed/global workflow skills when available:
 Load only the reference needed for the current action:
 
 - `references/artifact-policy.md`: decide brief vs PRD vs ADR vs plan.
+- `references/workflow-presets.md`: route a request among `fast-contract`, `standard`, and `full`.
 - `references/workflow-modes.md`: mode behavior and stop points.
 - `references/adr-decision-guide.md`: decide whether a change needs an ADR.
 - `references/parallel-work-guide.md`: ownership, write scope, dependency rules.
@@ -242,8 +277,8 @@ Use templates as output shapes, adapting paths only when the user or repository 
 
 - Do not create an ADR for a trivial or easily reversible choice.
 - Do not finalize an ADR with an empty `scope` frontmatter — an unscoped decision is invisible to `adr-correlator` and will be re-decided later.
-- Do not enter `plan`, `review`, `execute`, or `update` while its precondition (see Modes → Mode preconditions) is unmet — stop and surface the exact next action instead of improvising.
-- Do not implement before there is an approved plan, unless the user explicitly asks for a very small direct change.
+- Do not enter `plan`, `review`, `execute`, or `update` while its precondition (see Modes → Mode preconditions) is unmet — stop and surface the exact next action instead of improvising. A complete Contract Snapshot is the `execute` precondition for the `fast-contract` preset.
+- Do not implement before there is an approved plan, unless the user explicitly asks for a very small direct change or the `fast-contract` preset has a complete Contract Snapshot and execution request.
 - Do not mark a plan `planned` or send it for review while its `Validation` status is not `clean`, or while the `Traceability Matrix` (medium+ features) has any `gap` row. Fix the plan and re-run the self-check first.
 - Do not assign parallel work without non-overlapping write scopes.
 - Do not launch parallel Workers across layers without a contract-first gate when shared ports/DTOs/enums/migrations are involved.

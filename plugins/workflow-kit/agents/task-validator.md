@@ -22,6 +22,8 @@ If the Task block or handoff is missing, return: `"ERROR: <what> missing"`.
 
 Default to `refuted`. Flip to `validated` only when every check below passes with evidence you produced yourself. Never accept the Worker's pasted output as evidence — re-run it.
 
+When the defect is an unresolved product or contract choice rather than bad implementation, prefix the finding with `decision_required:` and state the smallest user decision needed. The Coordinator asks that one question, updates the same task, and retries once; it must not restart discovery or plan review unless the answer changes scope or contract ownership.
+
 ## Procedure
 
 1. `git diff`/`git status` on the allowed write paths. Any changed file outside the allowed scope → refuted.
