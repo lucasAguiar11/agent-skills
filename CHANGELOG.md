@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.26.0 — 2026-08-17
+
+- `workflow-kit`: corrige o manifesto interno `.codex-plugin/plugin.json` para alinhar a versão instalada pelo Codex ao marketplace
+
 ## 1.25.1 — 2026-08-17
 
 - `feature-delivery`: presets `fast-contract`, `standard` e `full` escolhem o menor fluxo que preserva a evidência necessária; o novo `fast-contract` usa Contract Snapshot, um Worker, um Validator, checks focados e build final
