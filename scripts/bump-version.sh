@@ -2,28 +2,40 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-VERSION="${1:-}"
+PLUGIN="${1:-}"
+VERSION="${2:-}"
 
-if [[ -z "$VERSION" ]]; then
-  echo "Usage: $0 <semver>" >&2
+if [[ -z "$PLUGIN" || -z "$VERSION" ]]; then
+  echo "Usage: $0 <plugin> <semver>" >&2
+  echo "Exemplo: $0 workflow-kit 1.26.0" >&2
+  exit 1
+fi
+
+if [[ ! -d "$ROOT/plugins/$PLUGIN" ]]; then
+  echo "Plugin desconhecido: $PLUGIN" >&2
   exit 1
 fi
 
 update_json_version() {
   local file="$1"
-  python3 - "$file" "$VERSION" <<'PY'
+  python3 - "$file" "$PLUGIN" "$VERSION" <<'PY'
 import json
 import sys
 
-path, version = sys.argv[1], sys.argv[2]
+path, plugin, version = sys.argv[1], sys.argv[2], sys.argv[3]
 with open(path, encoding="utf-8") as fh:
     data = json.load(fh)
 
 if path.endswith("marketplace.json"):
-    if "metadata" in data and isinstance(data["metadata"], dict):
+    names = [p.get("name") for p in data.get("plugins", [])]
+    if plugin not in names:
+        sys.exit(0)
+    for entry in data.get("plugins", []):
+        if entry.get("name") == plugin:
+            entry["version"] = version
+    # ponytail: metadata.version do marketplace acompanha o workflow-kit (plugin ancora)
+    if plugin == "workflow-kit" and isinstance(data.get("metadata"), dict):
         data["metadata"]["version"] = version
-    for plugin in data.get("plugins", []):
-        plugin["version"] = version
 else:
     data["version"] = version
 
@@ -33,19 +45,16 @@ with open(path, "w", encoding="utf-8") as fh:
 PY
 }
 
-for file in \
-  "$ROOT/.agents/plugins/marketplace.json" \
-  "$ROOT/.claude-plugin/marketplace.json" \
-  "$ROOT/.cursor-plugin/marketplace.json" \
-  "$ROOT/plugins/workflow-kit/.codex-plugin/plugin.json" \
-  "$ROOT/plugins/workflow-kit/.claude-plugin/plugin.json" \
-  "$ROOT/plugins/workflow-kit/.cursor-plugin/plugin.json" \
-  "$ROOT/plugins/figma-to-code/.codex-plugin/plugin.json" \
-  "$ROOT/plugins/figma-to-code/.claude-plugin/plugin.json" \
-  "$ROOT/plugins/figma-to-code/.cursor-plugin/plugin.json"
-do
+# marketplaces (um por host) + todos os manifests do plugin alvo
+files=()
+while IFS= read -r f; do files+=("$f"); done < <(
+  find "$ROOT" -name marketplace.json -not -path "*/node_modules/*"
+  find "$ROOT/plugins/$PLUGIN" -name plugin.json
+)
+
+for file in "${files[@]}"; do
   update_json_version "$file"
   echo "updated $file"
 done
 
-echo "Version bumped to $VERSION"
+echo "$PLUGIN bumped to $VERSION"
