@@ -1,0 +1,17 @@
+{
+  "name": "yolo",
+  "version": "1.0.0",
+  "description": "Executes the request immediately through /yolo without chat confirmation or a risk checklist",
+  "author": {
+    "name": "lucasAguiar11"
+  },
+  "keywords": [
+    "yolo",
+    "execute",
+    "shell",
+    "git",
+    "no-confirm"
+  ],
+  "license": "MIT",
+  "skills": "./skills"
+}

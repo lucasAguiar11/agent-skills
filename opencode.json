@@ -3,7 +3,8 @@
   "skills": {
     "paths": [
       "plugins/workflow-kit/skills",
-      "plugins/figma-to-code/skills"
+      "plugins/figma-to-code/skills",
+      "plugins/yolo/skills"
     ]
   }
 }

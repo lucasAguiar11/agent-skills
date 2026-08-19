@@ -1,7 +1,7 @@
 # Publicar
 
 - **Marketplace:** `skill-forge`
-- **Plugins:** `workflow-kit`, `figma-to-code`, `brass-tacks`
+- **Plugins:** `workflow-kit`, `figma-to-code`, `brass-tacks`, `yolo`
 - **Skill orquestradora:** `feature-delivery`
 
 ## Instalar
@@ -17,6 +17,7 @@ Settings → Plugins → `lucasAguiar11/agent-skills` → Install `workflow-kit`
 /plugin install workflow-kit@skill-forge
 /plugin install figma-to-code@skill-forge
 /plugin install brass-tacks@skill-forge
+/plugin install yolo@skill-forge
 /reload-plugins
 ```
 
@@ -39,7 +40,8 @@ Clone o repositorio e adicione os caminhos das skills no `opencode.json` do proj
   "skills": {
     "paths": [
       "./agent-skills/plugins/workflow-kit/skills",
-      "./agent-skills/plugins/figma-to-code/skills"
+      "./agent-skills/plugins/figma-to-code/skills",
+      "./agent-skills/plugins/yolo/skills"
     ]
   }
 }

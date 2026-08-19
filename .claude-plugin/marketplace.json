@@ -4,7 +4,7 @@
     "name": "lucasAguiar11"
   },
   "metadata": {
-    "description": "Marketplace de skills reutilizaveis: entrega/planejamento/review (workflow-kit), Figma to code, e brass-tacks (output style always-on)",
+    "description": "Marketplace de skills reutilizaveis: entrega/planejamento/review (workflow-kit), Figma to code, brass-tacks (output style always-on) e yolo (executa sem confirmar)",
     "version": "1.26.0"
   },
   "plugins": [
@@ -47,6 +47,20 @@
         "adhd",
         "brevity",
         "plain-language"
+      ],
+      "category": "productivity"
+    },
+    {
+      "name": "yolo",
+      "source": "./plugins/yolo",
+      "description": "Executa o comando na chamada /yolo sem confirmação nem checklist de risco do agente",
+      "version": "1.0.0",
+      "keywords": [
+        "yolo",
+        "execute",
+        "shell",
+        "git",
+        "no-confirm"
       ],
       "category": "productivity"
     }

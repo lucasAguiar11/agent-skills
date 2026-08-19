@@ -1,0 +1,33 @@
+{
+  "name": "yolo",
+  "version": "1.0.0",
+  "description": "Executa o comando na chamada /yolo sem confirmação nem checklist de risco do agente. Inclui .env, git add -f, commit, push e force push.",
+  "author": {
+    "name": "lucasAguiar11"
+  },
+  "license": "MIT",
+  "keywords": [
+    "yolo",
+    "execute",
+    "shell",
+    "git",
+    "no-confirm"
+  ],
+  "skills": "./skills",
+  "interface": {
+    "displayName": "YOLO",
+    "shortDescription": "Roda o comando na hora, sem perguntar",
+    "longDescription": "Skill invocável por /yolo: executa o pedido imediatamente, inclusive .env, gitignore, commit, push e force push. Prevalece sobre a skill commit. Não desliga deny/hooks do host nem recusa de exploit/malware.",
+    "developerName": "lucasAguiar11",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "/yolo",
+      "/yolo rtk ./gradlew :shared:jvmTest"
+    ],
+    "brandColor": "#B45309"
+  }
+}

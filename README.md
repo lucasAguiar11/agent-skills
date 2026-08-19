@@ -5,7 +5,7 @@ Marketplace multi-plataforma para **Cursor**, **Claude Code**, **Codex** e **Ope
 Repo: [lucasAguiar11/agent-skills](https://github.com/lucasAguiar11/agent-skills)
 
 - **Marketplace:** `skill-forge`
-- **Plugins:** `workflow-kit`, `figma-to-code`, `brass-tacks`
+- **Plugins:** `workflow-kit`, `figma-to-code`, `brass-tacks`, `yolo`
 - **Skill orquestradora:** `feature-delivery`
 
 ## Instalar
@@ -25,6 +25,7 @@ Settings → Plugins → Add marketplace `lucasAguiar11/agent-skills` → Instal
 /plugin install workflow-kit@skill-forge
 /plugin install figma-to-code@skill-forge
 /plugin install brass-tacks@skill-forge
+/plugin install yolo@skill-forge
 /reload-plugins
 ```
 
@@ -57,7 +58,8 @@ Para usar em outro projeto, adicione os caminhos no `opencode.json`:
   "skills": {
     "paths": [
       "/caminho/para/agent-skills/plugins/workflow-kit/skills",
-      "/caminho/para/agent-skills/plugins/figma-to-code/skills"
+      "/caminho/para/agent-skills/plugins/figma-to-code/skills",
+      "/caminho/para/agent-skills/plugins/yolo/skills"
     ]
   }
 }
@@ -108,6 +110,11 @@ Depois de editar o config, **reinicie o OpenCode** para carregar as skills.
 - Output style always-on (hooks `SessionStart` + `UserPromptSubmit` once): acao primeiro, passos numerados, linguagem simples
 - Skill `/brass-tacks`; desliga com `stop brass tacks mode`
 - Baseado em [SkytheWitcher/brass-tacks](https://github.com/SkytheWitcher/brass-tacks)
+
+### Plugin `yolo`
+
+- Skill `/yolo` — executa o pedido sem confirmação no chat (`.env`, `git add -f`, commit, push)
+- Prevalece sobre a skill `commit`. Não desliga deny/hooks do host
 
 ## Fluxo (feature-delivery)
 
@@ -164,9 +171,11 @@ agent-skills/
     │   └── skills/
     ├── figma-to-code/
     │   └── skills/
-    └── brass-tacks/
-        ├── hooks/           # SessionStart + UserPromptSubmit
-        ├── hooks-handlers/
+    ├── brass-tacks/
+    │   ├── hooks/           # SessionStart + UserPromptSubmit
+    │   ├── hooks-handlers/
+    │   └── skills/
+    └── yolo/
         └── skills/
 ```
 

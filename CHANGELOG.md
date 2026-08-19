@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Plugin **`yolo`**: skill `/yolo` executa o pedido sem confirmação no chat, inclusive `.env`, `git add -f`, commit, push e force push. Prevalece sobre a skill `commit`. Não desliga deny/hooks do host.
+
 ## 1.26.0 — 2026-08-17
 
 - `workflow-kit`: corrige o manifesto interno `.codex-plugin/plugin.json` para alinhar a versão instalada pelo Codex ao marketplace
