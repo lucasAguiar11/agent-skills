@@ -72,7 +72,10 @@ The plugin ships six `Reader` agents under `agents/` (Claude Code only — auto-
 
 When to reach for a Reader: the doc is large, you only need part of it, and reading it whole would crowd out context you still need. For small docs (the feature index is usually small, a Level 0 plan is tiny), read inline — a subagent round-trip costs more than it saves.
 
-The plugin also ships one non-Reader bundled agent: `task-validator` (the `Validator` role above). Dispatched by the Coordinator during `execute`, one per completed Worker workstream — see `references/subagent-handoff.md`.
+The plugin also ships one non-Reader bundled agent: `task-validator` (the
+`Validator` role above). The Coordinator dispatches it in the final validation
+wave after the post-execution review bundle freezes the diff, one per
+substantive workstream — see `references/subagent-handoff.md`.
 
 ## Token Economy
 

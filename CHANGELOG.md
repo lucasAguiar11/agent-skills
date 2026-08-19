@@ -4,6 +4,13 @@
 
 - Plugin **`yolo`**: skill `/yolo` executa o pedido sem confirmação no chat, inclusive `.env`, `git add -f`, commit, push e force push. Prevalece sobre a skill `commit`. Não desliga deny/hooks do host.
 
+## 1.27.0 — 2026-08-19
+
+- `feature-delivery`: roteamento explícito entre `fast-contract`, `standard` e `full`, com evidência do preset e do `Cost profile`
+- `feature-delivery`: `full` passa a usar uma revisão consolidada do plano, uma wave final de validators por workstream e build integrado no diff congelado
+- `feature-delivery`: melhorias P2 após o freeze — refactors, otimizações e cobertura extra — ficam como follow-up em vez de reabrir a entrega
+- `feature-delivery`: sincroniza `SKILL.md`, `workflow-modes.md`, `subagent-handoff.md`, `subagent-policy.md`, presets, template de plano e README
+
 ## 1.26.0 — 2026-08-17
 
 - `workflow-kit`: corrige o manifesto interno `.codex-plugin/plugin.json` para alinhar a versão instalada pelo Codex ao marketplace

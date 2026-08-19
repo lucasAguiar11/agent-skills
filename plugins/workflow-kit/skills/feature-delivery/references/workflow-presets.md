@@ -8,14 +8,15 @@ Select one explicitly with `@feature-delivery <preset> <goal>`, or let triage se
 |---|---|---|---|---|
 | `fast-contract` | Existing verified HTTP/event contract; one consumer module plus adapter/host/tests; no persistence, auth, public contract, migration, shared UI or cross-feature ownership change | Contract Snapshot in task header or existing issue | One Worker, one Validator, focused checks, final build | One user decision only for `decision_required`; retry same task once |
 | `standard` | Well-understood feature or scoped refactor with product behavior but no hard-to-reverse architecture decision | Feature brief + plan | Single worker inline or sequential tasks | Plan review, focused checks, final verification |
-| `full` | New or changed public contract, persistence, auth, migration, shell/design-system boundary, Figma/new screen, cross-repo dependency, or real parallel ownership | Brief/PRD, ADR when needed, plan with ownership/waves | Coordinator + waves | Contract-first gate, Validators, full post-execution sequence |
+| `full` | New or changed public contract, persistence, auth, migration, shell/design-system boundary, Figma/new screen, cross-repo dependency, or real parallel ownership | Brief/PRD, ADR when needed, plan with ownership/waves | Coordinator + waves | Contract-first gate, one consolidated plan review, Validators per workstream, frozen-diff final build |
 
 ## Routing
 
 1. A user-named preset wins when its conditions hold.
 2. Triage selects `fast-contract` when every eligibility condition is evidenced.
 3. Triage selects `full` when any `full` trigger exists. Otherwise use `standard`.
-4. Promote only upward (`fast-contract` → `standard`/`full`, `standard` → `full`) when new evidence changes eligibility. Never restart the workflow merely because a user answered a decision already recorded in the same task.
+4. Record the chosen preset and its routing evidence before creating artifacts. When the user asks for speed, record `Cost profile: economy`.
+5. Promote only upward (`fast-contract` → `standard`/`full`, `standard` → `full`) when new evidence changes eligibility. Never restart the workflow merely because a user answered a decision already recorded in the same task.
 
 ## Shared safety floor
 

@@ -121,27 +121,33 @@ Depois de editar o config, **reinicie o OpenCode** para carregar as skills.
 O orquestrador escolhe o menor conjunto de artefatos para a mudança e avança por portões verificáveis. Os passos pesados (waves, subagents) só aparecem quando há trabalho paralelo real; um micro-change usa só `Goal / Tasks / Verification / Risks`.
 
 ```text
-triage   → classifica o pedido, registra a feature em docs/features.md
-   │        (precondição de cada modo é auto-guiada: se faltar, para e diz o comando exato)
+triage   → escolhe explicitamente fast-contract, standard ou full
+   │        registra evidência do roteamento, cost profile e write scope
+   │
 plan     → feature brief / PRD / ADR (quando estrutural) + plano
-   │        ADR exige `scope` → adr-correlator linka decisões anteriores (não re-decide)
-   │        plano preenche Traceability (REQ→design→teste) e Libraries (lib+versão+doc)
+   │        ADR exige `scope` → adr-correlator linka decisões anteriores
+   │        plano preenche Traceability (REQ→design→teste) e Libraries
    ▼
 Validation  ┌─ self-check V-001..V-007 ─────────────┐
 do plano    │  algum fail? → status: needs-resolve  │
             │  corrige → re-checa                    │──┐ loop até clean
             └───────────────────────────────────────┘◄─┘
-   │        só vira `planned`/aprovável com status: clean (sem gap, libs com doc ref)
-review   → findings dentro do plano; pós-execute inclui test-guide (keep/improve/remove/missing)
-execute  → Integration Coordinator: waves, handoffs, verificação focada por wave
+   │        só vira `planned`/aprovável com status: clean
+review   → uma revisão consolidada; nova rodada só com decisão blocking nova
+execute  → Integration Coordinator: waves, handoffs, verificação focada
    │        precondição: plano `approved` + Validation `clean`
-checkpoint → Post-feature Checkpoint (lixo + checagens por limiar) antes de commit/PR
+freeze   → após focused checks + bundle pós-execução; aceitar só P0/P1
+   │        P2 (refactor, otimização, cobertura extra) vira follow-up
+final    → um Validator por workstream + um build integrado no diff congelado
+checkpoint → Post-feature Checkpoint antes de commit/PR
 ```
 
 Por padrão, `feature-delivery` usa o perfil `balanced`. Para reduzir custo e
 latência, use `Cost profile: economy`: modelos solicitados pelo usuário ficam
 restritos a Workers, Readers/Verifiers usam o tier mínimo, a espera é orientada
-por eventos e a suíte completa fica para a verificação final.
+por eventos e a suíte completa fica para a verificação final. Em `full`, o
+roteamento exige uma revisão consolidada do plano e um Validator por
+workstream; revalidação ocorre somente no workstream refutado por evidência.
 
 **Portões de validação do plano:**
 

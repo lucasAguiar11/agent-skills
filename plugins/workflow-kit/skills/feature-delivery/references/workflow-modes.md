@@ -11,7 +11,7 @@ Before choosing a mode, select a preset from `workflow-presets.md`. `fast-contra
 | `triage` | Optional Scouts for docs/code/contracts | yes, read-only |
 | `plan` | Scout discovery, then Planner artifacts | partial |
 | `review` | Reviewer structural + Reviewer tests | yes, read-only |
-| `execute` | Coordinator + Workers/Validators/Verifiers by wave | yes, by wave |
+| `execute` | Coordinator + Workers by implementation wave; Validators in the final validation wave | yes, by wave |
 | `update` | Scout impact scan, then Planner diff | usually serial |
 
 Read `references/subagent-policy.md` for role mapping, `references/model-tier-policy.md` for model tiers, and `references/subagent-handoff.md` for launch/handoff rules.
@@ -119,20 +119,27 @@ Steps:
 2. Verify ownership, stop conditions, `Wave Schedule`, `Subagent Launch Spec`, and the selected cost profile/override scope. Contracted work verifies its one task and worker scope only.
 3. Set plan status to `in_progress` if not already. Contracted work records progress in its task header/issue instead.
 4. Run optional wave 0 work: contract confirmation, discovery, or pre-review.
-5. For each wave:
+5. For each implementation wave:
    - resolve `model_tier`, cost profile, and override scope per launch spec and pass `model` only to roles covered by that scope;
    - launch eligible subagents in parallel;
    - collect handoff blocks;
-   - launch one `task-validator` per completed Worker workstream (adversarial validation — `references/subagent-handoff.md`);
    - wait for events instead of polling `list_agents`;
    - run focused wave verification; reserve the full suite/build for final verification unless the plan opts in to full checks per wave;
    - update `Wave Execution Log` and print the Team Board;
    - stop if any workstream is `blocked` or `failed`.
-6. After the last wave, run `Final Verification`.
-7. Run the Post-execution Sequence (`SKILL.md` → `## Post-execution Sequence`): one review bundle with `simplify`, `clean-comments` on the feature diff files only (strip narrative comments; keep gotchas), `code-review-and-quality`, and `test-guide` when triggered; then Post-feature Checkpoint, AGENTS.md improvements (propose durable `AGENTS.md` additions, apply only as their own change), `verification-before-completion`, and status sync across `docs/features.md`, the feature brief/PRD, and the plan frontmatter.
-8. Optional **External Wait** after commit/PR (or deploy) when the user wants CI/smoke watched — `references/external-wait.md`. Prefer `gh … --watch`; else host scheduler/`/loop`. Skip if no external target.
+6. Run the single post-execution review bundle. If it changes code, rerun only the affected focused test module.
+7. Freeze the implementation diff. Launch one `task-validator` per substantive workstream. Revalidate only a workstream with concrete refutation evidence; classify P2 improvements as follow-up work.
+8. Run `Final Verification` once on the frozen diff, then run the Post-feature Checkpoint, report AGENTS.md improvement proposals, run `verification-before-completion`, and sync status across `docs/features.md`, the feature brief/PRD, and the plan frontmatter.
+9. Optional **External Wait** after commit/PR (or deploy) when the user wants CI/smoke watched — `references/external-wait.md`. Prefer `gh … --watch`; else host scheduler/`/loop`. Skip if no external target.
 
-If the plan has no launch spec and the work is small, the Coordinator may execute directly without subagents. When that inline delivery is **substantive** — touches domain rules, persistence, API/contracts, or a non-trivial diff — launch one `task-validator` on the Coordinator's own delivery before `Final Verification`: pass the plan's Task block plus a self-handoff (files changed, steps done, evidence), and treat `refuted` like any Validator refusal (fix findings, re-validate once, then stop and ask). Trivial diffs (a few lines, no domain/persistence/contract impact) skip this — inline verification and the Post-execution Sequence cover them.
+If the plan has no launch spec and the work is small, the Coordinator may
+execute directly without subagents. When that inline delivery is substantive
+— touches domain rules, persistence, API/contracts, or a non-trivial diff —
+run the review bundle, freeze the diff, then launch one `task-validator` before
+`Final Verification`. Treat `refuted` as a concrete defect: fix it, revalidate
+once, then stop and ask if it is refuted again. Trivial diffs (a few lines, no
+domain/persistence/contract impact) skip validation; inline verification and
+the Post-execution Sequence cover them.
 
 If the plan has parallel workstreams but no launch spec, stop and update the plan in `update` mode before continuing.
 

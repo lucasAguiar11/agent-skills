@@ -30,14 +30,22 @@ The Integration Coordinator must:
 2. Launch only the workstreams allowed in the current wave.
 3. Wait for all subagents in the wave to finish or stop.
 4. Collect each subagent's handoff block.
-5. Audit the `Test changes` field of every handoff. Any `escape-hatch`, or a `feature-driven` change not mapped to a plan task, or a `test-was-wrong` without prior approval, blocks the wave — stop and ask the user. A baseline test deleted/skipped/weakened in the diff but not reported is a defect; surface it.
-6. Launch one `task-validator` (bundled agent, `workflow-kit:task-validator`) per `completed` Worker workstream, in parallel. On hosts without bundled-agent discovery (Cursor, Codex, or when the agent is not registered), launch a general-purpose subagent with the full contents of `agents/task-validator.md` embedded as its instructions — never skip validation because the named agent is unavailable. Pass the Task block (fetch via `plan-detail-reader`) and that workstream's handoff. The validator is adversarial and independent — it re-runs verification itself and defaults to `refuted`. A `refuted` verdict marks the workstream `failed` (see Merge Rules); the wave does not advance on the Worker's word alone.
-7. Run the wave verification profile from the plan. Use focused checks during
+5. Audit the `Test changes` field of every handoff. Any `escape-hatch`, or a
+   `feature-driven` change not mapped to a plan task, or a `test-was-wrong`
+   without prior approval, blocks the wave — stop and ask the user. A baseline
+   test deleted/skipped/weakened in the diff but not reported is a defect;
+   surface it.
+6. Run the wave verification profile from the plan. Use focused checks during
    intermediate waves and reserve the full suite/build for the final gate unless
    the plan explicitly opts into full verification per wave. Confirm skipped
    tests are accounted for (no silent growth).
-8. Update `Wave Execution Log` in the plan and print the Team Board (below).
-9. Unblock the next wave or stop and ask the user when a stop condition triggers.
+7. Update `Wave Execution Log` in the plan and print the Team Board (below).
+8. Unblock the next wave or stop and ask the user when a stop condition triggers.
+
+Do not launch `task-validator` during an implementation wave. After the
+post-execution review bundle freezes the diff, launch one validator per
+substantive workstream in a single final validation wave. Revalidate only a
+workstream with concrete refutation evidence.
 
 The Coordinator must not declare the feature `done`. Only final verification after all waves completes that transition.
 

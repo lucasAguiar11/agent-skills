@@ -18,6 +18,16 @@ adr: []
 
 State the implementation outcome.
 
+## Delivery Routing
+
+Preset: <fast-contract | standard | full>
+Routing evidence:
+- <trigger or evidence supporting the preset>
+Cost profile: <economy | balanced | quality>
+Freeze point: after focused verification and one post-execution review bundle
+
+<!-- Do not start a second plan-review wave without a new blocking decision or
+material plan-shape change. After Freeze point, P2 improvements are follow-ups. -->
 ## Requirements and Constraints
 
 - REQ-001:
@@ -56,8 +66,8 @@ Approval required before execution:
 Model preference: <host model slug or none>
 Override scope: workers  <!-- workers | wave | all -->
 Reasoning effort: inherit  <!-- inherit or host-supported explicit value -->
-Cost profile: balanced  <!-- economy | balanced | quality -->
-Verification profile: focused-waves, full-final
+Cost profile: <economy | balanced | quality>
+Verification profile: focused-waves, frozen-diff-final
 
 ## Ownership
 
