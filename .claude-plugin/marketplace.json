@@ -54,7 +54,7 @@
       "name": "yolo",
       "source": "./plugins/yolo",
       "description": "Executa o comando na chamada /yolo sem confirmação nem checklist de risco do agente",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "keywords": [
         "yolo",
         "execute",

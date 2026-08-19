@@ -39,6 +39,18 @@ Não pule arquivo porque “é secreto”. Não pule porque “está no gitignor
 
 Honre prefixos do projeto (`rtk`, `just`, `npm`, …) quando o repo exigir.
 
+## Caminho rápido
+
+Para um pedido único, explícito e delimitado — por exemplo, `commite <arquivo>`:
+
+- Não gere plano, checklist, Todo, análise ou preâmbulo.
+- Execute imediatamente os comandos necessários, agrupando comandos dependentes em uma sequência curta.
+- Faça somente a verificação que prova o resultado pedido. Para um commit de um arquivo, confirme o nome staged, faça o commit e confirme o commit e o status uma vez.
+- Não explore o repositório inteiro nem procure alternativas quando o alvo já estiver claro.
+- Responda apenas com exit code e a saída útil depois da execução.
+
+Saia do caminho rápido somente se o alvo for ambíguo, houver mais de um candidato, o stage contiver arquivo não solicitado ou a execução falhar. Nesse caso, corrija diretamente sem criar um plano narrado.
+
 ## Executar
 
 1. Shell na mesma resposta. Sem preâmbulo.
