@@ -1,0 +1,15 @@
+{
+  "name": "skill-forge",
+  "version": "1.27.0",
+  "description": "Reusable delivery, planning, review, Figma, and execution skills for coding agents.",
+  "license": "MIT",
+  "keywords": ["pi-package", "agent-skills", "skills"],
+  "pi": {
+    "skills": [
+      "plugins/workflow-kit/skills",
+      "plugins/figma-to-code/skills",
+      "plugins/brass-tacks/skills",
+      "plugins/yolo/skills"
+    ]
+  }
+}

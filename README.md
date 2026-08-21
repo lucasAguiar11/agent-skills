@@ -10,6 +10,15 @@ Repo: [lucasAguiar11/agent-skills](https://github.com/lucasAguiar11/agent-skills
 
 ## Instalar
 
+### Pi Agent
+
+```bash
+pi install git:github.com/lucasAguiar11/agent-skills
+```
+
+Reinicie o Pi (ou rode `/reload`) e use as skills normalmente. Para instalar só
+neste projeto, execute o mesmo comando com `-l`.
+
 ### Cursor
 
 Settings → Plugins → Add marketplace `lucasAguiar11/agent-skills` → Install **`workflow-kit`**
