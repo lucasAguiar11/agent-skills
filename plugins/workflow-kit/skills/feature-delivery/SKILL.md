@@ -57,6 +57,33 @@ Artifacts that already exist with a sequential ID are **not** renamed. The date 
 13. Run the Post-execution Sequence (below) before commit/PR.
 14. **Single-approval rule.** An upfront execution request ("implement X", "executa", "faz a feature") is the approval — plan, self-review, and execute in one continuous flow without re-asking. Only stop for the user when: (a) the decision gate finds a `blocking` decision, (b) plan `Validation` cannot reach `status: clean`, or (c) a Validator refutes the same workstream twice. When the user asked only for a plan, stop after step 9 and wait for approval before executing.
 
+
+## Execute an Existing Approved Plan
+
+When the user names an existing feature and asks to execute it, and its plan is
+`approved` with `Validation: clean`, enter `execute` immediately:
+
+1. Do not rerun triage, artifact selection, the decision gate, or plan review.
+   Read only the relevant Task block plus the contract/design sections that
+   constrain it. Reopen those gates only when new evidence contradicts them.
+2. Before assigning a Worker, extract 3–5 **release invariants**: conditions
+   that must always hold for the changed behavior to be safe. Map each one to
+   an existing or new focused test. For example: “without a successful
+   association request, opening a box and writing its session are blocked.”
+3. Put the invariants, test scenarios, allowed write paths, and stop
+   conditions in the Worker handoff. A Worker must make the focused tests pass
+   before it reports completion.
+4. Use one Worker for a single vertical slice. Do not add a Planner, Reader,
+   Wave Schedule, or parallel review merely because the plan already contains
+   multiple layers.
+5. Run one consolidated post-execution review. A P0/P1 finding returns to the
+   same Worker once with the concrete evidence; rerun only the affected focused
+   tests, then freeze the diff. Do not start an additional review wave unless
+   a new blocking decision or changed contract requires it.
+
+This path removes repeated discovery and review ceremony without removing the
+contract, focused tests, or final verification.
+
 ## Preset: `fast-contract`
 
 Use this preset instead of the Default Flow when all conditions hold:

@@ -18,6 +18,15 @@ fast | standard | high
 
 Resolve at launch using `references/model-tier-policy.md`. Optional explicit `model_override` when the user or plan already named a host model.
 
+## Resolved Host Model
+
+Host:
+Resolved model:
+Fallback:
+
+For Codex, record the resolved Codex model when the host can select one. When it
+cannot, state `Model tier: <tier> — reason: <risk or role>` in the task header.
+
 ## Cost Profile
 
 economy | balanced | quality
@@ -56,6 +65,14 @@ Relevant docs:
 ## Inputs
 
 - Input document or code path.
+
+## Release Invariants (Required for Workers changing behavior)
+
+- Condition that must always hold:
+- Focused test scenario proving it:
+
+List 3–5 for an existing approved plan. A missing invariant or test mapping is
+a stop condition before code changes.
 
 ## Expected Output
 
@@ -100,6 +117,9 @@ Files changed:
 
 Test changes:
 - none | <test path>: feature-driven (mapped to task <ref>, red-green proven) | test-was-wrong (approved) | escape-hatch (STOPPED — not applied)
+
+Invariant evidence:
+- <invariant> — <focused test command/result>
 
 Evidence:
 - command: (full suite / package)

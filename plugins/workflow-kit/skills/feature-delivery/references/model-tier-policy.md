@@ -137,6 +137,17 @@ Claude Code may not expose model selection on every subagent path. When unavaila
 
 When Codex cannot set model per subagent, state tier in the task prompt header: `Model tier: high — reason: migration + domain rules`.
 
+Codex launch resolution:
+
+1. Resolve `fast` to the host fast profile when available; otherwise omit
+   `model` and keep the role read-only.
+2. Resolve `standard` to the host default Codex implementation model.
+3. Resolve `high` to the host high-reasoning Codex profile. If no explicit
+   profile is available, keep the default Codex model and set
+   `Reasoning effort: high` in the task header.
+4. A user-named Codex model applies only within its recorded override scope.
+   Never infer a slug from a tier or copy it to Scouts and Verifiers.
+
 ## Plan and Launch Requirements
 
 When a plan includes `Subagent Launch Spec`, every row must include `model_tier`.

@@ -158,6 +158,13 @@ por eventos e a suíte completa fica para a verificação final. Em `full`, o
 roteamento exige uma revisão consolidada do plano e um Validator por
 workstream; revalidação ocorre somente no workstream refutado por evidência.
 
+Quando o usuário aponta uma feature já `approved` com `Validation: clean` e
+pede execução, o plugin entra direto em `execute`. Não repete triage, plano ou
+review do plano. Antes do Worker, extrai 3–5 invariantes de entrega (condições
+que nunca podem falhar), mapeia cada uma para um teste focado e usa um único
+review bundle. Um achado P0/P1 retorna ao mesmo Worker uma vez; depois o diff
+congela para validação final.
+
 **Portões de validação do plano:**
 
 | Check | Pega |

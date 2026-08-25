@@ -6,8 +6,9 @@ The parent agent in `execute` mode acts as **Integration Coordinator**. It orche
 
 ## Wait Protocol
 
-Use event-driven waiting whenever the host provides it. The Coordinator should
-not turn a running wave into a timer loop.
+Use event-driven waiting whenever the host provides it. The Coordinator MUST NOT
+turn a running wave into a timer loop, poll for healthy Workers, or emit
+heartbeat status messages.
 
 1. Launch the eligible workstreams in one batch.
 2. Wait for an agent event or the host's wave-wait primitive.
@@ -77,7 +78,13 @@ When launching a subagent through the Task tool:
 4. Resolve `model_tier`, cost profile, and override scope using `references/model-tier-policy.md`; pass `model` to Task only for roles covered by that scope.
 5. Launch all subagents for the current wave in a **single message with multiple Task calls** when parallel execution is allowed.
 6. Pass the workstream id, wave number, model tier (and resolved model if applicable), allowed write paths, forbidden paths, verification commands, and stop conditions explicitly.
+
 7. Name the launch (the Task/Agent `description` shown in the host's progress tree) as `<Role> <WS> · <task short title> · wave <n>`, appending `· retry <m>` on retries — e.g. `DEV A · slugify · wave 1`, `QA B · word_count · wave 1 · retry 1`. Role vocabulary from the Team Board (`DEV`, `QA`, `CI`, `TL`, `SCOUT`). Never use generic labels ("agent", "subagent", "task").
+
+For a Worker that changes behavior, the launch must also include 3–5 release
+invariants and one focused test scenario for each. These are conditions that
+must always hold after the change. Missing invariant/test mappings block the
+launch; do not defer them to review.
 
 Do not launch parallel Workers with overlapping write paths. Prefer sequential execution or split the plan first.
 
@@ -91,9 +98,11 @@ Every subagent must return a handoff block in this shape:
 Status: completed | blocked | failed
 Workstream:
 Wave:
-
 Summary:
 - ...
+
+Release invariant evidence (Workers changing behavior only):
+- <invariant> — <focused test command/result>
 
 Files changed:
 - path (create|modify|delete) — only for Workers

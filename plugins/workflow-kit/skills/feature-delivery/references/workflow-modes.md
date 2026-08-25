@@ -10,7 +10,7 @@ Before choosing a mode, select a preset from `workflow-presets.md`. `fast-contra
 |---|---|---|
 | `triage` | Optional Scouts for docs/code/contracts | yes, read-only |
 | `plan` | Scout discovery, then Planner artifacts | partial |
-| `review` | Reviewer structural + Reviewer tests | yes, read-only |
+| `review` | One bundled Reviewer; split only for distinct evidence or approval gates | yes, read-only |
 | `execute` | Coordinator + Workers by implementation wave; Validators in the final validation wave | yes, by wave |
 | `update` | Scout impact scan, then Planner diff | usually serial |
 
@@ -90,9 +90,9 @@ Once the plan reaches `Validation: clean` and has 3+ `Task` blocks, offer to mir
 
 **Inside a continuous execution flow, suggest — never ask.** When the user asked for implementation upfront (single-approval rule), a blocking question about the tracker is the interruption that rule removes. Do not stop, do not wait for an answer: keep executing, and add one line to the closing report offering the sync (`Plan has N tasks — want them mirrored to <tracker>? Say the word and I sync.`). The user picks it up after delivery or ignores it. Ask up front only when the user stopped at the plan, or raised issues/tracker themselves.
 
-Prefer one bundled Reviewer when the same snapshot feeds all review checks.
+Use one bundled Reviewer when the same snapshot feeds all review checks.
 Split Reviewer subagents only when their evidence sources, write scopes, or
-approval gates differ:
+approval gates differ.
 
 | Workstream | Role | Skill | Scope |
 |---|---|---|---|
@@ -111,14 +111,26 @@ Use when the user explicitly asks to execute or implement — including an upfro
 
 For the `fast-contract` preset, the Contract Snapshot replaces the plan and its approval/validation fields. It must include source, request/response/error mapping, write scope, focused verification, final build, and the user's execution request. This preset has one Worker, one Validator, no waves, and no plan status updates.
 
+For a user-named plan that is `approved` with `Validation: clean`, go directly
+to `execute`. Do not repeat triage, artifact creation, the decision gate, or
+plan review unless the scope, contract, or requirements changed. First extract
+3–5 release invariants and map each one to an existing or new focused test;
+pass them to the Worker with its allowed write paths and stop conditions.
+
 The parent agent is the **Integration Coordinator**. Read `references/subagent-handoff.md` before launching work.
 
 Steps:
 
 1. Read the plan and confirm status is `approved` or `in_progress` (or auto-approve per the single-approval rule above). For the `fast-contract` preset, verify the Contract Snapshot instead.
-2. Verify ownership, stop conditions, `Wave Schedule`, `Subagent Launch Spec`, and the selected cost profile/override scope. Contracted work verifies its one task and worker scope only.
+2. For a parallel plan, verify ownership, stop conditions, `Wave Schedule`,
+   `Subagent Launch Spec`, and the selected cost profile/override scope. For a
+   single-workstream plan, verify only the Task block, Worker scope, release
+   invariants, and its focused verification. Contracted work verifies its one
+   task and worker scope only.
 3. Set plan status to `in_progress` if not already. Contracted work records progress in its task header/issue instead.
-4. Run optional wave 0 work: contract confirmation, discovery, or pre-review.
+4. Run wave 0 only for a recorded contract gap, discovery dependency, or
+   pre-review requirement. Do not use it to repeat discovery already captured
+   in an approved plan.
 5. For each implementation wave:
    - resolve `model_tier`, cost profile, and override scope per launch spec and pass `model` only to roles covered by that scope;
    - launch eligible subagents in parallel;

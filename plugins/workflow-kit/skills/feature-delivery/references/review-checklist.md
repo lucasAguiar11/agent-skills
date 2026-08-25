@@ -14,6 +14,9 @@ Completion, and Test Quality.
 - Section name: `Review Findings` for pre-execute reviews; `Post-execute Updates` for reviews after implementation.
 - Each finding row: `# / Severity / Area / Finding / Decision / Status` (`applied` / `deferred → <where>` / `rejected`).
 - Repeat rounds add rows or a dated subsection inside the same section. Never create `<FEATURE-ID>-review.md`, `<FEATURE-ID>-review-rN.md`, `FASE-X-review.md`, or any other `*-review*.md` file.
+- Run one pre-execute review pass. A second pass is allowed only after a new
+  blocking decision or a material plan-shape change; ordinary findings are
+  resolved in the same pass.
 
 ## Artifact Consistency
 
