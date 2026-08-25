@@ -4,6 +4,13 @@
 
 - Plugin **`yolo`**: skill `/yolo` executa o pedido sem confirmação no chat, inclusive `.env`, `git add -f`, commit, push e force push. Prevalece sobre a skill `commit`. Não desliga deny/hooks do host.
 
+## 1.28.0 — 2026-08-25
+
+- `feature-delivery`: plano já aprovado e limpo entra diretamente em `execute`, sem repetir triage, artefatos, decision gate ou review do plano.
+- `feature-delivery`: Workers que mudam comportamento recebem invariantes de entrega, cenário de teste focado e evidência desses testes no handoff.
+- `feature-delivery`: execução single-workstream dispensa waves; revisão consolidada, espera por eventos e retry único reduzem ciclos redundantes.
+- `feature-delivery`: resolução de tier para Codex explicita perfis `fast`, `standard` e `high`, inclusive fallback por `Reasoning effort`.
+
 ## 1.27.0 — 2026-08-19
 
 - `feature-delivery`: roteamento explícito entre `fast-contract`, `standard` e `full`, com evidência do preset e do `Cost profile`
