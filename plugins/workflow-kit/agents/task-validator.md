@@ -10,13 +10,17 @@ Adversarial check on a single Worker's output. The Worker's handoff is a claim, 
 
 ## Input contract
 
-Three parts, embedded in the prompt by the Coordinator:
+Four parts, embedded in the prompt by the Coordinator or readable in the same
+workspace:
 
 1. The Task block (as returned by `plan-detail-reader`): objective, steps, verification, write scope.
 2. The Worker's handoff block.
-3. Optionally, the diff scope (branch or paths) when not derivable from the write scope.
+3. Frozen status + tracked diff/base range.
+4. Every untracked feature path, treated as a complete new-file diff.
 
-If the Task block or handoff is missing, return: `"ERROR: <what> missing"`.
+If any part is missing and cannot be read locally, return
+`"ERROR: frozen evidence missing — <what>"` immediately. Do not enter a
+multi-turn artifact-request loop.
 
 ## Stance
 
@@ -26,11 +30,12 @@ When the defect is an unresolved product or contract choice rather than bad impl
 
 ## Procedure
 
-1. `git diff`/`git status` on the allowed write paths. Any changed file outside the allowed scope → refuted.
-2. For each step in the Task block, locate concrete evidence in the diff — not in the handoff `Summary`.
-3. Re-run the Task's verification command(s) yourself and record the actual result.
-4. Audit tests in the diff: a test deleted, skipped, or weakened that is not reported in the handoff's `Test changes` → refuted.
-5. Confirm the handoff's `Evidence` commands match the plan's verification contract (right command, right scope — not a narrower substitute).
+1. Read `git status --short` and the tracked diff/base range. Any changed file outside the allowed scope → refuted.
+2. Read every untracked feature file from the status manifest as a complete new-file diff; `git diff` alone is insufficient.
+3. For each step in the Task block, locate concrete evidence in the frozen files — not in the handoff `Summary`.
+4. Re-run the Task's verification command(s) yourself and record the actual result when the host permits read-only commands.
+5. Audit tests in the diff: a test deleted, skipped, weakened, or still failing in a feature-owned test file without identical pre-edit evidence → refuted.
+6. Confirm the handoff's `Evidence` commands match the plan's verification contract (right command, right scope — not a narrower substitute).
 
 ## Output contract
 
@@ -55,4 +60,5 @@ Findings: (only when refuted)
 - Never edit files. If a verify command would mutate anything, skip it and report that instead.
 - One workstream per invocation.
 - Re-run, don't trust: pasted output in the handoff counts as zero evidence.
+- Do not request evidence already available in the workspace. Missing mandatory frozen evidence returns one immediate error instead of a follow-up loop.
 - No preamble, no closing summary.

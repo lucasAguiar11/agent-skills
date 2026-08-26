@@ -84,6 +84,34 @@ When the user names an existing feature and asks to execute it, and its plan is
 This path removes repeated discovery and review ceremony without removing the
 contract, focused tests, or final verification.
 
+## Orchestration Gate
+
+Run this gate before invoking an external orchestration skill or launching any
+role not already required by this workflow.
+
+**Blocked — sequential plan.** When the approved plan omits `Parallelization`,
+`Wave Schedule`, and `Subagent Launch Spec`, do not add Scouts, Planners,
+Readers, parallel Reviewers, or another orchestration layer. Execute with at
+most one bounded Worker and one Validator for a substantive diff. Small work
+stays inline. An external orchestration skill never overrides this gate.
+
+**Pass — real parallel work.** Orchestration is allowed only when all are true:
+
+1. the plan defines at least two genuinely independent workstreams;
+2. write scopes do not overlap, or the additional workstreams are read-only;
+3. shared contracts and dependencies are fixed before launch;
+4. the plan contains the required launch spec and wave schedule.
+
+Default agent budget is two active subagents. A plan that needs more must record
+why each additional concurrent role reduces latency or supplies distinct
+high-risk evidence. The existence of multiple layers, many files, or a `full`
+preset is not evidence of parallelism.
+
+Model tier follows the role, not the feature size. Readers, Scouts, shell
+Verifiers, and mechanical Validators stay `fast`; `high` requires an explicit
+migration, security, public-contract, or similarly consequential judgment in
+that role's launch row.
+
 ## Preset: `fast-contract`
 
 Use this preset instead of the Default Flow when all conditions hold:
@@ -165,32 +193,53 @@ Cost profile: economy
 Verification profile: focused-waves, frozen-diff-final
 ```
 
+## Pre-edit Baseline Gate
+
+For `standard` or `full` work that changes domain behavior, persistence, a
+public contract, migrations, or tests, run the full relevant suite once before
+the first code edit when the environment can run it. Record exact failing test
+names, passed/failed/skipped counts, and unavailable fixtures in the plan.
+
+A final failure is “pre-existing” only when comparable pre-edit evidence shows
+the same test and failure. A test file touched by the feature is feature-owned
+until that comparison proves otherwise. Without a comparable baseline, a red
+final suite blocks `done`; keep the feature `in_progress` or `blocked`. An
+environment blocker discovered before implementation remains explicit in the
+plan and closing report.
+
 ## Post-execution Sequence
 
 Run this sequence after focused verification passes and before commit/PR:
 
-1. Run one review bundle on the same diff: `simplify`, `clean-comments` on
-   feature diff files only, `code-review-and-quality` when required, and
+1. The Coordinator runs mutating cleanup inline: `simplify`, then
+   `clean-comments` on feature diff files only. A Reviewer is always read-only;
+   “one review bundle” means one evidence pass, never one general-purpose agent
+   that both edits and reviews.
+2. Run one read-only review bundle: `code-review-and-quality` when required and
    `test-guide` when behavior or tests changed.
-2. If the bundle changes code, rerun only the affected focused test module.
-3. Freeze the implementation diff. After this point, accept only P0/P1
-   defects: a broken contract, failing verification, or a concrete
-   validator refutation. Refactors, optimizations, extra coverage, and
-   style improvements become follow-up work.
-4. Run one Validator per substantive workstream. Revalidate only the
-   workstream refuted with concrete evidence.
-5. Run the integrated final build once on the frozen diff. Do not repeat a
-   successful command unless source, configuration, or dependencies change.
-6. Run the Post-feature Checkpoint (`references/post-feature-checkpoint.md`)
+3. If inline cleanup changes code, rerun only the affected focused test module.
+4. Freeze the implementation diff. After this point, accept only P0/P1
+   defects: a broken contract, failing verification, or a concrete validator
+   refutation. Refactors, optimizations, extra coverage, and style improvements
+   become follow-up work.
+5. Capture the frozen evidence package before launching Validators:
+   `git status --short`, the tracked diff/base range, every untracked feature
+   path (read as a new file), Task/ownership scope, and exact verification
+   results. `git diff` alone is incomplete because it omits untracked files.
+6. Run one Validator per substantive workstream with that package. Revalidate
+   only the workstream refuted with concrete evidence.
+7. Run the integrated final suite/build once on the frozen diff. Compare any
+   failure with the pre-edit baseline; never label it pre-existing from memory.
+8. Run the Post-feature Checkpoint (`references/post-feature-checkpoint.md`)
    and report its result. A triggered action becomes a separate proposal; do
    not expand the current feature silently.
-7. Report AGENTS.md improvement proposals from
+9. Report AGENTS.md improvement proposals from
    `references/agents-md-improvements.md`; do not edit them silently.
-8. Run `verification-before-completion` before claiming completion.
-9. Set plan status to `done` only with fresh evidence, and sync status across
+10. Run `verification-before-completion` before claiming completion.
+11. Set plan status to `done` only with fresh evidence, and sync status across
    `docs/features.md`, the feature brief/PRD, and the plan frontmatter.
-10. **External Wait** is optional after commit/PR or deploy, never inside
-    waves or before local verification is green.
+12. **External Wait** is optional after commit/PR or deploy, never inside
+   waves or before local verification is green.
 
 ## Feature Registration
 
@@ -326,6 +375,7 @@ Use templates as output shapes, adapting paths only when the user or repository 
 - Do not enter `plan`, `review`, `execute`, or `update` while its precondition (see Modes → Mode preconditions) is unmet — stop and surface the exact next action instead of improvising. A complete Contract Snapshot is the `execute` precondition for the `fast-contract` preset.
 - Do not implement before there is an approved plan, unless the user explicitly asks for a very small direct change or the `fast-contract` preset has a complete Contract Snapshot and execution request.
 - Do not mark a plan `planned` or send it for review while its `Validation` status is not `clean`, or while the `Traceability Matrix` (medium+ features) has any `gap` row. Fix the plan and re-run the self-check first.
+- Do not invoke an external orchestration skill or add non-required agent roles when the plan is single-workstream. The Orchestration Gate permits at most one bounded Worker plus one Validator for a substantive diff; small work stays inline.
 - Do not assign parallel work without non-overlapping write scopes.
 - Do not launch parallel Workers across layers without a contract-first gate when shared ports/DTOs/enums/migrations are involved.
 - Do not advance to the next wave while any workstream in the current wave is `blocked` or `failed`.
@@ -336,6 +386,7 @@ Use templates as output shapes, adapting paths only when the user or repository 
 - Require an `Execution Profile` on parallel plans; default it to `balanced`, `workers`, and inherited reasoning when the user did not choose a cost or model preference.
 - Do not apply a user-selected model to every role unless the plan records `Override scope: all`; Workers are the default scope.
 - Do not poll `list_agents` or emit timer-based Team Boards while a wave is healthy; use the host's event wait and report state changes only.
+- Do not give a Reviewer write access. The Coordinator applies `simplify` and `clean-comments` inline before one read-only review bundle.
 - Do not launch one post-execution agent per review gate when the same diff, evidence, and approval boundary can be handled by one review bundle.
 - For `full`, do not start a second plan-review wave unless a new blocking
   decision or material plan-shape change is recorded in the plan.
@@ -343,10 +394,12 @@ Use templates as output shapes, adapting paths only when the user or repository 
   freeze, P0/P1 defects may be fixed; P2 improvements become follow-up work.
 - Run no more than one Validator wave per workstream. Revalidate only a
   workstream with concrete refutation evidence.
+- Do not launch a Validator before the frozen evidence package includes status, tracked diff, untracked feature files, ownership scope, and exact verification evidence.
 - Do not repeat a successful focused check or final build without a source,
   configuration, or dependency change.
 - Do not allow a plan to mutate another feature's owned module without recording the dependency and impact.
 - Do not claim completion without fresh verification evidence.
+- Do not call a final failure pre-existing without comparable pre-edit full-suite evidence. A failing test file touched by the feature is owned by the feature until proven otherwise; without that proof, keep status `in_progress` or `blocked`.
 - Do not set a feature to `done` (or any status change) in only one place. The status in `docs/features.md` (index), the feature brief/PRD, and the plan frontmatter must all match. A status changed in the brief but stale in the index is a defect — sync all three.
 - Do not delete, skip, or weaken a test that passed before the change in order to make execution green. Tests passing before the change form the protected baseline (see `test-guide` Test Integrity Gate). Any baseline test change must be classified `feature-driven` (mapped to a specific plan task that changes the asserted contract) and proven red-green, or `test-was-wrong` (explicit user approval first). A test edit that cannot be mapped to a planned contract change is an `escape-hatch`: stop, fix the code, and surface it to the user instead of applying it.
 - Do not finish an implementation review without invoking `test-guide` to audit the tests changed or added by the feature. Present the `keep/improve/remove/missing` classification, ask explicit approval before modifying any test, and do not mark the review as approved while `missing` items of medium or higher severity remain unaddressed.

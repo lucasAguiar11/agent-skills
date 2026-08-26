@@ -123,6 +123,25 @@ Tokens: 108k wave · 216k feature
 - O Coordinator espera eventos. Não faz polling de `list_agents` nem imprime heartbeat.
 - Workers recebem apenas o bloco da Task e a linha do launch spec. Prefira `fork_turns: none`.
 - A revisão pós-execução pode ser um único bundle com seções de `simplify`, `clean-comments`, `code-review-and-quality` e `test-guide` quando acionado; separar agentes só quando houver gates ou escopos diferentes.
+- Mutação e julgamento ficam separados: o Coordinator roda `simplify`/`clean-comments`; Reviewer é sempre read-only.
+- Antes do Validator: status, diff rastreado, arquivos untracked, ownership e outputs de verificação formam um pacote congelado obrigatório.
+- Falha final só é “preexistente” com evidência da suíte anterior; teste tocado pela feature é responsabilidade da feature até prova contrária.
+
+## Gate de orquestração
+
+Plano sem `Parallelization`, `Wave Schedule` e `Subagent Launch Spec` é
+sequencial: nenhuma skill externa de orquestração pode adicionar Scouts,
+Planners, Readers ou Reviewers. O teto é um Worker limitado e um Validator para
+diff substantivo; trabalho pequeno fica inline.
+
+Orquestração só passa com duas ou mais frentes independentes, ownership sem
+sobreposição, contratos compartilhados definidos e waves registradas. O limite
+padrão é dois subagentes ativos; cada agente adicional precisa de justificativa
+de latência ou evidência de risco independente no plano.
+
+Readers, Scouts, Verifiers e Validators mecânicos ficam em tier `fast`. Tier
+`high` exige risco consequencial explícito — migration, segurança ou contrato
+público — na linha de lançamento daquele papel.
 
 ## Presets de workflow
 
@@ -159,7 +178,7 @@ Cada subagente custa ~30k+ tokens só de spin-up. As alavancas são menos lança
 - QA em modelo rápido quando o check é mecânico; padrão quando julga cobertura/semântica.
 - Trabalho pequeno fica inline com o coordenador — sem par Dev+QA para meia dúzia de edits.
 - Um validator por entrega, nunca por step; `validated` é final, sem re-validar por segurança.
-- Sem Dev não há QA: o que o coordenador fez inline é coberto pela verificação de wave.
+- Trabalho inline trivial usa verificação local; diff substantivo recebe um único Validator, mesmo sem Worker.
 
 ## Garantias do desenho
 

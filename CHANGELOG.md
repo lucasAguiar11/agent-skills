@@ -3,6 +3,8 @@
 ## Unreleased
 
 - Plugin **`yolo`**: skill `/yolo` executa o pedido sem confirmação no chat, inclusive `.env`, `git add -f`, commit, push e force push. Prevalece sobre a skill `commit`. Não desliga deny/hooks do host.
+- `feature-delivery`: novo gate bloqueia orquestração externa em planos single-workstream, limita o fluxo sequencial a um Worker + um Validator e exige justificativa para mais de dois subagentes ativos ou tier `high`.
+- `feature-delivery`: Reviewer passa a ser obrigatoriamente read-only; cleanup mutável fica no Coordinator, Validator exige pacote congelado incluindo untracked, e falha final só conta como baseline com evidência comparável pré-edit.
 
 ## 1.28.0 — 2026-08-25
 

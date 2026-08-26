@@ -105,6 +105,22 @@ A test rewritten for a new contract must fail against the old implementation and
 
 A skipped or filtered test reads as green. Completion evidence must come from the full suite (or the full relevant project/package), not from a filtered run of only the tests you touched. Report the suite total (`N passed, M skipped`) and account for every skip — an unexplained jump in skipped count is a regression in coverage, not a pass.
 
+### Pre-existing failures require proof
+
+For structural `feature-delivery` work, run the full relevant suite before the
+first code edit when runnable and record exact failures/skips. A final failure
+is pre-existing only when the same test and failure appear in that pre-edit
+evidence.
+
+A failing test file touched by the feature is feature-owned by default. Fix the
+production bug or apply a `feature-driven` test correction that preserves or
+strengthens the assertion. Do not defer it as “baseline” merely because a
+similar failure existed elsewhere.
+
+Without comparable pre-edit evidence, a red final suite blocks `done`; keep the
+feature `in_progress` or `blocked` unless the plan recorded an explicit
+user-approved exception before execution.
+
 ### Default actions
 
 - Red test during execution → fix the code, not the test.

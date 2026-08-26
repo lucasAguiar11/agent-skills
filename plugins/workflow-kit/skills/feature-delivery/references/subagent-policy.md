@@ -5,6 +5,24 @@ Use subagents when they increase throughput or improve review quality without cr
 In `plan` mode, prefer documenting launch specs in the implementation plan.
 In `execute` mode, the parent agent acts as **Integration Coordinator** and must launch subagents from those specs when workstreams are independent. Read `references/subagent-handoff.md` for handoff and merge rules.
 
+## Orchestration Gate
+
+This gate is authoritative even when another installed skill recommends
+orchestration.
+
+- **Sequential plan:** no `Parallelization`, `Wave Schedule`, or
+  `Subagent Launch Spec` means no orchestration layer. Use at most one bounded
+  Worker and one Validator for a substantive diff; execute small work inline.
+  Do not add Scouts, Planners, Readers, or Reviewers around known evidence.
+- **Parallel plan:** launch only when there are at least two independent
+  workstreams, ownership is non-overlapping, shared contracts are fixed, and
+  launch/wave sections exist.
+- **Budget:** default maximum is two active subagents. Every additional
+  concurrent role needs a plan-recorded latency or independent-risk reason.
+- **Tier:** Readers, Scouts, shell Verifiers, and mechanical Validators use
+  `fast`. `high` is reserved for a role with an explicit consequential
+  migration, security, or public-contract judgment.
+
 ## Good Candidates
 
 Use subagents for:
@@ -80,6 +98,7 @@ substantive workstream — see `references/subagent-handoff.md`.
 ## Token Economy
 
 Every subagent costs a full context spin-up (~30k+ tokens even for a trivial task), so the levers are fewer launches and smaller prompts — never weaker checks:
+- **External orchestrators do not create permission:** if this gate blocks orchestration, an installed `orchestrate`-style skill cannot add roles or raise the agent budget.
 
 - **Prompt = Task block + launch-spec row, nothing more.** Never paste the whole plan, brief, or another workstream's context into a subagent prompt; fetch bounded detail via `plan-detail-reader`.
 - **Model preference scope:** a user-selected model applies to Workers by default. Do not copy it to shell Verifiers, Readers, or mechanical Validators unless the user explicitly selected `Override scope: all`.
@@ -88,10 +107,24 @@ Every subagent costs a full context spin-up (~30k+ tokens even for a trivial tas
 - **One Validator per workstream, never per step or per file.**
 - **Small work stays inline.** A task the Coordinator can do in a few edits does not justify a Worker + Validator pair (see Poor Candidates); the pair is for parallel or riskier slices.
 - **No re-validation without a retry.** A `validated` verdict is final for that wave; do not relaunch validators for reassurance.
-- **One post-execution review bundle:** when simplify, clean-comments, code-review-and-quality, and test-guide target the same diff, use one Reviewer pass with separate sections in its handoff. Split into multiple agents only when write scopes, evidence sources, or approval gates differ.
+- **One post-execution review bundle:** the Coordinator applies `simplify` and `clean-comments` inline, then one read-only Reviewer covers `code-review-and-quality` and `test-guide` in separate sections. A Reviewer never edits; do not combine mutation and judgment in one general-purpose agent.
 - **Event-driven waiting:** after launching a wave, wait for agent events or the host's wave-wait primitive. Do not poll `list_agents` on a timer or emit progress messages just to keep the session alive.
 - **Context inheritance:** prefer `fork_turns: none` for Workers, Validators, Reviewers, and Verifiers. Pass the bounded Task block and launch row; inherit history only when a Reader explicitly needs it.
 - The Team Board's `Tokens` line (`subagent-handoff.md`) keeps the running spend visible to the user — sum of `subagent_tokens` from agent results.
+
+## Frozen Validator Evidence
+
+Before launch, the Coordinator provides or makes locally readable:
+
+1. `git status --short`, including deleted and untracked paths;
+2. tracked diff or base/head range;
+3. every untracked feature file, treated as a complete new-file diff;
+4. Task block, ownership scope, and Worker handoff;
+5. exact focused/final verification output.
+
+`git diff` alone is not a frozen package because it omits untracked files. If
+the host prevents the Validator from running commands, the package is
+mandatory at spawn time; do not launch and ask for artifacts later.
 
 ## Skill Mapping
 

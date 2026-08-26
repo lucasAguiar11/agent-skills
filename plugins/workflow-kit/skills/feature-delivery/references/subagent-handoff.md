@@ -43,6 +43,18 @@ The Integration Coordinator must:
 7. Update `Wave Execution Log` in the plan and print the Team Board (below).
 8. Unblock the next wave or stop and ask the user when a stop condition triggers.
 
+Before the final validation wave, freeze and record one evidence package:
+
+- `git status --short` manifest;
+- tracked diff/base range;
+- every untracked feature path, read as a complete new file;
+- Task/ownership scope and Worker handoff;
+- exact focused and final verification output.
+
+`git diff` without the untracked manifest is incomplete. When the host prevents
+Validator commands, attach this package to the launch prompt instead of
+starting an evidence-request loop.
+
 Do not launch `task-validator` during an implementation wave. After the
 post-execution review bundle freezes the diff, launch one validator per
 substantive workstream in a single final validation wave. Revalidate only a
@@ -184,7 +196,11 @@ Do not rewrite goals, requirements, or ownership mid-flight unless the user appr
 
 After the last wave:
 
-1. Run `Final Verification` from the plan.
-2. Invoke `test-guide` when tests changed or domain/API/persistence behavior changed.
-3. Invoke `verification-before-completion` before claiming success.
-4. Set plan status to `done` only with fresh evidence recorded in the plan or reported to the user.
+1. Run `Final Verification` from the plan on the frozen diff.
+2. Compare final-suite failures with a recorded pre-edit baseline. A touched
+   failing test is feature-owned until identical pre-edit evidence proves
+   otherwise.
+3. Invoke `test-guide` when tests changed or domain/API/persistence behavior changed.
+4. Invoke `verification-before-completion` before claiming success.
+5. Set plan status to `done` only with fresh green evidence or an explicit
+   pre-approved baseline exception. Otherwise keep `in_progress`/`blocked`.
