@@ -42,7 +42,7 @@ Artifacts that already exist with a sequential ID are **not** renamed. The date 
 
 ## Default Flow
 
-1. Select the `fast-contract`, `standard`, or `full` preset, then choose the lightest useful artifact set. See `references/workflow-presets.md`.
+1. Select the `fast-contract`, `standard`, or `full` preset, then choose the lightest useful artifact set. See `references/workflow-presets.md`. For a cross-repo handoff, load `safe-handoff-execution` before discovery.
 2. Record the selected preset, routing evidence, cost profile, and write scope before creating artifacts.
 3. For `standard` or `full`, register or update the feature in `docs/features.md`.
 4. For `standard` or `full`, create or update `docs/features/<FEATURE-ID>.md`.
@@ -325,6 +325,7 @@ Use these local/project skills when appropriate:
 - `create-architectural-decision-record`: create an ADR for structural decisions.
 - `create-implementation-plan`: create a new plan.
 - `update-implementation-plan`: update an existing plan.
+- `safe-handoff-execution`: aplica execução inline-first, limite de Worker, janela curta de espera e proteção contra sobrescrita em handoffs cross-repo.
 
 Use installed/global workflow skills when available:
 
