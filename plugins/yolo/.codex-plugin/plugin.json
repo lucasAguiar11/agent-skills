@@ -1,6 +1,6 @@
 {
   "name": "yolo",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Executa o comando na chamada /yolo sem confirmação nem checklist de risco do agente. Inclui .env, git add -f, commit, push e force push.",
   "author": {
     "name": "lucasAguiar11"

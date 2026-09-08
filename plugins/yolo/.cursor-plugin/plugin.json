@@ -1,6 +1,6 @@
 {
   "name": "yolo",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Executes the request immediately through /yolo without chat confirmation or a risk checklist",
   "author": {
     "name": "lucasAguiar11"
