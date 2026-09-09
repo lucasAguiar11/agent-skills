@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 1.32.0 — 2026-09-09
+
+- `workflow-kit`: adiciona extensão nativa do OMP pelo marketplace, com política de eficiência, indicador `eficiência: ATIVA` após aplicação bem-sucedida e deduplicação entre turnos.
+- A extensão reinicia a aplicação após compactação, branch ou troca de sessão, sem acumular mensagens de contexto.
+
 ## 1.31.0 — 2026-09-09
 
 - `workflow-kit`: novo hook `SessionStart` injeta uma política curta de velocidade e economia de tokens no formato do Claude Code, sem carregar skills inteiras nem gravar configurações nos projetos.
