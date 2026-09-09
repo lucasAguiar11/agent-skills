@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 1.31.0 — 2026-09-09
+
+- `workflow-kit`: novo hook `SessionStart` injeta uma política curta de velocidade e economia de tokens no formato do Claude Code, sem carregar skills inteiras nem gravar configurações nos projetos.
+- Nova skill `fast-subagent-protocol`: contexto reutilizável, checkpoints por papel, handoffs compactos, cancelamento seguro e validação sobre arquivos estáveis.
+- `feature-delivery`: exige o protocolo antes de lançar subagents, preservando o gate de orquestração e as regras do repositório.
+- `safe-handoff-execution`: delega a supervisão ao protocolo e remove o prazo fixo de 120 segundos, preservando contratos e limites de escrita entre repositórios.
+
 ## 1.29.0 — 2026-08-26
 
 - Plugin **`yolo`**: skill `/yolo` executa o pedido sem confirmação no chat, inclusive `.env`, `git add -f`, commit, push e force push. Prevalece sobre a skill `commit`. Não desliga deny/hooks do host.
