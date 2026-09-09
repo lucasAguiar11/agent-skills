@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 1.33.0 — 2026-09-09
+
+- `workflow-kit`: adiciona o protocolo wire v1 em JSON, com eventos persistentes para launches, checkpoints, handoffs, veredictos e bloqueios.
+- `workflow-kit`: adiciona validação de evidências por SHA-256, fingerprints de ambiente, cache reutilizável, capsule de contexto e ledger de eficiência.
+- `workflow-kit`: adiciona os tools `workflow_event` e `workflow_lookup`, com gate de dois agentes ativos, retry monotônico e prova obrigatória para conclusões.
+
 ## 1.32.0 — 2026-09-09
 
 - `workflow-kit`: adiciona extensão nativa do OMP pelo marketplace, com política de eficiência, indicador `eficiência: ATIVA` após aplicação bem-sucedida e deduplicação quando o marcador já existe no contexto efetivo.
