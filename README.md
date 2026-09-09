@@ -109,7 +109,7 @@ Depois de editar o config, **reinicie o OpenCode** para carregar as skills.
 - `code-review-and-quality` (review multi-eixo de PR/MR ou de diff local; ex-`pr-review`)
 - `supersede-feature`
 
-**Eficiência ao iniciar a sessão:** o plugin inclui `hooks/hooks.json` com um `SessionStart` que injeta uma regra curta de velocidade e economia de tokens, sem carregar skills inteiras nem escrever configurações nos projetos. A skill `fast-subagent-protocol` é carregada antes de delegar. O hook usa o contrato de plugins do Claude Code (`CLAUDE_PLUGIN_ROOT` e `hookSpecificOutput.additionalContext`); habilite/atualize o plugin e inicie uma nova sessão. Instalar apenas as skills não instala esse hook. A ativação automática em OMP/Orca e outros hosts não foi verificada.
+**Eficiência:** Claude Code usa `hooks/hooks.json` para injetar a política no `SessionStart`; OMP usa `extensions/index.ts`, declarada em `package.json → omp.extensions`, para aplicar a política, mostrar `eficiência: ATIVA` somente após a aplicação e deduplicar entre turnos. Após atualizar o plugin, reinicie a sessão para carregar a extensão. Instalar apenas as skills não carrega o runtime OMP.
 
 **Reader agents** (Claude Code — auto-discovery em `agents/`, context offload): `plan-reader`, `plan-detail-reader`, `feature-reader`, `adr-reader`, `adr-correlator`, `feature-index-reader`. Cada um lê um doc grande e devolve um digest de forma fixa, mantendo o thread principal enxuto. Nos demais hosts (Cursor/Codex/OpenCode) os docs são lidos inline.
 
