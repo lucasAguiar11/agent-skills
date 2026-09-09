@@ -109,7 +109,7 @@ Depois de editar o config, **reinicie o OpenCode** para carregar as skills.
 - `code-review-and-quality` (review multi-eixo de PR/MR ou de diff local; ex-`pr-review`)
 - `supersede-feature`
 
-**Eficiência:** Claude Code usa `hooks/hooks.json` para injetar a política no `SessionStart`; OMP usa `extensions/index.ts`, declarada em `package.json → omp.extensions`, para aplicar a política, mostrar `eficiência: ATIVA` somente após a aplicação e deduplicar entre turnos. Após atualizar o plugin, reinicie a sessão para carregar a extensão. Instalar apenas as skills não carrega o runtime OMP.
+**Eficiência:** Claude Code usa `hooks/hooks.json` para injetar a política no `SessionStart`; OMP usa `extensions/index.ts`, declarada em `package.json → omp.extensions`, para transformar o contexto efetivo, mostrar `eficiência: ATIVA` somente após a aplicação e não duplicar a política quando o marcador já existe. Se compactação ou troca de contexto remover o marcador, a política é reinjetada. Após atualizar o plugin, reinicie a sessão para carregar a extensão. Instalar apenas as skills não carrega o runtime OMP.
 
 **Reader agents** (Claude Code — auto-discovery em `agents/`, context offload): `plan-reader`, `plan-detail-reader`, `feature-reader`, `adr-reader`, `adr-correlator`, `feature-index-reader`. Cada um lê um doc grande e devolve um digest de forma fixa, mantendo o thread principal enxuto. Nos demais hosts (Cursor/Codex/OpenCode) os docs são lidos inline.
 

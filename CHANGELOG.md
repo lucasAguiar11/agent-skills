@@ -4,8 +4,8 @@
 
 ## 1.32.0 — 2026-09-09
 
-- `workflow-kit`: adiciona extensão nativa do OMP pelo marketplace, com política de eficiência, indicador `eficiência: ATIVA` após aplicação bem-sucedida e deduplicação entre turnos.
-- A extensão reinicia a aplicação após compactação, branch ou troca de sessão, sem acumular mensagens de contexto.
+- `workflow-kit`: adiciona extensão nativa do OMP pelo marketplace, com política de eficiência, indicador `eficiência: ATIVA` após aplicação bem-sucedida e deduplicação quando o marcador já existe no contexto efetivo.
+- A extensão reaplica a política quando compactação, branch ou troca de sessão deixam o marcador fora do contexto reconstruído, sem consultar histórico ancestral como prova.
 
 ## 1.31.0 — 2026-09-09
 
