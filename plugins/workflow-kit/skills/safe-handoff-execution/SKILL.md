@@ -1,6 +1,6 @@
 ---
 name: safe-handoff-execution
-description: Executa handoffs cross-repo e features de forma rápida, com escopo rígido, workers limitados e proteção contra sobrescrita acidental.
+description: Executa handoffs cross-repo com contrato verificável, escopo rígido e proteção contra sobrescrita acidental. Use ao consumir um handoff de outra aplicação.
 ---
 
 # Execução segura de handoffs
@@ -23,13 +23,9 @@ Use esta skill ao implementar um handoff de outra aplicação, especialmente qua
 
 ## Delegação
 
-- Trabalhe inline por padrão.
-- Use no máximo um Worker para uma fatia vertical realmente independente.
-- Não crie Scout, Planner, wave ou Reviewer extra em plano sequencial.
-- O Worker edita apenas os caminhos autorizados e não executa suíte ampla.
-- Aguarde uma única janela de até 120 segundos. Se não entregar, envie encerramento e assuma inline.
-- Worker parcial não é conclusão. Verifique o diff, corrija ou substitua inline.
-- Validator roda uma vez depois do diff congelado. Revalide somente após uma refutação P0/P1 concreta.
+- Trabalhe inline por padrão; antes de delegar, carregue `fast-subagent-protocol` para contexto, checkpoints, cancelamento e recuperação de trabalho parcial.
+- Preserve o gate do `feature-delivery`: no máximo um Worker limitado e um Validator para diff substantivo; não adicione Scouts, Planners, waves ou Reviewers em plano sequencial.
+- O protocolo não autoriza ampliar os caminhos de escrita nem alterar o repositório de origem.
 
 ## Edição segura
 

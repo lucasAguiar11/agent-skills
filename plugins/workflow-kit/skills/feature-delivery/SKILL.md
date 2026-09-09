@@ -89,6 +89,11 @@ contract, focused tests, or final verification.
 Run this gate before invoking an external orchestration skill or launching any
 role not already required by this workflow.
 
+Before launching any subagent, including required Workers and Validators, load
+the bundled `fast-subagent-protocol` once for context reuse, role-specific
+checkpoints, and safe cancellation. This gate and repository rules still decide
+which roles are allowed; the protocol never expands that permission.
+
 **Blocked — sequential plan.** When the approved plan omits `Parallelization`,
 `Wave Schedule`, and `Subagent Launch Spec`, do not add Scouts, Planners,
 Readers, parallel Reviewers, or another orchestration layer. Execute with at
@@ -325,7 +330,8 @@ Use these local/project skills when appropriate:
 - `create-architectural-decision-record`: create an ADR for structural decisions.
 - `create-implementation-plan`: create a new plan.
 - `update-implementation-plan`: update an existing plan.
-- `safe-handoff-execution`: aplica execução inline-first, limite de Worker, janela curta de espera e proteção contra sobrescrita em handoffs cross-repo.
+- `fast-subagent-protocol`: required before subagent launch; context reuse, role-specific checkpoints, safe cancellation, and centralized verification.
+- `safe-handoff-execution`: contract snapshot, write boundaries, and safe editing for cross-repository handoffs.
 
 Use installed/global workflow skills when available:
 

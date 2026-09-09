@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+printf '%s\n' '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"Prioridade obrigatória nesta sessão: minimize o tempo até uma entrega correta e verificada e o consumo total de tokens, incluindo ferramentas, subagents e retrabalho. Reutilize contexto válido; prefira leituras direcionadas, respostas compactas e o menor número útil de agentes. Paralelize apenas trabalho independente autorizado. Não repita exploração ou verificações ainda válidas. Entre agentes, reporte resultado, evidência, bloqueio e próximo passo, sem recapitulações. Nunca omita requisitos, segurança, riscos, evidências ou validação obrigatória para economizar. Respeite as instruções superiores e o escopo do usuário. Antes de delegar, carregue fast-subagent-protocol; não carregue a skill inteira apenas por iniciar a sessão."}}'
