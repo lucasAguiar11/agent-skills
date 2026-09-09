@@ -19,8 +19,33 @@ type ContextEvent = {
 };
 
 type EfficiencyContext = {
-  ui: { setStatus: (key: string, value: string) => void };
+  ui: {
+    setStatus: (key: string, value: string) => void;
+    theme?: { fg: (tone: string, text: string) => string };
+  };
 };
+
+type EfficiencyState = "pending" | "active";
+
+function setEfficiencyStatus(ctx: EfficiencyContext, state: EfficiencyState): void {
+  const label = state === "active" ? "ON" : "...";
+  const plain = `${state === "active" ? "●" : "○"} ⚡ eficiência: ${label}`;
+
+  try {
+    const theme = ctx.ui.theme;
+    if (theme?.fg) {
+      const indicator = theme.fg(state === "active" ? "accent" : "dim", state === "active" ? "●" : "○");
+      const title = theme.fg("muted", "eficiência: ");
+      const value = theme.fg("text", label);
+      ctx.ui.setStatus(STATUS_KEY, `${indicator} ⚡ ${title}${value}`);
+      return;
+    }
+  } catch {
+    // UI themes can be unavailable during startup.
+  }
+
+  ctx.ui.setStatus(STATUS_KEY, plain);
+}
 
 function hasPolicyInContext(messages: readonly ContextMessage[]): boolean {
   return messages.some((message) => {
@@ -41,7 +66,7 @@ function hasPolicyInContext(messages: readonly ContextMessage[]): boolean {
 
 export function registerEfficiency(pi: ExtensionAPI): void {
   const markPending = (ctx: EfficiencyContext) => {
-    ctx.ui.setStatus(STATUS_KEY, "eficiência: PENDENTE");
+    setEfficiencyStatus(ctx, "pending");
   };
 
   pi.on("session_start", async (_event, ctx) => {
@@ -62,11 +87,11 @@ export function registerEfficiency(pi: ExtensionAPI): void {
 
   pi.on("context", async (event: ContextEvent, ctx) => {
     if (hasPolicyInContext(event.messages)) {
-      ctx.ui.setStatus(STATUS_KEY, "eficiência: ATIVA");
+      setEfficiencyStatus(ctx, "active");
       return;
     }
 
-    ctx.ui.setStatus(STATUS_KEY, "eficiência: ATIVA");
+    setEfficiencyStatus(ctx, "active");
     return {
       messages: [
         ...event.messages,
