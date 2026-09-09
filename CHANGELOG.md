@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-## 1.33.0 — 2026-09-09
+## 1.34.0 — 2026-09-09
+- `workflow-kit`: captura automaticamente spawns e ciclos de vida do tool `task` no OMP, aplicando o gate de agentes ativos e retries sem depender de `workflow_event` manual.
 
 - `workflow-kit`: adiciona o protocolo wire v1 em JSON, com eventos persistentes para launches, checkpoints, handoffs, veredictos e bloqueios.
 - `workflow-kit`: adiciona validação de evidências por SHA-256, fingerprints de ambiente, cache reutilizável, capsule de contexto e ledger de eficiência.
