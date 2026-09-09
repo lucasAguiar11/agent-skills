@@ -100,6 +100,79 @@ launch; do not defer them to review.
 
 Do not launch parallel Workers with overlapping write paths. Prefer sequential execution or split the plan first.
 
+# Wire protocol v1
+
+Use `workflow_event` in OMP, or `/workflow-event` for manual inspection, to
+record one JSON event. The protocol is the machine-readable form of the
+handoff; Markdown remains the human-facing form.
+
+Supported event types:
+
+| Type | Required proof |
+|---|---|
+| `spawn.request` | goal, disjoint scope, tier, budget, reason |
+| `checkpoint` | goal, changed paths, evidence, open items, next step |
+| `handoff` | status, evidence, verification; `completed` requires a passed check |
+| `verdict` | `validated` or `refuted`, evidence, verification |
+| `blocked` | reason, unblock condition, optional evidence |
+
+`workflow_lookup` tenta reutilizar evidência por objetivo e escopo. O resultado
+só é hit se todos os hashes de arquivos e fingerprints do ambiente continuarem
+válidos; caso contrário, repita a investigação e registre um novo checkpoint.
+
+Example:
+
+```json
+{
+  "v": 1,
+  "type": "handoff",
+  "id": "h-17",
+  "run": "run-42",
+  "from": "worker",
+  "to": "coordinator",
+  "workstream": "A",
+  "goal": "Corrigir o roteamento de retry",
+  "scope": ["plugins/workflow-kit/extensions"],
+  "status": "completed",
+  "evidence": [
+    {
+      "path": "plugins/workflow-kit/extensions/efficiency.ts",
+      "sha256": "<sha256 do arquivo inteiro>",
+      "bytes": 1234,
+      "lineRange": [42, 58]
+    }
+  ],
+  "verification": [
+    {
+      "command": "node --test plugins/workflow-kit/extensions/protocol.test.ts",
+      "status": "passed",
+      "cwd": "/workspace",
+      "environment": {
+        "cwd": "/workspace",
+        "runtime": "node v22",
+        "platform": "darwin-arm64",
+        "env": {},
+        "files": [],
+        "digest": "<fingerprint do ambiente>"
+      },
+      "evidence": []
+    }
+  ],
+  "next": "Rodar o smoke test do fluxo completo"
+}
+```
+
+Rules:
+
+- `sha256` cobre o arquivo inteiro, inclusive mudanças fora do trecho citado.
+- O consumidor deve recalcular e comparar o hash antes de reutilizar a evidência.
+- Arquivos novos e não rastreados entram no mesmo mecanismo.
+- Resultado de teste inclui comando, diretório, runtime, ambiente e arquivos de
+  configuração/dependência relevantes.
+- Cache de teste só é válido quando essa fingerprint inteira coincide.
+- Binário/base64 não é formato de prompt. Um renderer compacto pode existir
+  depois, mas o JSON validado é a fonte de verdade.
+
 ## Handoff Block (Required From Every Subagent)
 
 Every subagent must return a handoff block in this shape:

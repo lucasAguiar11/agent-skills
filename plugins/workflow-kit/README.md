@@ -127,6 +127,29 @@ Tokens: 108k wave · 216k feature
 - Antes do Validator: status, diff rastreado, arquivos untracked, ownership e outputs de verificação formam um pacote congelado obrigatório.
 - Falha final só é “preexistente” com evidência da suíte anterior; teste tocado pela feature é responsabilidade da feature até prova contrária.
 
+## Protocolo wire v1
+
+No OMP, `workflow_event` registra launches, checkpoints, handoffs, veredictos e
+bloqueios como eventos JSON validados. `/workflow-event` permite inspecionar ou
+registrar o mesmo formato manualmente.
+
+`workflow_lookup` consulta o cache por objetivo e escopo. Um cache hit devolve
+referências de evidência; o consumidor ainda lê o arquivo quando precisar. Um
+arquivo, variável de ambiente, runtime, configuração ou dependência divergente
+torna o resultado um cache miss.
+
+O evento é persistido na sessão. O status `workflow-efficiency` mostra tokens
+quando o host fornece uso real, além de tools, launches, retries, veredictos e
+cache hits/misses.
+
+Evidências carregam o SHA-256 do arquivo inteiro. O consumidor recalcula o hash
+antes de reutilizar a referência, inclusive para arquivos novos ou alterados
+sem commit. Verificações também carregam comando, ambiente, runtime e arquivos
+de configuração/dependência relevantes.
+
+JSON/NDJSON é a fonte canônica. Binário e base64 não são usados no prompt:
+agentes precisam ler e produzir o contrato sem uma camada opaca adicional.
+
 ## Gate de orquestração
 
 Plano sem `Parallelization`, `Wave Schedule` e `Subagent Launch Spec` é
