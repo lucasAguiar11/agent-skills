@@ -7,7 +7,8 @@ export const PROTOCOL_VERSION = 1 as const;
 export const PROTOCOL_ENTRY = "workflow-kit:protocol:v1";
 export const CAPSULE_MARKER = "<!-- workflow-efficiency:capsule:v1 -->";
 
-type EventType = "spawn.request" | "checkpoint" | "handoff" | "verdict" | "blocked";
+type EventType = "spawn.request" | "checkpoint" | "handoff" | "verdict" | "blocked" | "agent.lifecycle";
+type AgentLifecycleStatus = "started" | "completed" | "failed" | "aborted";
 type VerificationStatus = "passed" | "failed" | "skipped";
 
 export interface EvidenceRef {
@@ -63,6 +64,17 @@ export interface CheckpointEvent extends CommonEvent {
   open: string[];
   next: string;
 }
+export interface AgentLifecycleEvent extends CommonEvent {
+  type: "agent.lifecycle";
+  status: AgentLifecycleStatus;
+  agent: string;
+  agentSource: string;
+  task: string;
+  index: number;
+  parentToolCallId?: string;
+  sessionFile?: string;
+  error?: string;
+}
 
 export interface HandoffEvent extends CommonEvent {
   type: "handoff";
@@ -90,7 +102,7 @@ export interface BlockedEvent extends CommonEvent {
   evidence: EvidenceRef[];
 }
 
-export type WorkflowEvent = SpawnRequest | CheckpointEvent | HandoffEvent | VerdictEvent | BlockedEvent;
+export type WorkflowEvent = SpawnRequest | CheckpointEvent | AgentLifecycleEvent | HandoffEvent | VerdictEvent | BlockedEvent;
 
 export interface ContextCapsule {
   v: typeof PROTOCOL_VERSION;
@@ -209,7 +221,7 @@ export function parseWorkflowEvent(input: unknown): { event?: WorkflowEvent; err
     const item = object(typeof input === "string" ? json(input) : input, "event");
     const base = common(item);
     const type = text(item.type, "type") as EventType;
-    if (!["spawn.request", "checkpoint", "handoff", "verdict", "blocked"].includes(type)) throw new Error("type is invalid");
+    if (!["spawn.request", "agent.lifecycle", "checkpoint", "handoff", "verdict", "blocked"].includes(type)) throw new Error("type is invalid");
 
     if (type === "spawn.request") {
       const budget = object(item.budget, "budget");
@@ -221,6 +233,25 @@ export function parseWorkflowEvent(input: unknown): { event?: WorkflowEvent; err
       const tier = text(item.tier, "tier") as SpawnRequest["tier"];
       if (!["fast", "standard", "high"].includes(tier)) throw new Error("tier is invalid");
       return { event: { ...base, type, goal: text(item.goal, "goal"), scope: textArray(item.scope, "scope"), tier, budget: parsedBudget, attempt: integer(item.attempt, "attempt", true) ?? 0, reason: text(item.reason, "reason") }, errors: [] };
+    }
+    if (type === "agent.lifecycle") {
+      const status = text(item.status, "status") as AgentLifecycleEvent["status"];
+      if (!["started", "completed", "failed", "aborted"].includes(status)) throw new Error("lifecycle status is invalid");
+      return {
+        event: {
+          ...base,
+          type,
+          status,
+          agent: text(item.agent, "agent"),
+          agentSource: text(item.agentSource, "agentSource"),
+          task: text(item.task, "task"),
+          index: integer(item.index, "index", true) ?? 0,
+          ...(item.parentToolCallId === undefined ? {} : { parentToolCallId: text(item.parentToolCallId, "parentToolCallId") }),
+          ...(item.sessionFile === undefined ? {} : { sessionFile: text(item.sessionFile, "sessionFile") }),
+          ...(item.error === undefined ? {} : { error: text(item.error, "error") }),
+        },
+        errors: [],
+      };
     }
 
     if (type === "checkpoint") {
@@ -249,6 +280,72 @@ export function parseWorkflowEvent(input: unknown): { event?: WorkflowEvent; err
   } catch (error) {
     return { errors: [error instanceof Error ? error.message : "invalid workflow event"] };
   }
+}
+
+export interface AutomaticTask {
+  index: number;
+  name?: string;
+  agent: string;
+  task: string;
+  effort?: string;
+}
+
+function record(value: unknown): Record<string, unknown> | undefined {
+  return typeof value === "object" && value !== null && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
+}
+
+function optionalText(value: unknown): string | undefined {
+  return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+export function extractAutomaticTaskItems(input: unknown): AutomaticTask[] {
+  const root = record(input);
+  if (!root) return [];
+  const rawItems = Array.isArray(root.tasks) ? root.tasks : [root];
+  return rawItems.flatMap((raw, index) => {
+    const item = record(raw);
+    const task = optionalText(item?.task);
+    if (!task) return [];
+    return [{
+      index,
+      ...(optionalText(item.name) ? { name: optionalText(item.name) } : {}),
+      agent: optionalText(item.agent) ?? "task",
+      task,
+      ...(optionalText(item.effort) ? { effort: optionalText(item.effort) } : {}),
+    }];
+  });
+}
+
+function automaticTier(effort: string | undefined): SpawnRequest["tier"] {
+  return effort === "hi" ? "high" : effort === "lo" ? "fast" : "standard";
+}
+
+export function createAutomaticSpawnRequests(
+  toolCallId: string,
+  run: string,
+  input: unknown,
+  previousAttempts: ReadonlyMap<string, number>,
+): SpawnRequest[] {
+  return extractAutomaticTaskItems(input).map((item) => {
+    const workstream = item.name ?? `${item.agent}-${toolCallId}-${item.index}`;
+    const previousAttempt = previousAttempts.get(`${run}/${workstream}`);
+    return {
+      v: PROTOCOL_VERSION,
+      type: "spawn.request",
+      id: `automatic-${toolCallId}-${item.index}`,
+      run,
+      from: "omp",
+      workstream,
+      goal: item.task,
+      scope: [],
+      tier: automaticTier(item.effort),
+      budget: {},
+      attempt: previousAttempt === undefined ? 0 : previousAttempt + 1,
+      reason: "automatic capture from task tool",
+      ...(item.agent ? { to: item.agent } : {}),
+      at: new Date().toISOString(),
+    };
+  });
 }
 
 function canonical(value: unknown): unknown {
@@ -308,7 +405,7 @@ export function buildVerificationCacheKey(ref: VerificationRef): string {
 }
 
 function eventEvidence(event: WorkflowEvent): EvidenceRef[] {
-  return event.type === "spawn.request" ? [] : event.evidence;
+  return "evidence" in event ? event.evidence : [];
 }
 
 export function createContextCapsule(events: readonly WorkflowEvent[]): ContextCapsule | undefined {
@@ -325,6 +422,10 @@ export function createContextCapsule(events: readonly WorkflowEvent[]): ContextC
     if (event.type === "handoff") event.scope.forEach((item) => changed.add(item));
     if (event.type === "checkpoint") open = event.open;
     if (event.type === "blocked") open = [event.reason];
+    if (event.type === "agent.lifecycle" && event.status !== "started") {
+      open = event.status === "completed" ? [] : [`${event.agent} ${event.status}: ${event.error ?? event.task}`];
+      next = event.status === "completed" ? "coordinator review" : "inspect failure or retry";
+    }
     if (event.type === "checkpoint" || event.type === "handoff") next = event.next;
     if (event.type === "blocked") next = event.unblockCondition;
     for (const ref of eventEvidence(event)) refs.set(`${ref.path}:${ref.sha256}`, ref);
@@ -433,7 +534,25 @@ export class WorkflowGate {
       if (previousAttempt !== undefined && event.attempt !== previousAttempt + 1) return { ok: false, reason: `retry attempt must increment from ${previousAttempt}` };
       return { ok: true };
     }
-    if ((event.type === "verdict" || event.type === "handoff" || event.type === "blocked") && !this.seen.has(id)) return { ok: false, reason: `unknown workstream: ${event.workstream}` };
+    if ((event.type === "agent.lifecycle" || event.type === "verdict" || event.type === "handoff" || event.type === "blocked") && !this.seen.has(id)) return { ok: false, reason: `unknown workstream: ${event.workstream}` };
+    return { ok: true };
+  }
+
+  checkBatch(events: readonly WorkflowEvent[]): { ok: true } | { ok: false; reason: string } {
+    const snapshot = new WorkflowGate(this.config);
+    snapshot.active.clear();
+    this.active.forEach((item) => snapshot.active.add(item));
+    snapshot.seen.clear();
+    this.seen.forEach((item) => snapshot.seen.add(item));
+    snapshot.retryable.clear();
+    this.retryable.forEach((item) => snapshot.retryable.add(item));
+    snapshot.attempts.clear();
+    this.attempts.forEach((attempt, id) => snapshot.attempts.set(id, attempt));
+    for (const event of events) {
+      const decision = snapshot.check(event);
+      if (!decision.ok) return decision;
+      snapshot.apply(event);
+    }
     return { ok: true };
   }
 
@@ -444,6 +563,13 @@ export class WorkflowGate {
       this.seen.add(id);
       this.retryable.delete(id);
       this.attempts.set(id, event.attempt);
+    } else if (event.type === "agent.lifecycle") {
+      this.seen.add(id);
+      if (event.status !== "started") {
+        this.active.delete(id);
+        if (event.status === "failed" || event.status === "aborted") this.retryable.add(id);
+        else this.retryable.delete(id);
+      }
     } else if (event.type === "verdict") {
       this.active.delete(id);
       if (event.status === "refuted") this.retryable.add(id);

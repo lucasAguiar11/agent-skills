@@ -1,15 +1,20 @@
 import { Type } from "typebox";
 import type { ExtensionAPI, ExtensionContext } from "@oh-my-pi/pi-coding-agent";
+import type { SubagentLifecyclePayload } from "@oh-my-pi/pi-coding-agent/task";
+import { TASK_SUBAGENT_LIFECYCLE_CHANNEL } from "@oh-my-pi/pi-coding-agent/task";
 import {
   CAPSULE_MARKER,
   DEFAULT_GATE_CONFIG,
   EvidenceCache,
   PROTOCOL_ENTRY,
   WorkflowGate,
+  createAutomaticSpawnRequests,
   createContextCapsule,
   parseWorkflowEvent,
   renderContextCapsule,
+  type AgentLifecycleEvent,
   type ContextCapsule,
+  type SpawnRequest,
   type WorkflowEvent,
 } from "./protocol";
 import {
@@ -42,6 +47,75 @@ interface RuntimeState {
   cache: EvidenceCache;
   ledger: EfficiencyLedger;
   capsule?: ContextCapsule;
+}
+
+interface AutomaticSpawn {
+  request: SpawnRequest;
+  toolCallId: string;
+  index: number;
+  childId?: string;
+  committed: boolean;
+  finished: boolean;
+}
+
+function objectValue(value: unknown): Record<string, unknown> | undefined {
+  return typeof value === "object" && value !== null && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
+}
+
+function lifecyclePayload(value: unknown): SubagentLifecyclePayload | undefined {
+  const item = objectValue(value);
+  if (
+    !item ||
+    typeof item.id !== "string" ||
+    typeof item.agent !== "string" ||
+    typeof item.agentSource !== "string" ||
+    !["started", "completed", "failed", "aborted"].includes(String(item.status)) ||
+    !Number.isInteger(item.index) ||
+    (item.index as number) < 0
+  ) return undefined;
+  return item as unknown as SubagentLifecyclePayload;
+}
+function lifecycleEvent(spawn: AutomaticSpawn, payload: SubagentLifecyclePayload, id = payload.id, failureReason?: string): AgentLifecycleEvent {
+  const error = failureReason ?? (payload.status === "failed" ? "subagent failed" : payload.status === "aborted" ? "subagent aborted" : undefined);
+  return {
+    v: 1,
+    type: "agent.lifecycle",
+    id: `automatic-${id}-${payload.status}`,
+    run: spawn.request.run,
+    from: "omp",
+    workstream: spawn.request.workstream,
+    status: payload.status,
+    agent: payload.agent,
+    agentSource: payload.agentSource,
+    task: spawn.request.goal,
+    index: payload.index,
+    ...(payload.parentToolCallId ? { parentToolCallId: payload.parentToolCallId } : {}),
+    ...(payload.sessionFile ? { sessionFile: payload.sessionFile } : {}),
+    ...(error ? { error } : {}),
+    at: new Date().toISOString(),
+  };
+}
+
+function taskResultItems(value: unknown): Array<{ index: number; failed: boolean; error?: string }> {
+  const root = objectValue(value);
+  const details = objectValue(root?.details);
+  const results = details?.results;
+  if (!Array.isArray(results)) return [];
+  return results.flatMap((raw, position) => {
+    const item = objectValue(raw);
+    if (!item) return [];
+    const index = Number.isInteger(item.index) && (item.index as number) >= 0 ? item.index as number : position;
+    const error = typeof item.error === "string" && item.error.trim() ? item.error.trim() : typeof item.stderr === "string" && item.stderr.trim() ? item.stderr.trim() : undefined;
+    const failed = item.aborted === true || (typeof item.exitCode === "number" && item.exitCode !== 0) || Boolean(error);
+    return [{ index, failed, ...(error ? { error } : {}) }];
+  });
+}
+
+function taskIsRunning(value: unknown): boolean {
+  const root = objectValue(value);
+  const details = objectValue(root?.details);
+  const asyncState = objectValue(details?.async)?.state;
+  return asyncState === "running";
 }
 
 function markerInMessages(messages: readonly ContextMessage[], marker: string): boolean {
@@ -125,6 +199,35 @@ function ingestEvent(raw: unknown, ctx: ExtensionContext, state: RuntimeState, p
   return { ok: true, message: `accepted ${parsed.event.type} · ${parsed.event.workstream}`, event: parsed.event };
 }
 
+function appendAutomaticLifecycle(
+  spawn: AutomaticSpawn,
+  payload: SubagentLifecyclePayload,
+  ctx: ExtensionContext,
+  state: RuntimeState,
+  pi: ExtensionAPI,
+  emitted: Set<string>,
+  failureReason?: string,
+): boolean {
+  if (payload.status !== "started" && spawn.finished) return true;
+  const event = lifecycleEvent(spawn, payload, payload.id, failureReason);
+  if (emitted.has(event.id)) return true;
+  const result = ingestEvent(event, ctx, state, pi);
+  if (!result.ok) return false;
+  emitted.add(event.id);
+  if (payload.status !== "started") spawn.finished = true;
+  return true;
+}
+
+function automaticResultPayload(spawn: AutomaticSpawn, failed: boolean): SubagentLifecyclePayload {
+  return {
+    id: `${spawn.request.id}-result`,
+    agent: spawn.request.to ?? "task",
+    agentSource: "bundled",
+    status: failed ? "failed" : "completed",
+    index: spawn.index,
+  };
+}
+
 export function registerEfficiency(pi: ExtensionAPI): void {
   const state: RuntimeState = {
     pending: true,
@@ -139,6 +242,74 @@ export function registerEfficiency(pi: ExtensionAPI): void {
     state.pending = true;
     setEfficiencyStatus(ctx, "pending", state.ledger);
   };
+
+  const sessionRun = (ctx: ExtensionContext): string => ctx.sessionManager.getSessionId() || ctx.cwd;
+  const automaticByTool = new Map<string, AutomaticSpawn[]>();
+  const automaticByChild = new Map<string, AutomaticSpawn>();
+  const emittedLifecycle = new Set<string>();
+  const buildAutomaticSpawns = (toolCallId: string, input: unknown, ctx: ExtensionContext): AutomaticSpawn[] =>
+    createAutomaticSpawnRequests(toolCallId, sessionRun(ctx), input, state.gate.getAttempts()).map((request, index) => ({
+      request,
+      toolCallId,
+      index,
+      committed: false,
+      finished: false,
+    }));
+  const commitAutomaticSpawns = (toolCallId: string, input: unknown, ctx: ExtensionContext): void => {
+    const spawns = automaticByTool.get(toolCallId) ?? buildAutomaticSpawns(toolCallId, input, ctx);
+    if (!spawns.length) return;
+    automaticByTool.set(toolCallId, spawns);
+    const pending = spawns.filter((spawn) => !spawn.committed);
+    if (!pending.length) return;
+    const decision = state.gate.checkBatch(pending.map((spawn) => spawn.request));
+    if (!decision.ok) {
+      ctx.ui.notify(`automatic workflow blocked: ${decision.reason}`, "error");
+      return;
+    }
+    for (const spawn of pending) {
+      const result = ingestEvent(spawn.request, ctx, state, pi);
+      if (!result.ok) {
+        ctx.ui.notify(`automatic workflow rejected: ${result.message}`, "error");
+        return;
+      }
+      spawn.committed = true;
+    }
+  };
+  const findAutomaticSpawn = (payload: SubagentLifecyclePayload): AutomaticSpawn | undefined => {
+    const known = automaticByChild.get(payload.id);
+    if (known) return known;
+    if (payload.parentToolCallId) {
+      const direct = automaticByTool.get(payload.parentToolCallId)?.find((spawn) => spawn.index === payload.index && !spawn.childId);
+      if (direct) {
+        direct.childId = payload.id;
+        automaticByChild.set(payload.id, direct);
+        return direct;
+      }
+    }
+    for (const spawns of automaticByTool.values()) {
+      const candidate = spawns.find((spawn) => !spawn.childId && spawn.index === payload.index && (spawn.request.to === payload.agent || spawn.request.goal === payload.description));
+      if (candidate) {
+        candidate.childId = payload.id;
+        automaticByChild.set(payload.id, candidate);
+        return candidate;
+      }
+    }
+    return undefined;
+  };
+  const cleanupAutomaticSpawn = (spawn: AutomaticSpawn, childId?: string): void => {
+    if (childId) automaticByChild.delete(childId);
+    const spawns = automaticByTool.get(spawn.toolCallId);
+    if (spawns?.every((item) => item.finished)) automaticByTool.delete(spawn.toolCallId);
+  };
+
+  pi.on("tool_call", async (event, ctx) => {
+    if (event.toolName !== "task") return;
+    const spawns = buildAutomaticSpawns(event.toolCallId, event.input, ctx);
+    if (!spawns.length) return;
+    const decision = state.gate.checkBatch(spawns.map((spawn) => spawn.request));
+    if (!decision.ok) return { block: true, reason: `workflow gate: ${decision.reason}` };
+    automaticByTool.set(event.toolCallId, spawns);
+  });
 
   pi.registerTool({
     name: "workflow_event",
@@ -177,6 +348,17 @@ export function registerEfficiency(pi: ExtensionAPI): void {
         isError: false,
       };
     },
+  });
+  pi.events.on(TASK_SUBAGENT_LIFECYCLE_CHANNEL, (value) => {
+    const payload = lifecyclePayload(value);
+    const spawn = payload ? findAutomaticSpawn(payload) : undefined;
+    if (!payload || !spawn?.committed || !currentContext) return;
+    appendAutomaticLifecycle(spawn, payload, currentContext, state, pi, emittedLifecycle);
+    if (payload.status !== "started" && spawn.finished) cleanupAutomaticSpawn(spawn, payload.id);
+  });
+
+  pi.on("tool_approval_resolved", async (event) => {
+    if (!event.approved) automaticByTool.delete(event.toolCallId);
   });
 
   pi.registerCommand("workflow-event", {
@@ -224,13 +406,34 @@ export function registerEfficiency(pi: ExtensionAPI): void {
     setEfficiencyStatus(ctx, "active", state.ledger);
   });
 
-  pi.on("tool_execution_start", async (_event, ctx) => {
+  pi.on("tool_execution_start", async (event, ctx) => {
     currentContext = ctx;
+    if (event.toolName === "task") commitAutomaticSpawns(event.toolCallId, event.args, ctx);
     recordToolStart(state.ledger);
   });
 
   pi.on("tool_execution_end", async (event, ctx) => {
     currentContext = ctx;
+    if (event.toolName === "task" && !taskIsRunning(event.result)) {
+      const spawns = automaticByTool.get(event.toolCallId) ?? [];
+      const results = taskResultItems(event.result);
+      for (const spawn of spawns) {
+        if (spawn.finished) continue;
+        const result = results.find((item) => item.index === spawn.index);
+        const failed = event.isError || result?.failed === true;
+        appendAutomaticLifecycle(
+          spawn,
+          automaticResultPayload(spawn, failed),
+          ctx,
+          state,
+          pi,
+          emittedLifecycle,
+          result?.error,
+        );
+        if (spawn.finished) cleanupAutomaticSpawn(spawn);
+      }
+      automaticByTool.delete(event.toolCallId);
+    }
     recordToolEnd(state.ledger, event.isError);
   });
 

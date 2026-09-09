@@ -6,6 +6,7 @@ import test from "node:test";
 import {
   EvidenceCache,
   WorkflowGate,
+  createAutomaticSpawnRequests,
   buildVerificationCacheKey,
   createContextCapsule,
   createEnvironmentFingerprint,
@@ -172,6 +173,85 @@ test("enforces two active agents and one retry", () => {
   assert.equal(repeatedRetry.ok, false);
   assert.match(repeatedRetry.reason, /attempt must increment/);
   assert.equal(gate.check(spawn("A", 2)).ok, false);
+});
+
+test("creates automatic spawn requests from task calls", () => {
+  const requests = createAutomaticSpawnRequests(
+    "call-1",
+    "session-1",
+    {
+      context: "inspect independently",
+      tasks: [
+        { name: "A", agent: "scout", task: "inspect the API", effort: "lo" },
+        { agent: "reviewer", task: "review the diff", effort: "hi" },
+      ],
+    },
+    new Map(),
+  );
+  assert.deepEqual(requests.map(({ workstream, goal, tier, attempt, scope }) => ({ workstream, goal, tier, attempt, scope })), [
+    { workstream: "A", goal: "inspect the API", tier: "fast", attempt: 0, scope: [] },
+    { workstream: "reviewer-call-1-1", goal: "review the diff", tier: "high", attempt: 0, scope: [] },
+  ]);
+});
+
+test("tracks automatic lifecycle and releases active capacity", () => {
+  const gate = new WorkflowGate();
+  const spawn = parseWorkflowEvent({
+    v: 1,
+    type: "spawn.request",
+    id: "spawn-auto",
+    run: "run-auto",
+    from: "omp",
+    workstream: "A",
+    goal: "inspect",
+    scope: [],
+    tier: "standard",
+    budget: {},
+    attempt: 0,
+    reason: "automatic capture",
+  }).event;
+  const lifecycle = (status) => parseWorkflowEvent({
+    v: 1,
+    type: "agent.lifecycle",
+    id: `lifecycle-${status}`,
+    run: "run-auto",
+    from: "omp",
+    workstream: "A",
+    status,
+    agent: "scout",
+    agentSource: "bundled",
+    task: "inspect",
+    index: 0,
+  }).event;
+  assert.equal(gate.check(spawn).ok, true);
+  gate.apply(spawn);
+  assert.equal(gate.check(lifecycle("started")).ok, true);
+  gate.apply(lifecycle("started"));
+  assert.equal(gate.getActiveCount(), 1);
+  assert.equal(gate.check(lifecycle("completed")).ok, true);
+  gate.apply(lifecycle("completed"));
+  assert.equal(gate.getActiveCount(), 0);
+});
+
+test("checks automatic spawn batches without mutating the gate", () => {
+  const gate = new WorkflowGate();
+  const spawn = (workstream) => parseWorkflowEvent({
+    v: 1,
+    type: "spawn.request",
+    id: `spawn-${workstream}`,
+    run: "run-batch",
+    from: "omp",
+    workstream,
+    goal: "test",
+    scope: [],
+    tier: "standard",
+    budget: {},
+    attempt: 0,
+    reason: "automatic capture",
+  }).event;
+  gate.apply(spawn("A"));
+  assert.equal(gate.checkBatch([spawn("B"), spawn("C")]).ok, false);
+  assert.equal(gate.getActiveCount(), 1);
 });
 
 test("renders a compact context capsule", () => {

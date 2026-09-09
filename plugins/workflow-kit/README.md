@@ -129,18 +129,25 @@ Tokens: 108k wave · 216k feature
 
 ## Protocolo wire v1
 
-No OMP, `workflow_event` registra launches, checkpoints, handoffs, veredictos e
-bloqueios como eventos JSON validados. `/workflow-event` permite inspecionar ou
-registrar o mesmo formato manualmente.
+No OMP, chamadas do tool `task` são capturadas automaticamente. Cada spawn
+gera um `spawn.request`; o ciclo de vida do subagente gera eventos
+`agent.lifecycle` para `started`, `completed`, `failed` ou `aborted`. O gate
+também bloqueia a chamada quando o limite de dois subagentes ativos ou de
+retry é excedido.
+
+`workflow_event` continua disponível para checkpoints, evidências, handoffs,
+veredictos e bloqueios que exigem julgamento do Coordinator. Um subagente
+concluído automaticamente não é tratado como validado: a validação ainda
+precisa de evidência e de uma verificação aprovada.
 
 `workflow_lookup` consulta o cache por objetivo e escopo. Um cache hit devolve
 referências de evidência; o consumidor ainda lê o arquivo quando precisar. Um
 arquivo, variável de ambiente, runtime, configuração ou dependência divergente
 torna o resultado um cache miss.
 
-O evento é persistido na sessão. O status `workflow-efficiency` mostra tokens
-quando o host fornece uso real, além de tools, launches, retries, veredictos e
-cache hits/misses.
+Os eventos são persistidos na sessão. O status `workflow-efficiency` mostra
+tokens quando o host fornece uso real, além de tools, launches, retries,
+veredictos, cache hits/misses e eventos automáticos.
 
 Evidências carregam o SHA-256 do arquivo inteiro. O consumidor recalcula o hash
 antes de reutilizar a referência, inclusive para arquivos novos ou alterados
