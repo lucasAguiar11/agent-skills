@@ -1,6 +1,10 @@
 # Changelog
 
 ## Unreleased
+## 1.41.0 — 2026-09-10
+
+- `workflow-kit`: remove o registro da extensão runtime do plugin; skills e comandos permanecem disponíveis.
+
 ## 1.40.0 — 2026-09-10
 
 - `workflow-kit`: exibe no `/workflow` o transcript completo dos agents filhos quando o host fornece `sessionFile`.
