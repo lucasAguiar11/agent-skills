@@ -149,6 +149,23 @@ Os eventos são persistidos na sessão. O status `workflow-efficiency` mostra
 tokens quando o host fornece uso real, além de tools, launches, retries,
 veredictos, cache hits/misses e eventos automáticos.
 
+## Inspeção interativa da sessão
+
+No OMP interativo, use `/workflow` para abrir o TUI da sessão atual:
+
+- `1`: timeline de mensagens, entradas de sessão e eventos de workflow;
+- `2`: agents agrupados por workstream, com status e quantidade de eventos;
+- `Tab`: alterna entre as visões;
+- `j`/`k` ou setas: navega;
+- `[`/`]` ou PageUp/PageDown: rola o detalhe selecionado;
+- `r`: atualiza a leitura;
+- `q`/`Esc`: fecha.
+
+O viewer reutiliza a branch da sessão e os eventos persistidos pelo plugin. Ele
+mostra mensagens do coordenador, chamadas/resultados de tools e lifecycle dos
+subagents. Transcripts internos completos de sessões filhas ainda não são
+carregados; o TUI mostra o resultado e os eventos disponíveis na sessão atual.
+
 Evidências carregam o SHA-256 do arquivo inteiro. O consumidor recalcula o hash
 antes de reutilizar a referência, inclusive para arquivos novos ou alterados
 sem commit. Verificações também carregam comando, ambiente, runtime e arquivos

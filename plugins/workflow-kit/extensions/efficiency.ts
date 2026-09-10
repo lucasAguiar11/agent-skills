@@ -1,6 +1,7 @@
 import { Type } from "typebox";
 import type { ExtensionAPI, ExtensionContext } from "@oh-my-pi/pi-coding-agent";
 import type { SubagentLifecyclePayload } from "@oh-my-pi/pi-coding-agent/task";
+import { WorkflowViewer } from "./workflow-tui";
 import { TASK_SUBAGENT_LIFECYCLE_CHANNEL } from "@oh-my-pi/pi-coding-agent/task";
 import {
   CAPSULE_MARKER,
@@ -373,6 +374,28 @@ export function registerEfficiency(pi: ExtensionAPI): void {
     description: "Show workflow efficiency ledger",
     handler: async (_args, ctx) => {
       ctx.ui.notify(formatLedger(state.ledger), "info");
+    },
+  });
+
+  pi.registerCommand("workflow", {
+    description: "Inspect session messages, tasks, and agents",
+    handler: async (_args, ctx) => {
+      if (!ctx.hasUI) {
+        ctx.ui.notify("The workflow TUI requires interactive mode", "error");
+        return;
+      }
+      const getSnapshot = () => ({
+        entries: ctx.sessionManager.getBranch(),
+        events: state.events,
+        ledger: state.ledger,
+      });
+      await ctx.ui.custom<void>((tui, theme, keybindings, done) => new WorkflowViewer(
+        getSnapshot,
+        () => tui.requestRender(),
+        (color, text) => theme.fg(color as never, text),
+        keybindings,
+        () => done(undefined),
+      ));
     },
   });
 
