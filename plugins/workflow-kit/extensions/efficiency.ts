@@ -395,7 +395,7 @@ export function registerEfficiency(pi: ExtensionAPI): void {
         (color, text) => theme.fg(color as never, text),
         keybindings,
         () => done(undefined),
-      ));
+      ), { overlay: true });
     },
   });
 

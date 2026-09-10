@@ -151,7 +151,7 @@ veredictos, cache hits/misses e eventos automáticos.
 
 ## Inspeção interativa da sessão
 
-No OMP interativo, use `/workflow` para abrir o TUI da sessão atual:
+No OMP interativo, use `/workflow` para abrir o TUI modal da sessão atual:
 
 - `1`: timeline de mensagens, entradas de sessão e eventos de workflow;
 - `2`: agents agrupados por workstream, com status e quantidade de eventos;
