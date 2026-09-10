@@ -9,7 +9,13 @@ interface KeybindingsLike {
 type Paint = (color: string, text: string) => string;
 
 const LIST_LINES = 3;
-const DETAIL_LINES = 3;
+const MAX_DETAIL_LINES = 12;
+
+function detailLineCount(): number {
+  const terminalRows = process.stdout.rows ?? 40;
+  const maxHeight = Math.min(Math.floor(terminalRows * 0.92), Math.max(1, terminalRows - 2));
+  return Math.max(2, Math.min(MAX_DETAIL_LINES, maxHeight - 8 - LIST_LINES * 2));
+}
 
 function line(value: string, width: number): string {
   return truncateToWidth(replaceTabs(value), Math.max(1, width));
@@ -75,7 +81,7 @@ export class WorkflowViewer implements Component {
     }
     const detailDirection = data === "]" || data === "\u001b[6~" ? 1 : data === "[" || data === "\u001b[5~" ? -1 : 0;
     if (detailDirection) {
-      this.detailScroll = Math.max(0, this.detailScroll + detailDirection * DETAIL_LINES);
+      this.detailScroll = Math.max(0, this.detailScroll + detailLineCount());
       this.invalidate();
       this.requestRender();
       return;
@@ -104,7 +110,8 @@ export class WorkflowViewer implements Component {
     this.selected = Math.max(0, Math.min(rows.length - 1, this.selected));
     this.selectedId = rows[this.selected]?.id;
     const selected = rows[this.selected];
-    const key = `${width}|${this.mode}|${this.selected}|${this.detailScroll}|${rows.map((row) => `${row.id}:${row.title}:${row.subtitle}`).join("|")}`;
+    const detailLines = detailLineCount();
+    const key = `${width}|${this.mode}|${this.selected}|${this.detailScroll}|${detailLines}|${rows.map((row) => `${row.id}:${row.title}:${row.subtitle}`).join("|")}`;
     if (key === this.cacheKey) return this.cache;
 
     const output: string[] = [];
@@ -125,13 +132,13 @@ export class WorkflowViewer implements Component {
     while (output.length < 4 + LIST_LINES * 2) output.push(panelRow("", width, this.paint));
     output.push(panelRule(width, this.paint, "├", "┤"));
     const allDetailLines = wrappedDetail(selected?.detail ?? "", contentWidth);
-    const maxDetailScroll = Math.max(0, allDetailLines.length - DETAIL_LINES);
+    const maxDetailScroll = Math.max(0, allDetailLines.length - detailLines);
     this.detailScroll = Math.min(this.detailScroll, maxDetailScroll);
-    const visibleDetail = allDetailLines.slice(this.detailScroll, this.detailScroll + DETAIL_LINES);
+    const visibleDetail = allDetailLines.slice(this.detailScroll, this.detailScroll + detailLines);
     const detailRange = `${Math.min(this.detailScroll + 1, allDetailLines.length)}-${Math.min(this.detailScroll + visibleDetail.length, allDetailLines.length)}/${allDetailLines.length}`;
     output.push(panelRow(this.paint("accent", `${selected?.title ?? "Detalhe"} · ${detailRange}`), width, this.paint));
     visibleDetail.forEach((detail) => output.push(panelRow(detail, width, this.paint)));
-    while (output.length < 4 + LIST_LINES * 2 + 1 + 1 + DETAIL_LINES) output.push(panelRow("", width, this.paint));
+    while (output.length < 4 + LIST_LINES * 2 + 1 + 1 + detailLines) output.push(panelRow("", width, this.paint));
     output.push(panelRow(this.paint("muted", `tools ${snapshot.ledger.toolCalls} · launches ${snapshot.ledger.launches} · events ${snapshot.ledger.protocolEvents}`), width, this.paint));
     output.push(panelRule(width, this.paint, "╰", "╯"));
     this.cacheKey = key;

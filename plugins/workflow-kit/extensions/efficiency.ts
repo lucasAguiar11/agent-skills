@@ -399,8 +399,8 @@ export function registerEfficiency(pi: ExtensionAPI): void {
         overlay: true,
         overlayOptions: {
           anchor: "center",
-          width: "80%",
-          maxHeight: "90%",
+          width: "90%",
+          maxHeight: "92%",
           margin: 1,
         },
       });
