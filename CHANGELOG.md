@@ -1,6 +1,10 @@
 # Changelog
 
 ## Unreleased
+## 1.40.0 — 2026-09-10
+
+- `workflow-kit`: exibe no `/workflow` o transcript completo dos agents filhos quando o host fornece `sessionFile`.
+
 ## 1.39.0 — 2026-09-10
 
 - `workflow-kit`: corrige o retorno da paginação de detalhes com `[` e PageUp.
