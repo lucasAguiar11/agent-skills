@@ -1,6 +1,10 @@
 # Changelog
 
 ## Unreleased
+## 1.38.0 — 2026-09-10
+
+- `workflow-kit`: amplia o modal `/workflow` e adapta a área de detalhes à altura disponível do terminal.
+
 ## 1.37.0 — 2026-09-09
 
 - `workflow-kit`: posiciona `/workflow` como modal centralizado, com largura reduzida, bordas e altura compacta.
