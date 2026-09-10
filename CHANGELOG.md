@@ -1,6 +1,10 @@
 # Changelog
 
 ## Unreleased
+## 1.39.0 — 2026-09-10
+
+- `workflow-kit`: corrige o retorno da paginação de detalhes com `[` e PageUp.
+
 ## 1.38.0 — 2026-09-10
 
 - `workflow-kit`: amplia o modal `/workflow` e adapta a área de detalhes à altura disponível do terminal.
