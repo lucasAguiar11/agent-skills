@@ -1,6 +1,10 @@
 # Changelog
 
 ## Unreleased
+## 1.37.0 — 2026-09-09
+
+- `workflow-kit`: posiciona `/workflow` como modal centralizado, com largura reduzida, bordas e altura compacta.
+
 
 ## 1.36.0 — 2026-09-09
 
