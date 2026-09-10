@@ -81,7 +81,7 @@ export class WorkflowViewer implements Component {
     }
     const detailDirection = data === "]" || data === "\u001b[6~" ? 1 : data === "[" || data === "\u001b[5~" ? -1 : 0;
     if (detailDirection) {
-      this.detailScroll = Math.max(0, this.detailScroll + detailLineCount());
+      this.detailScroll = Math.max(0, this.detailScroll + detailDirection * detailLineCount());
       this.invalidate();
       this.requestRender();
       return;
