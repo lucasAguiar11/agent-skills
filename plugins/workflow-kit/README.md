@@ -161,10 +161,11 @@ No OMP interativo, use `/workflow` para abrir um modal centralizado do TUI da se
 - `r`: atualiza a leitura;
 - `q`/`Esc`: fecha.
 
-O viewer reutiliza a branch da sessão e os eventos persistidos pelo plugin. Ele
-mostra mensagens do coordenador, chamadas/resultados de tools e lifecycle dos
-subagents. Transcripts internos completos de sessões filhas ainda não são
-carregados; o TUI mostra o resultado e os eventos disponíveis na sessão atual.
+O viewer reutiliza a branch da sessão e os eventos persistidos pelo plugin. Quando
+o host fornece `sessionFile` para um lifecycle de agent, ele carrega o transcript
+completo da sessão filha em modo somente leitura e o anexa ao detalhe do agent.
+Se o arquivo não existir ou estiver fora da pasta de artifacts da sessão, mostra
+os eventos disponíveis sem tentar acessar o caminho.
 
 Evidências carregam o SHA-256 do arquivo inteiro. O consumidor recalcula o hash
 antes de reutilizar a referência, inclusive para arquivos novos ou alterados

@@ -1,10 +1,19 @@
 import type { EfficiencyLedger } from "./ledger";
 import type { WorkflowEvent } from "./protocol";
 
+export interface WorkflowTuiTranscript {
+  workstream: string;
+  agent: string;
+  sessionFile: string;
+  detail: string;
+  error?: string;
+}
+
 export interface WorkflowTuiSnapshot {
   entries: readonly unknown[];
   events: readonly WorkflowEvent[];
   ledger: EfficiencyLedger;
+  transcripts?: readonly WorkflowTuiTranscript[];
 }
 
 export type WorkflowTuiMode = "timeline" | "agents";
@@ -34,6 +43,13 @@ function jsonValue(value: unknown): string {
 function compact(value: string, length = 120): string {
   const text = value.replace(/\s+/g, " ").trim();
   return text.length > length ? `${text.slice(0, length - 1)}…` : text;
+}
+
+function transcriptDetail(transcripts: readonly WorkflowTuiTranscript[], workstream: string, sessionFile?: string): string {
+  return transcripts
+    .filter((transcript) => transcript.workstream === workstream && (!sessionFile || transcript.sessionFile === sessionFile))
+    .map((transcript) => `--- ${transcript.agent} transcript ---\n${transcript.error ? `unavailable: ${transcript.error}` : transcript.detail}`)
+    .join("\n\n");
 }
 
 function contentText(content: unknown): string {
@@ -85,7 +101,7 @@ function entryRow(entry: Record<string, unknown>, index: number): WorkflowTuiRow
   };
 }
 
-function eventRow(event: WorkflowEvent, index: number): WorkflowTuiRow {
+function eventRow(event: WorkflowEvent, index: number, transcripts: readonly WorkflowTuiTranscript[]): WorkflowTuiRow {
   let title: string;
   let subtitle: string;
   if (event.type === "spawn.request") {
@@ -107,12 +123,15 @@ function eventRow(event: WorkflowEvent, index: number): WorkflowTuiRow {
     title = `blocked: ${compact(event.reason)}`;
     subtitle = `blocked · ${event.workstream}`;
   }
+  const transcript = event.type === "agent.lifecycle"
+    ? transcriptDetail(transcripts, event.workstream, event.sessionFile)
+    : "";
   return {
     id: `event:${event.id}:${index}`,
     kind: event.type === "agent.lifecycle" ? "agent" : "event",
     title,
     subtitle,
-    detail: jsonValue(event),
+    detail: [jsonValue(event), transcript].filter(Boolean).join("\n\n"),
     timestamp: timestamp(event.at),
   };
 }
@@ -129,13 +148,14 @@ function emptyRow(mode: WorkflowTuiMode): WorkflowTuiRow {
 
 function timelineRows(snapshot: WorkflowTuiSnapshot): WorkflowTuiRow[] {
   const rows: Array<{ row: WorkflowTuiRow; order: number }> = [];
+  const transcripts = snapshot.transcripts ?? [];
   snapshot.entries.forEach((raw, index) => {
     const entry = objectValue(raw);
     const row = entry ? entryRow(entry, index) : undefined;
     if (row) rows.push({ row, order: index });
   });
   snapshot.events.forEach((event, index) => {
-    rows.push({ row: eventRow(event, index), order: snapshot.entries.length + index });
+    rows.push({ row: eventRow(event, index, transcripts), order: snapshot.entries.length + index });
   });
   rows.sort((left, right) => {
     const leftTime = left.row.timestamp;
@@ -149,6 +169,7 @@ function timelineRows(snapshot: WorkflowTuiSnapshot): WorkflowTuiRow[] {
 
 function agentRows(snapshot: WorkflowTuiSnapshot): WorkflowTuiRow[] {
   const grouped = new Map<string, WorkflowEvent[]>();
+  const transcripts = snapshot.transcripts ?? [];
   snapshot.events.forEach((event) => {
     const items = grouped.get(event.workstream) ?? [];
     items.push(event);
@@ -164,7 +185,7 @@ function agentRows(snapshot: WorkflowTuiSnapshot): WorkflowTuiRow[] {
       kind: "agent",
       title: `${workstream}: ${status}`,
       subtitle: `${agent} · ${events.length} eventos${spawn ? ` · ${compact(spawn.goal, 70)}` : ""}`,
-      detail: jsonValue(events),
+      detail: [jsonValue(events), transcriptDetail(transcripts, workstream)].filter(Boolean).join("\n\n"),
       timestamp: timestamp(events[0]?.at),
     };
   });

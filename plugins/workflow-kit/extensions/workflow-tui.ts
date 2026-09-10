@@ -42,6 +42,7 @@ export class WorkflowViewer implements Component {
   private detailScroll = 0;
   private cacheKey = "";
   private cache: readonly string[] = [];
+  private refreshing = false;
 
   constructor(
     private readonly getSnapshot: () => WorkflowTuiSnapshot,
@@ -49,6 +50,7 @@ export class WorkflowViewer implements Component {
     private readonly paint: Paint,
     private readonly keybindings: KeybindingsLike,
     private readonly done: () => void,
+    private readonly refresh?: () => Promise<void>,
   ) {}
 
   handleInput(data: string): void {
@@ -75,6 +77,15 @@ export class WorkflowViewer implements Component {
       return;
     }
     if (data === "r") {
+      if (this.refresh && !this.refreshing) {
+        this.refreshing = true;
+        void this.refresh().catch(() => {}).finally(() => {
+          this.refreshing = false;
+          this.invalidate();
+          this.requestRender();
+        });
+        return;
+      }
       this.invalidate();
       this.requestRender();
       return;

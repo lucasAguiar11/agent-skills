@@ -1,8 +1,10 @@
 import { Type } from "typebox";
-import type { ExtensionAPI, ExtensionContext } from "@oh-my-pi/pi-coding-agent";
+import { loadSessionMessagesReadOnly, type ExtensionAPI, type ExtensionContext } from "@oh-my-pi/pi-coding-agent";
 import type { SubagentLifecyclePayload } from "@oh-my-pi/pi-coding-agent/task";
-import { WorkflowViewer } from "./workflow-tui";
 import { TASK_SUBAGENT_LIFECYCLE_CHANNEL } from "@oh-my-pi/pi-coding-agent/task";
+import { isAbsolute, relative, resolve, sep } from "node:path";
+import { WorkflowViewer } from "./workflow-tui";
+import type { WorkflowTuiTranscript } from "./workflow-tui-model";
 import {
   CAPSULE_MARKER,
   DEFAULT_GATE_CONFIG,
@@ -58,6 +60,33 @@ interface AutomaticSpawn {
   committed: boolean;
   finished: boolean;
 }
+function trustedChildSessionFile(ctx: ExtensionContext, sessionFile: string): string | undefined {
+  const parentFile = ctx.sessionManager.getSessionFile();
+  if (!parentFile?.endsWith(".jsonl") || !sessionFile.endsWith(".jsonl")) return undefined;
+  const artifactsDir = resolve(parentFile.slice(0, -".jsonl".length));
+  const candidate = resolve(sessionFile);
+  const childPath = relative(artifactsDir, candidate);
+  if (!childPath || isAbsolute(childPath) || childPath.startsWith(`..${sep}`)) return undefined;
+  return candidate;
+}
+
+async function loadWorkflowTranscripts(ctx: ExtensionContext, events: readonly WorkflowEvent[]): Promise<WorkflowTuiTranscript[]> {
+  const files = new Map<string, { workstream: string; agent: string }>();
+  for (const event of events) {
+    if (event.type !== "agent.lifecycle" || !event.sessionFile) continue;
+    const sessionFile = trustedChildSessionFile(ctx, event.sessionFile);
+    if (sessionFile && !files.has(sessionFile)) files.set(sessionFile, { workstream: event.workstream, agent: event.agent });
+  }
+  return Promise.all([...files.entries()].map(async ([sessionFile, owner]) => {
+    try {
+      const messages = await loadSessionMessagesReadOnly(sessionFile);
+      return { ...owner, sessionFile, detail: JSON.stringify(messages, null, 2) ?? "[]" };
+    } catch (error) {
+      return { ...owner, sessionFile, detail: "", error: error instanceof Error ? error.message : String(error) };
+    }
+  }));
+}
+
 
 function objectValue(value: unknown): Record<string, unknown> | undefined {
   return typeof value === "object" && value !== null && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
@@ -384,10 +413,15 @@ export function registerEfficiency(pi: ExtensionAPI): void {
         ctx.ui.notify("The workflow TUI requires interactive mode", "error");
         return;
       }
+      let transcripts = await loadWorkflowTranscripts(ctx, state.events);
+      const refreshTranscripts = async (): Promise<void> => {
+        transcripts = await loadWorkflowTranscripts(ctx, state.events);
+      };
       const getSnapshot = () => ({
         entries: ctx.sessionManager.getBranch(),
         events: state.events,
         ledger: state.ledger,
+        transcripts,
       });
       await ctx.ui.custom<void>((tui, theme, keybindings, done) => new WorkflowViewer(
         getSnapshot,
@@ -395,6 +429,7 @@ export function registerEfficiency(pi: ExtensionAPI): void {
         (color, text) => theme.fg(color as never, text),
         keybindings,
         () => done(undefined),
+        refreshTranscripts,
       ), {
         overlay: true,
         overlayOptions: {

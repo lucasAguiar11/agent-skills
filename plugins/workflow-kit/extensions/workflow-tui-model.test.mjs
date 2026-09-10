@@ -75,6 +75,23 @@ test("groups agent details by workstream", () => {
   assert.match(rows[0].subtitle, /scout/);
   assert.match(rows[0].detail, /inspect the API/);
 });
+test("includes loaded child transcripts in agent details", () => {
+  const snapshot = {
+    ledger,
+    entries: [],
+    events: [{ ...spawn, ...lifecycle, sessionFile: "/sessions/main/agent.jsonl" }],
+    transcripts: [{
+      workstream: "A",
+      agent: "scout",
+      sessionFile: "/sessions/main/agent.jsonl",
+      detail: '[\n  {"role":"assistant","content":"worker result"}\n]',
+    }],
+  };
+
+  assert.match(buildWorkflowTuiRows(snapshot, "agents")[0].detail, /worker result/);
+  assert.match(buildWorkflowTuiRows(snapshot, "timeline").find((row) => row.kind === "agent").detail, /worker result/);
+});
+
 
 test("shows an explicit empty state", () => {
   const rows = buildWorkflowTuiRows({ ledger, entries: [], events: [] }, "agents");
