@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.36.0 — 2026-09-09
+
+- `workflow-kit`: transforma `/workflow` em overlay modal, preservando o editor da sessão.
+
 ## 1.35.0 — 2026-09-09
 
 - `workflow-kit`: adiciona `/workflow`, TUI da sessão atual para inspecionar mensagens, tasks, agents e lifecycle.

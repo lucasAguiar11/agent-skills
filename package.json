@@ -1,6 +1,6 @@
 {
   "name": "skill-forge",
-  "version": "1.35.0",
+  "version": "1.36.0",
   "description": "Reusable delivery, planning, review, Figma, and execution skills for coding agents.",
   "license": "MIT",
   "keywords": ["pi-package", "agent-skills", "skills"],
