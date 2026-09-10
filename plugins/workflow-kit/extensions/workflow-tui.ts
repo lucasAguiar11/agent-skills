@@ -1,5 +1,5 @@
 import type { Component } from "@oh-my-pi/pi-tui";
-import { replaceTabs, truncateToWidth, wrapTextWithAnsi } from "@oh-my-pi/pi-tui";
+import { replaceTabs, truncateToWidth, visibleWidth, wrapTextWithAnsi } from "@oh-my-pi/pi-tui";
 import { buildWorkflowTuiRows, type WorkflowTuiMode, type WorkflowTuiRow, type WorkflowTuiSnapshot } from "./workflow-tui-model";
 
 interface KeybindingsLike {
@@ -8,11 +8,21 @@ interface KeybindingsLike {
 
 type Paint = (color: string, text: string) => string;
 
-const LIST_LINES = 10;
-const DETAIL_LINES = 8;
+const LIST_LINES = 3;
+const DETAIL_LINES = 3;
 
 function line(value: string, width: number): string {
   return truncateToWidth(replaceTabs(value), Math.max(1, width));
+}
+
+function panelRule(width: number, paint: Paint, left: string, right: string): string {
+  return line(paint("border", `${left}${"─".repeat(Math.max(0, width - 2))}${right}`), width);
+}
+
+function panelRow(value: string, width: number, paint: Paint): string {
+  const innerWidth = Math.max(1, width - 4);
+  const content = truncateToWidth(replaceTabs(value), innerWidth);
+  return `${paint("border", "│")} ${content}${" ".repeat(Math.max(0, innerWidth - visibleWidth(content)))} ${paint("border", "│")}`;
 }
 
 function wrappedDetail(value: string, width: number): string[] {
@@ -99,28 +109,31 @@ export class WorkflowViewer implements Component {
 
     const output: string[] = [];
     const modeLabel = this.mode === "timeline" ? "TIMELINE" : "AGENTS";
-    output.push(line(this.paint("accent", `Workflow · ${modeLabel}`), width));
-    output.push(line(`1 timeline · 2 agents · Tab alterna · j/k navega · [/]: detalhe · r atualiza · q fecha`, width));
-    output.push(line(this.paint("muted", "─".repeat(Math.max(1, width))), width));
+    const contentWidth = Math.max(1, width - 4);
+    output.push(panelRule(width, this.paint, "╭", "╮"));
+    output.push(panelRow(this.paint("accent", `Workflow · ${modeLabel}`), width, this.paint));
+    output.push(panelRow("1 timeline · 2 agents · Tab alterna · j/k navega · [/]: detalhe · r atualiza · q fecha", width, this.paint));
+    output.push(panelRule(width, this.paint, "├", "┤"));
 
     rows.slice(Math.max(0, this.selected - LIST_LINES + 1), Math.max(LIST_LINES, this.selected + 1)).forEach((row, offset) => {
       const index = Math.max(0, this.selected - LIST_LINES + 1) + offset;
       const marker = index === this.selected ? "›" : " ";
-      output.push(line(`${marker} ${row.title}`, width));
-      output.push(line(`  ${this.paint("muted", row.subtitle)}`, width));
+      output.push(panelRow(`${marker} ${row.title}`, width, this.paint));
+      output.push(panelRow(`  ${this.paint("muted", row.subtitle)}`, width, this.paint));
     });
 
-    while (output.length < 3 + LIST_LINES * 2) output.push("");
-    output.push(line(this.paint("muted", "─".repeat(Math.max(1, width))), width));
-    const allDetailLines = wrappedDetail(selected?.detail ?? "", width);
+    while (output.length < 4 + LIST_LINES * 2) output.push(panelRow("", width, this.paint));
+    output.push(panelRule(width, this.paint, "├", "┤"));
+    const allDetailLines = wrappedDetail(selected?.detail ?? "", contentWidth);
     const maxDetailScroll = Math.max(0, allDetailLines.length - DETAIL_LINES);
     this.detailScroll = Math.min(this.detailScroll, maxDetailScroll);
     const visibleDetail = allDetailLines.slice(this.detailScroll, this.detailScroll + DETAIL_LINES);
     const detailRange = `${Math.min(this.detailScroll + 1, allDetailLines.length)}-${Math.min(this.detailScroll + visibleDetail.length, allDetailLines.length)}/${allDetailLines.length}`;
-    output.push(line(this.paint("accent", `${selected?.title ?? "Detalhe"} · ${detailRange}`), width));
-    visibleDetail.forEach((detail) => output.push(line(detail, width)));
-    while (output.length < 3 + LIST_LINES * 2 + 1 + 1 + DETAIL_LINES) output.push("");
-    output.push(line(this.paint("muted", `tools ${snapshot.ledger.toolCalls} · launches ${snapshot.ledger.launches} · events ${snapshot.ledger.protocolEvents}`), width));
+    output.push(panelRow(this.paint("accent", `${selected?.title ?? "Detalhe"} · ${detailRange}`), width, this.paint));
+    visibleDetail.forEach((detail) => output.push(panelRow(detail, width, this.paint)));
+    while (output.length < 4 + LIST_LINES * 2 + 1 + 1 + DETAIL_LINES) output.push(panelRow("", width, this.paint));
+    output.push(panelRow(this.paint("muted", `tools ${snapshot.ledger.toolCalls} · launches ${snapshot.ledger.launches} · events ${snapshot.ledger.protocolEvents}`), width, this.paint));
+    output.push(panelRule(width, this.paint, "╰", "╯"));
     this.cacheKey = key;
     this.cache = output;
     return output;
