@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.35.0 — 2026-09-09
+
+- `workflow-kit`: adiciona `/workflow`, TUI da sessão atual para inspecionar mensagens, tasks, agents e lifecycle.
+
 ## 1.34.0 — 2026-09-09
 - `workflow-kit`: captura automaticamente spawns e ciclos de vida do tool `task` no OMP, aplicando o gate de agentes ativos e retries sem depender de `workflow_event` manual.
 
