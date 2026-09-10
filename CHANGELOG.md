@@ -1,6 +1,11 @@
 # Changelog
 
 ## Unreleased
+
+## 1.42.0 — 2026-09-10
+
+- `workflow-kit`: ativa Ponytail no nível ultra e Caveman no início de cada sessão.
+
 ## 1.41.0 — 2026-09-10
 
 - `workflow-kit`: remove o registro da extensão runtime do plugin; skills e comandos permanecem disponíveis.
