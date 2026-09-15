@@ -5,7 +5,7 @@ Marketplace multi-plataforma para **Cursor**, **Claude Code**, **Codex** e **Ope
 Repo: [lucasAguiar11/agent-skills](https://github.com/lucasAguiar11/agent-skills)
 
 - **Marketplace:** `skill-forge`
-- **Plugins:** `workflow-kit`, `figma-to-code`, `brass-tacks`, `yolo`
+- **Plugins:** `workflow-kit`, `figma-to-code`, `i-have-adhd`, `yolo`
 - **Skill orquestradora:** `feature-delivery`
 
 ## Instalar
@@ -33,7 +33,7 @@ Settings → Plugins → Add marketplace `lucasAguiar11/agent-skills` → Instal
 /plugin marketplace add lucasAguiar11/agent-skills
 /plugin install workflow-kit@skill-forge
 /plugin install figma-to-code@skill-forge
-/plugin install brass-tacks@skill-forge
+/plugin install i-have-adhd@skill-forge
 /plugin install yolo@skill-forge
 /reload-plugins
 ```
@@ -50,10 +50,12 @@ codex plugin marketplace add lucasAguiar11/agent-skills
 ```
 
 `/plugins` → **workflow-kit** → Install **workflow-kit**
+`/plugins` → **i-have-adhd** → Install **i-have-adhd**
 
 ```text
 @workflow-kit
 @feature-delivery
+$i-have-adhd
 ```
 
 ### OpenCode
@@ -68,6 +70,7 @@ Para usar em outro projeto, adicione os caminhos no `opencode.json`:
     "paths": [
       "/caminho/para/agent-skills/plugins/workflow-kit/skills",
       "/caminho/para/agent-skills/plugins/figma-to-code/skills",
+      "/caminho/para/agent-skills/plugins/i-have-adhd/skills",
       "/caminho/para/agent-skills/plugins/yolo/skills"
     ]
   }
@@ -117,11 +120,12 @@ Depois de editar o config, **reinicie o OpenCode** para carregar as skills.
 
 - `figma-to-code` — Figma to code quase pixel perfect, independente de stack, com verificacao visual
 
-### Plugin `brass-tacks`
+### Plugin `i-have-adhd`
 
-- Output style always-on (hooks `SessionStart` + `UserPromptSubmit` once): acao primeiro, passos numerados, linguagem simples
-- Skill `/brass-tacks`; desliga com `stop brass tacks mode`
-- Baseado em [SkytheWitcher/brass-tacks](https://github.com/SkytheWitcher/brass-tacks)
+- Output ADHD-friendly baseado em [ayghri/i-have-adhd](https://github.com/ayghri/i-have-adhd)
+- Hook `SessionStart` ativa automaticamente a skill no Claude Code
+- Skill `/i-have-adhd` (ou `$i-have-adhd` no Codex) para ativacao manual
+- `stop adhd mode` ou `normal mode` desliga a skill na sessao atual
 
 ### Plugin `yolo`
 
@@ -196,9 +200,8 @@ agent-skills/
     │   └── skills/
     ├── figma-to-code/
     │   └── skills/
-    ├── brass-tacks/
-    │   ├── hooks/           # SessionStart + UserPromptSubmit
-    │   ├── hooks-handlers/
+    ├── i-have-adhd/
+    │   ├── hooks/           # SessionStart opt-in
     │   └── skills/
     └── yolo/
         └── skills/

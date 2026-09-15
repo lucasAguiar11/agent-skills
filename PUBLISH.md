@@ -1,7 +1,7 @@
 # Publicar
 
 - **Marketplace:** `skill-forge`
-- **Plugins:** `workflow-kit`, `figma-to-code`, `brass-tacks`, `yolo`
+- **Plugins:** `workflow-kit`, `figma-to-code`, `i-have-adhd`, `yolo`
 - **Skill orquestradora:** `feature-delivery`
 
 ## Instalar
@@ -16,12 +16,12 @@ Settings → Plugins → `lucasAguiar11/agent-skills` → Install `workflow-kit`
 /plugin marketplace add lucasAguiar11/agent-skills
 /plugin install workflow-kit@skill-forge
 /plugin install figma-to-code@skill-forge
-/plugin install brass-tacks@skill-forge
+/plugin install i-have-adhd@skill-forge
 /plugin install yolo@skill-forge
 /reload-plugins
 ```
 
-`brass-tacks` injeta o estilo de saida em toda sessao (hooks SessionStart + skill `/brass-tacks`). Confie o plugin para os hooks rodarem.
+`i-have-adhd` e ativado automaticamente pelo hook `SessionStart` no Claude Code. Use `/i-have-adhd` em hosts sem esse hook e `stop adhd mode` ou `normal mode` para desativar na sessao atual.
 
 ### Codex
 
@@ -30,6 +30,9 @@ codex plugin marketplace add lucasAguiar11/agent-skills
 ```
 
 `/plugins` → **workflow-kit** → Install **workflow-kit**
+`/plugins` → **i-have-adhd** → Install **i-have-adhd**
+
+Use `$i-have-adhd` para ativar o modo no Codex.
 
 ### OpenCode
 
@@ -41,6 +44,7 @@ Clone o repositorio e adicione os caminhos das skills no `opencode.json` do proj
     "paths": [
       "./agent-skills/plugins/workflow-kit/skills",
       "./agent-skills/plugins/figma-to-code/skills",
+      "./agent-skills/plugins/i-have-adhd/skills",
       "./agent-skills/plugins/yolo/skills"
     ]
   }

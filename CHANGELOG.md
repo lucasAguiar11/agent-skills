@@ -2,9 +2,12 @@
 
 ## Unreleased
 
+## 1.43.0 — 2026-09-15
+- `i-have-adhd`: adiciona output ADHD-friendly baseado no projeto upstream `ayghri/i-have-adhd` e ativa no inicio de cada sessao via `SessionStart`.
+
 ## 1.42.0 — 2026-09-10
 
-- `workflow-kit`: ativa Ponytail no nível ultra e Caveman no início de cada sessão.
+- `workflow-kit`: ativa Ponytail no nível ultra no início de cada sessão.
 
 ## 1.41.0 — 2026-09-10
 
