@@ -31,6 +31,18 @@ Skill para criar commits seguindo o padrão [Conventional Commits](https://www.c
 | `test` | Testes |
 | `build` | Dependências/build |
 
+## Breaking change
+
+Mudança incompatível (remove ou renomeia API/contrato público, exige migração ou versão nova de outro sistema, remove fluxo existente) leva `!` após o tipo/escopo **e** o rodapé `BREAKING CHANGE:` explicando o impacto:
+
+```
+feat(api)!: trocar contrato do trace
+
+BREAKING CHANGE: o app passa a exigir a API v2.
+```
+
+Ferramentas de versão (git-cliff, semantic-release) usam esse marcador para subir o major; sem ele, a mudança sai como minor/patch. Na dúvida se é breaking, perguntar ao usuário ao listar os commits planejados.
+
 ## Workflow
 
 ### 1. Analisar mudanças
