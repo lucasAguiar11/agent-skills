@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.44.0 — 2026-10-15
+
+- `workflow-kit`: a skill `commit` passa a marcar mudança incompatível com `!` e rodapé `BREAKING CHANGE:`, usados por git-cliff/semantic-release para subir o major.
+
 ## 1.43.0 — 2026-09-15
 - `i-have-adhd`: adiciona output ADHD-friendly baseado no projeto upstream `ayghri/i-have-adhd` e ativa no inicio de cada sessao via `SessionStart`.
 
