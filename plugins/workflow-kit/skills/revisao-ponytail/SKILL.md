@@ -87,11 +87,13 @@ Acima de ~400 linhas ou ~10 arquivos, rode os eixos 3 e 4 em dois sub-agentes pa
 
 Para cada item: tem linha do diff? Tem prova que eu li? Sobrevive se o autor perguntar "mostra onde"? Qualquer "não" → apague. Item repetido nos dois eixos fica só em Padrões.
 
+Depois, releia no HEAD as linhas de cada item que sobrou (inclusive os vindos de sub-agente) e copie o trecho que vai na saída. Se o trecho não mostra o problema sozinho, apague o item.
+
 ## Saída
 
 Sem emoji. Exatamente esta estrutura:
 
-```markdown
+````markdown
 ## Revisão — `<ponto>`..HEAD
 
 **Arquivos:** <N> | **+<add> / -<del>**
@@ -100,23 +102,83 @@ Sem emoji. Exatamente esta estrutura:
 - <regra> — `<fonte>:<linha>`
 
 ### Padrões
-- `arquivo.ts:L10-18` [Quebra] <o que diverge>. Regra: `AGENTS.md` "<trecho>". Ajuste: <o que fazer>.
-- `arquivo.ts:L30` [Desvio] <o que diverge>. Padrão: `vizinho.ts:L42` <como é feito lá>. Ajuste: <o que fazer>.
+
+#### 1. [Quebra] <título curto>
+
+`arquivo.ts:L10-18` <o que diverge>. Regra: `AGENTS.md` "<trecho>". Ajuste: <o que fazer>.
+
+`arquivo.ts:10-18`
+```ts
+<linhas do arquivo novo que mostram o problema>
+```
+
+#### 2. [Desvio] <título curto>
+
+`arquivo.ts:L30` <o que diverge>. Ajuste: <o que fazer>.
+
+`arquivo.ts:28-31`
+```ts
+<linhas do arquivo novo>
+```
+Padrão em `vizinho.ts:40-44`:
+```ts
+<linhas do vizinho que mostram o jeito do repo>
+```
 
 ### Enxugamento
-- `arquivo.ts:L52-71`: delete: <o quê>. <substituto>.
+
+#### 1. delete: <título curto>
+
+`arquivo.ts:L52-71`: delete: <o quê>. <substituto>.
+
+`arquivo.ts:52-71`
+```ts
+<linhas a cortar>
+```
+
+#### 2. shrink: <título curto>
+
+`arquivo.ts:L80-84`: shrink: <o quê>.
+
+`arquivo.ts:80-84`
+```ts
+<forma atual>
+```
+Fica assim:
+```ts
+<forma curta equivalente>
+```
 
 net: -<N> linhas possíveis.
 
 ### Perguntas
-- <dúvida real que depende de contexto>
 
-**Resumo:** Padrões: <n> (<pior item>). Enxugamento: <n> (<pior item>).
+#### <dúvida real que depende de contexto>
+
+`arquivo.ts:12-15`
+```ts
+<trecho que motiva a dúvida, quando ela cita código>
 ```
 
+**Resumo:** Padrões: <n> (<pior item>). Enxugamento: <n> (<pior item>).
+````
+
+Trechos de código:
+
+- Copie do arquivo no HEAD, lido nesta sessão. Não reescreva nem resuma o código; marque linhas omitidas com `...`. Acima de cada bloco, `arquivo:linha-inicial-final` do trecho.
+- Mostre só as linhas que provam o item, até ~15 por bloco. Use a linguagem certa no bloco (`ts`, `sql`, `md`, `json`).
+- `[Quebra]`: trecho do código novo. Mostre também o trecho da regra (doc, arquivo de config) quando ela não couber na frase.
+- `[Desvio]`: trecho do código novo e trecho do vizinho citado.
+- `shrink`: forma atual e a forma curta em blocos separados. `delete`/`yagni`: trecho a cortar, mais uma frase com a prova de que não tem uso (grep, chamador único).
+- Duplicata: os dois trechos, o novo e o que já existe.
+- Item que não é código (estrutura de pastas, seção de doc): mostre a árvore ou o trecho do doc no lugar do código.
+
+Estrutura:
+
 - **Régua**: só as regras que você de fato usou para julgar, inclusive para aprovar; no máximo ~8 linhas.
+- Itens numerados por eixo, começando em 1, na ordem de gravidade (`[Quebra]` antes de `[Desvio]`).
 - **Padrões** vazio: `Segue os padrões.`
-- **Enxugamento** vazio: `Já está enxuto. Pode subir.` no lugar da lista e do `net`.
+- **Enxugamento** vazio: `Já está enxuto. Pode subir.` no lugar dos itens e do `net`.
 - **Perguntas** vazio: omita a seção.
 - **Resumo** com eixo zerado: só o número, sem `(<pior item>)`.
 - Não reordene nem misture eixos.
