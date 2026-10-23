@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.46.0 — 2026-10-23
+
+- `workflow-kit`: `revisao-ponytail` passa a mostrar cada item como bloco numerado com o trecho de código do problema copiado do HEAD, mais o trecho do vizinho em `[Desvio]`, a forma curta em `shrink` e os dois lados em duplicata.
+
 ## 1.45.0 — 2026-10-23
 
 - `workflow-kit`: nova skill `revisao-ponytail`, review pt-BR do diff desde um ponto fixo em dois eixos: Padrões (mantém a estrutura e segue as convenções documentadas e vivas do repo, com rótulos `[Quebra]`/`[Desvio]`) e Enxugamento (contrato do `ponytail-review`, embutido para funcionar sem ele). Regra zero: sem evidência citada (`arquivo:linha` ou trecho da regra), sem finding; zero findings é saída válida.
