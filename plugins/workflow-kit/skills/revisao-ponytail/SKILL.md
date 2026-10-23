@@ -8,7 +8,7 @@ Revisão do diff entre um ponto fixo e o estado atual, em dois eixos:
 - **Padrões**: a mudança mantém a estrutura presente e segue as convenções que o repo já usa?
 - **Enxugamento**: o que dá pra cortar, no formato do `ponytail-review`.
 
-Fora de escopo: aderência à spec, segurança e performance (use `code-review-and-quality`). Esta skill só lista; não aplica correções.
+Fora de escopo: aderência à spec, segurança e performance (use `code-review-and-quality`). Esta skill só lista; não aplica correções. Postar na PR só quando o usuário pedir (seção `Comentários na PR`).
 
 ## Regra zero: não inventar problema
 
@@ -182,3 +182,40 @@ Estrutura:
 - **Perguntas** vazio: omita a seção.
 - **Resumo** com eixo zerado: só o número, sem `(<pior item>)`.
 - Não reordene nem misture eixos.
+
+## Comentários na PR
+
+Só quando o usuário pedir para postar. A revisão no chat continua completa; o comentário na PR é curto e direto.
+
+- Antes de postar, mostre o preview no chat e espere aprovação explícita. Ajuste pedido muda o preview e ele é mostrado de novo; só poste a versão aprovada, sem mudar nada.
+- Uma review, um comentário inline por item, na linha que mostra o problema. Corpo da review: uma linha (`<N> ajustes de padrão, comentados inline.`), sem repetir os itens.
+- Comentário: 1–2 frases. O problema e o ajuste, com a referência (`arquivo:linha` do padrão ou a regra do `AGENTS.md` em poucas palavras). Sem rótulo, sem título, sem explicar o óbvio.
+- Código só se a frase não basta, até ~5 linhas.
+- Bloco `suggestion` só se o item inteiro se resolve nas linhas comentadas e o arquivo compila depois de aplicar. Se precisa de import, outra linha, outro arquivo ou mover arquivo: sem `suggestion`, descreva o ajuste. Nunca divida um item em várias sugestões.
+- Errou um comentário: edite o comentário. Nunca abra uma segunda review para corrigir a primeira.
+- Perguntas de regra de negócio não vão para a PR sem pedido explícito.
+
+Preview (exatamente o que vai ser enviado):
+
+````markdown
+**PR #<n>** · evento: `REQUEST_CHANGES` · commit `<sha curto>`
+
+**Corpo da review:** <uma linha>
+
+1. `arquivo.ts:L34`
+   > <texto do comentário, como vai aparecer>
+
+2. `arquivo.ts:L35-43`
+   > <texto do comentário>
+   ```suggestion
+   <linhas que substituem L35-43>
+   ```
+
+Posto assim?
+````
+
+Exemplo:
+
+```markdown
+`ACTIONS` duplica `PERMISSION_ACTIONS` (`src/domain/enums/screen.enum.ts:98`). Importe de `@domain/enums` e apague esta linha.
+```
