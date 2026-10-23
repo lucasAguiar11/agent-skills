@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.45.0 — 2026-10-23
+
+- `workflow-kit`: nova skill `revisao-ponytail`, review pt-BR do diff desde um ponto fixo em dois eixos: Padrões (mantém a estrutura e segue as convenções documentadas e vivas do repo, com rótulos `[Quebra]`/`[Desvio]`) e Enxugamento (contrato do `ponytail-review`, embutido para funcionar sem ele). Regra zero: sem evidência citada (`arquivo:linha` ou trecho da regra), sem finding; zero findings é saída válida.
+
 ## 1.44.0 — 2026-10-15
 
 - `workflow-kit`: a skill `commit` passa a marcar mudança incompatível com `!` e rodapé `BREAKING CHANGE:`, usados por git-cliff/semantic-release para subir o major.
