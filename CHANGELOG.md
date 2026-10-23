@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.47.0 — 2026-10-23
+
+- `workflow-kit`: `revisao-ponytail` ganha regras para comentários na PR: só sob pedido e depois de aprovar um preview no chat, uma review, um comentário de 1–2 frases por item, `suggestion` só quando aplica sozinha e compila, e correção por edição em vez de segunda review.
+
 ## 1.46.0 — 2026-10-23
 
 - `workflow-kit`: `revisao-ponytail` passa a mostrar cada item como bloco numerado com o trecho de código do problema copiado do HEAD, mais o trecho do vizinho em `[Desvio]`, a forma curta em `shrink` e os dois lados em duplicata.
