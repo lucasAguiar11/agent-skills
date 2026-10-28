@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.48.0 — 2026-10-28
+
 - Todos os plugins: `plugin.json` (Agent Plugins v1) na raiz de cada plugin para instalar no Hermes Agent com `hermes plugins install lucasAguiar11/agent-skills#plugins/<nome>`. O `bump-version.sh` já atualiza esse arquivo junto com os outros manifests.
 - `figma-to-code`: o export de PNG via API REST descreve a chamada com `X-Figma-Token` em vez de um `curl` literal com o token, que o scan de segurança do Hermes bloqueava como exfiltração.
 
