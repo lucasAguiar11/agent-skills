@@ -34,6 +34,18 @@ codex plugin marketplace add lucasAguiar11/agent-skills
 
 Use `$i-have-adhd` para ativar o modo no Codex.
 
+### Hermes Agent
+
+```bash
+hermes plugins install lucasAguiar11/agent-skills#plugins/workflow-kit --enable
+hermes plugins install lucasAguiar11/agent-skills#plugins/figma-to-code --enable
+hermes plugins install lucasAguiar11/agent-skills#plugins/i-have-adhd --enable
+hermes plugins install lucasAguiar11/agent-skills#plugins/yolo --enable
+hermes gateway restart
+```
+
+Cada plugin precisa do `plugin.json` (Agent Plugins v1) na raiz; `hermes plugins validate plugins/<nome>` confere antes de publicar. Só as skills carregam no Hermes.
+
 ### OpenCode
 
 Clone o repositorio e adicione os caminhos das skills no `opencode.json` do projeto:

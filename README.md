@@ -1,6 +1,6 @@
 # Skill Forge
 
-Marketplace multi-plataforma para **Cursor**, **Claude Code**, **Codex** e **OpenCode** — skills reutilizaveis para entrega, planejamento, review e execucao em **qualquer projeto**.
+Marketplace multi-plataforma para **Cursor**, **Claude Code**, **Codex**, **OpenCode** e **Hermes Agent** — skills reutilizaveis para entrega, planejamento, review e execucao em **qualquer projeto**.
 
 Repo: [lucasAguiar11/agent-skills](https://github.com/lucasAguiar11/agent-skills)
 
@@ -57,6 +57,20 @@ codex plugin marketplace add lucasAguiar11/agent-skills
 @feature-delivery
 $i-have-adhd
 ```
+
+### Hermes Agent
+
+Cada plugin tem um `plugin.json` (Agent Plugins v1) na raiz. Instale pela subpasta:
+
+```bash
+hermes plugins install lucasAguiar11/agent-skills#plugins/workflow-kit --enable
+hermes plugins install lucasAguiar11/agent-skills#plugins/figma-to-code --enable
+hermes plugins install lucasAguiar11/agent-skills#plugins/i-have-adhd --enable
+hermes plugins install lucasAguiar11/agent-skills#plugins/yolo --enable
+hermes gateway restart
+```
+
+O Hermes carrega só as skills. Hooks (`SessionStart`), Reader agents (`agents/`) e a extensão OMP não rodam lá: ative o `i-have-adhd` pela skill.
 
 ### OpenCode
 
@@ -115,7 +129,7 @@ Depois de editar o config, **reinicie o OpenCode** para carregar as skills.
 
 **Eficiência:** Claude Code usa `hooks/hooks.json` para injetar a política no `SessionStart`; OMP usa `extensions/index.ts`, declarada em `package.json → omp.extensions`, para transformar o contexto efetivo, mostrar `eficiência: ATIVA` somente após a aplicação e não duplicar a política quando o marcador já existe. Se compactação ou troca de contexto remover o marcador, a política é reinjetada. Após atualizar o plugin, reinicie a sessão para carregar a extensão. Instalar apenas as skills não carrega o runtime OMP.
 
-**Reader agents** (Claude Code — auto-discovery em `agents/`, context offload): `plan-reader`, `plan-detail-reader`, `feature-reader`, `adr-reader`, `adr-correlator`, `feature-index-reader`. Cada um lê um doc grande e devolve um digest de forma fixa, mantendo o thread principal enxuto. Nos demais hosts (Cursor/Codex/OpenCode) os docs são lidos inline.
+**Reader agents** (Claude Code — auto-discovery em `agents/`, context offload): `plan-reader`, `plan-detail-reader`, `feature-reader`, `adr-reader`, `adr-correlator`, `feature-index-reader`. Cada um lê um doc grande e devolve um digest de forma fixa, mantendo o thread principal enxuto. Nos demais hosts (Cursor/Codex/OpenCode/Hermes) os docs são lidos inline.
 
 ### Plugin `figma-to-code`
 
@@ -197,14 +211,18 @@ agent-skills/
 ├── opencode.json
 └── plugins/
     ├── workflow-kit/
+    │   ├── plugin.json    # Hermes (Agent Plugins v1)
     │   ├── agents/        # Reader agents (Claude Code)
     │   └── skills/
     ├── figma-to-code/
+    │   ├── plugin.json
     │   └── skills/
     ├── i-have-adhd/
+    │   ├── plugin.json
     │   ├── hooks/           # SessionStart opt-in
     │   └── skills/
     └── yolo/
+        ├── plugin.json
         └── skills/
 ```
 
@@ -217,6 +235,11 @@ agent-skills/
 
 ```bash
 codex plugin marketplace update skill-forge
+```
+
+```bash
+hermes plugins update
+hermes gateway restart
 ```
 
 ## Licenca

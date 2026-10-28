@@ -1,0 +1,20 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "workflow-kit",
+  "version": "1.47.0",
+  "description": "Workflow kit with feature-delivery orchestration, PRD, ADR, implementation plans, wave-based subagents, review and verification gates",
+  "author": {
+    "name": "lucasAguiar11"
+  },
+  "keywords": [
+    "workflow-kit",
+    "feature-delivery",
+    "planning",
+    "subagents",
+    "review-plan",
+    "test-guide",
+    "clean-comments"
+  ],
+  "license": "MIT",
+  "repository": "https://github.com/lucasAguiar11/agent-skills"
+}

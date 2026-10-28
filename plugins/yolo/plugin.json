@@ -1,0 +1,18 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "yolo",
+  "version": "1.0.2",
+  "description": "Executes the request immediately through /yolo without chat confirmation or a risk checklist",
+  "author": {
+    "name": "lucasAguiar11"
+  },
+  "keywords": [
+    "yolo",
+    "execute",
+    "shell",
+    "git",
+    "no-confirm"
+  ],
+  "license": "MIT",
+  "repository": "https://github.com/lucasAguiar11/agent-skills"
+}

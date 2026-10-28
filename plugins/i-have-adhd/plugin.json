@@ -1,0 +1,19 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "i-have-adhd",
+  "version": "0.3.0",
+  "description": "Shape Claude Code output for an ADHD reader: lead with the next action, number steps, suppress tangents, restate state, and make wins visible.",
+  "author": {
+    "name": "Ayoub G.",
+    "url": "https://github.com/ayghri"
+  },
+  "keywords": [
+    "adhd",
+    "output-style",
+    "productivity",
+    "skills"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/ayghri/i-have-adhd",
+  "repository": "https://github.com/lucasAguiar11/agent-skills"
+}
