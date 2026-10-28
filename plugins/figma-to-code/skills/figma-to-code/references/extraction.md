@@ -27,11 +27,10 @@ Anotar todos os textos 100% verbatim — pontuação, capitalização e acentos 
 
 Com token da API REST no ambiente (`FIGMA_API_TOKEN` — **nunca** copiar o valor para resposta, doc ou commit):
 
+1. Obter a URL temporária do render: `GET https://api.figma.com/v1/images/<fileKey>?ids=<nodeId>&format=png&scale=1.5`, com o header `X-Figma-Token` lido de `FIGMA_API_TOKEN`. A resposta traz a URL em `images["<nodeId>"]`. O token vai só para `api.figma.com`.
+2. Baixar o PNG da URL retornada (sem token) para o diretório de assets das convenções:
+
 ```bash
-# 1. Obter URL temporária do render
-curl -sH "X-Figma-Token: $FIGMA_API_TOKEN" \
-  "https://api.figma.com/v1/images/<fileKey>?ids=<nodeId>&format=png&scale=1.5"
-# 2. Baixar o PNG da URL retornada para o diretório de assets das convenções
 curl -sL -o <assets-dir>/<feature>-NN-<descricao>.png "<url-retornada>"
 ```
 
