@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "service-blueprint",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Service blueprints and sequential process timelines as a single SVG + PNG, with a JSON-driven generator, explanatory balloons and content validation",
   "author": {
     "name": "lucasAguiar11"

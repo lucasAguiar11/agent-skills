@@ -1,6 +1,6 @@
 {
   "name": "service-blueprint",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Blueprint de serviço e linha do tempo de processos como SVG único + PNG, com gerador por spec JSON, balões explicativos, glossário e validação do conteúdo",
   "author": {
     "name": "lucasAguiar11"

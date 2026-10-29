@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.50.0 — 2026-10-29
+
+- `service-blueprint` (0.2.0): leva o diagrama para o Whimsical como board editável. Novo conversor `scripts/whimsical.py` (SVG do `timeline.py` → lotes de operações para o `edit` do MCP remoto do Whimsical), com a ordem de criação que deixa as linhas de vida atrás dos balões, cores exatas dos balões, selos e setas com âncoras. A skill ganha a seção §9: MCP remoto × desktop, regras do conversor, o que não tem equivalente, como conferir e como refazer.
+
 ## 1.49.0 — 2026-10-29
 
 - Novo plugin `service-blueprint` (0.1.0): skill `service-blueprint` para desenhar blueprint de serviço ou linha do tempo sequencial de um processo como SVG único + PNG. Inclui o gerador `scripts/timeline.py` (spec JSON → SVG/PNG, com avisos de texto estourado), um exemplo completo, balões explicativos e de "o que é / por que confirmar", glossário, mapa de integração com chamadas numeradas e selo de certeza, e validação do conteúdo contra as fontes.
