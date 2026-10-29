@@ -171,6 +171,8 @@ net: -<N> linhas possíveis.
 ```
 
 **Resumo:** Padrões: <n> (<pior item>). Enxugamento: <n> (<pior item>).
+
+**Veredito:** <Aprovar | Não aprovar> — <motivo em uma linha>
 ````
 
 Trechos de código:
@@ -191,6 +193,7 @@ Estrutura:
 - **Enxugamento** vazio: `Já está enxuto. Pode subir.` no lugar dos itens e do `net`.
 - **Perguntas** vazio: omita a seção.
 - **Resumo** com eixo zerado: só o número, sem `(<pior item>)`.
+- **Veredito**: `Não aprovar` se houver algum `[Quebra]`; senão `Aprovar`. `[Desvio]`, Enxugamento e Perguntas não bloqueiam; o motivo cita o `[Quebra]` ou quantos ajustes opcionais ficaram.
 - Não reordene nem misture eixos.
 
 ## Comentários na PR
@@ -208,7 +211,7 @@ Só quando o usuário pedir para postar. A revisão no chat continua completa; o
 Preview (exatamente o que vai ser enviado):
 
 ````markdown
-**PR #<n>** · evento: `REQUEST_CHANGES` · commit `<sha curto>`
+**PR #<n>** · evento: `<REQUEST_CHANGES se Não aprovar | APPROVE se Aprovar>` · commit `<sha curto>`
 
 **Corpo da review:** <uma linha>
 
