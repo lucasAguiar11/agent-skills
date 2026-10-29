@@ -1,0 +1,247 @@
+{
+  "title": "Devolução de compra online",
+  "subtitle": "Exemplo da skill · cliente devolve um produto pela loja virtual. Fictício; datas ilustrativas.",
+  "footer": "Exemplo fictício. Métodos e códigos são ilustrativos.",
+  "labels": {
+    "date": "DATA",
+    "attention": "ATENÇÃO",
+    "optional": "opcional ou condicional",
+    "internal": "itálico colorido",
+    "internal_desc": "ação interna do sistema da cor",
+    "sender": "cor da seta = quem envia",
+    "balloon_info": "explica o passo",
+    "balloon_confirm": "por que confirmar"
+  },
+  "note_types": {
+    "block": {
+      "label": "Trava"
+    },
+    "confirm": {
+      "label": "Confirmar"
+    },
+    "contingency": {
+      "label": "Contingência"
+    }
+  },
+  "actors": [
+    {
+      "id": "cli",
+      "name": "Cliente",
+      "role": "quem devolve",
+      "color": "#14783a"
+    },
+    {
+      "id": "loja",
+      "name": "Loja",
+      "role": "app e atendimento",
+      "color": "#1d4ed8"
+    },
+    {
+      "id": "log",
+      "name": "Transportadora",
+      "role": "coleta",
+      "color": "#0f766e"
+    },
+    {
+      "id": "erp",
+      "name": "ERP",
+      "role": "estoque e financeiro",
+      "color": "#6d28d9"
+    }
+  ],
+  "tags": {
+    "ETIQUETA": {
+      "color": "#c2410c",
+      "tint": "#fbe4d5",
+      "desc": "etiqueta de postagem"
+    },
+    "NF": {
+      "color": "#6d28d9",
+      "tint": "#ebe3fa",
+      "desc": "documento fiscal"
+    }
+  },
+  "rows": [
+    {
+      "phase": "Pedido",
+      "color": "#1d4ed8",
+      "tint": "#f1f4fa"
+    },
+    {
+      "date": "01/11",
+      "from": "cli",
+      "to": "loja",
+      "label": "Pede a devolução no app",
+      "sub": "motivo + fotos",
+      "note": {
+        "type": "block",
+        "text": "Fora do prazo de 7 dias, o pedido é recusado."
+      }
+    },
+    {
+      "at": "loja",
+      "label": "Aprova e gera a autorização",
+      "sub": "regra por motivo",
+      "balloon": "A regra por motivo decide sozinha: defeito aprova direto, arrependimento passa pelo atendimento."
+    },
+    {
+      "from": "loja",
+      "to": "log",
+      "label": "Agenda a coleta",
+      "code": "pickups.create()"
+    },
+    {
+      "id": "wait0",
+      "from": "loja",
+      "to": "cli",
+      "label": "Etiqueta de postagem",
+      "tag": "ETIQUETA"
+    },
+    {
+      "phase": "Transporte",
+      "color": "#0f766e",
+      "tint": "#eff6f4"
+    },
+    {
+      "id": "col",
+      "date": "03/11",
+      "from": "log",
+      "to": "cli",
+      "label": "Coleta na casa do cliente",
+      "dashed": true,
+      "sub": "ou postagem numa agência",
+      "note": {
+        "type": "confirm",
+        "text": "A coleta em área rural tem custo extra?"
+      },
+      "balloon": {
+        "kind": "confirm",
+        "text": "O que é: a retirada do produto pela transportadora. Por que: se a coleta rural custar mais, a loja precisa decidir quem paga antes de agendar."
+      }
+    },
+    {
+      "id": "ent",
+      "date": "06/11",
+      "from": "log",
+      "to": "loja",
+      "label": "Entrega no centro de devolução"
+    },
+    {
+      "phase": "Conferência",
+      "color": "#1d4ed8",
+      "tint": "#fbfaf7"
+    },
+    {
+      "at": "loja",
+      "label": "Confere o produto e as fotos",
+      "sub": "aceita, parcial ou recusa"
+    },
+    {
+      "id": "nf",
+      "from": "loja",
+      "to": "erp",
+      "label": "Entrada da devolução",
+      "code": "returns.receive()",
+      "tag": "NF",
+      "note": {
+        "type": "block",
+        "text": "Sem a NF de entrada o estoque não volta."
+      },
+      "balloon": {
+        "kind": "confirm",
+        "text": "O que é: a nota de entrada que devolve o produto ao estoque. Por que: sem ela o ERP não libera o estorno."
+      }
+    },
+    {
+      "phase": "Reembolso",
+      "color": "#6d28d9",
+      "tint": "#f4f1fa"
+    },
+    {
+      "date": "07/11",
+      "from": "erp",
+      "to": "loja",
+      "label": "Libera o estorno",
+      "code": "refunds.approve()",
+      "note": {
+        "type": "contingency",
+        "text": "Gateway fora do ar: crédito na carteira da loja."
+      }
+    },
+    {
+      "id": "fim",
+      "from": "loja",
+      "to": "cli",
+      "label": "Reembolso e aviso por e-mail"
+    }
+  ],
+  "spans": [
+    {
+      "actor": "log",
+      "from": "col",
+      "to": "ent",
+      "kind": "held",
+      "label": "em trânsito"
+    },
+    {
+      "actor": "cli",
+      "from": "wait0",
+      "to": "fim",
+      "kind": "wait",
+      "label": "cliente esperando"
+    }
+  ],
+  "bottom": {
+    "left": {
+      "title": "Regras do fluxo",
+      "color": "#6d28d9",
+      "items": [
+        {
+          "key": "Prazo",
+          "text": "7 dias corridos a partir da entrega"
+        },
+        {
+          "key": "Estorno",
+          "text": "no mesmo meio de pagamento da compra"
+        }
+      ]
+    },
+    "right": {
+      "title": "O que precisamos saber",
+      "color": "#955a06",
+      "items": [
+        {
+          "key": "Jurídico",
+          "color": "#955a06",
+          "text": "Prazo vale para todos os produtos?"
+        },
+        {
+          "key": "Financeiro",
+          "color": "#0f766e",
+          "text": "Quem paga o frete na recusa?",
+          "hot": true,
+          "hint": "← muda o preço"
+        }
+      ]
+    }
+  },
+  "glossary": {
+    "title": "Termos",
+    "color": "#1d4ed8",
+    "columns": 3,
+    "items": [
+      {
+        "term": "NF de entrada",
+        "text": "Nota fiscal que registra o retorno do produto ao estoque. ≈ nota de devolução."
+      },
+      {
+        "term": "Estorno",
+        "text": "Devolução do valor pago no mesmo meio de pagamento da compra."
+      },
+      {
+        "term": "Gateway",
+        "text": "Serviço que processa o pagamento com cartão."
+      }
+    ]
+  }
+}

@@ -5,7 +5,7 @@ Marketplace multi-plataforma para **Cursor**, **Claude Code**, **Codex**, **Open
 Repo: [lucasAguiar11/agent-skills](https://github.com/lucasAguiar11/agent-skills)
 
 - **Marketplace:** `skill-forge`
-- **Plugins:** `workflow-kit`, `figma-to-code`, `i-have-adhd`, `yolo`
+- **Plugins:** `workflow-kit`, `figma-to-code`, `service-blueprint`, `i-have-adhd`, `yolo`
 - **Skill orquestradora:** `feature-delivery`
 
 ## Instalar
@@ -33,6 +33,7 @@ Settings → Plugins → Add marketplace `lucasAguiar11/agent-skills` → Instal
 /plugin marketplace add lucasAguiar11/agent-skills
 /plugin install workflow-kit@skill-forge
 /plugin install figma-to-code@skill-forge
+/plugin install service-blueprint@skill-forge
 /plugin install i-have-adhd@skill-forge
 /plugin install yolo@skill-forge
 /reload-plugins
@@ -50,6 +51,7 @@ codex plugin marketplace add lucasAguiar11/agent-skills
 ```
 
 `/plugins` → **workflow-kit** → Install **workflow-kit**
+`/plugins` → **service-blueprint** → Install **service-blueprint**
 `/plugins` → **i-have-adhd** → Install **i-have-adhd**
 
 ```text
@@ -65,6 +67,7 @@ Cada plugin tem um `plugin.json` (Agent Plugins v1) na raiz. Instale pela subpas
 ```bash
 hermes plugins install lucasAguiar11/agent-skills#plugins/workflow-kit --enable
 hermes plugins install lucasAguiar11/agent-skills#plugins/figma-to-code --enable
+hermes plugins install lucasAguiar11/agent-skills#plugins/service-blueprint --enable
 hermes plugins install lucasAguiar11/agent-skills#plugins/i-have-adhd --enable
 hermes plugins install lucasAguiar11/agent-skills#plugins/yolo --enable
 hermes gateway restart
@@ -84,6 +87,7 @@ Para usar em outro projeto, adicione os caminhos no `opencode.json`:
     "paths": [
       "/caminho/para/agent-skills/plugins/workflow-kit/skills",
       "/caminho/para/agent-skills/plugins/figma-to-code/skills",
+      "/caminho/para/agent-skills/plugins/service-blueprint/skills",
       "/caminho/para/agent-skills/plugins/i-have-adhd/skills",
       "/caminho/para/agent-skills/plugins/yolo/skills"
     ]
@@ -134,6 +138,12 @@ Depois de editar o config, **reinicie o OpenCode** para carregar as skills.
 ### Plugin `figma-to-code`
 
 - `figma-to-code` — Figma to code quase pixel perfect, independente de stack, com verificacao visual
+
+### Plugin `service-blueprint`
+
+- `service-blueprint` — blueprint de serviço ou linha do tempo sequencial de um processo com vários atores, como SVG único + PNG
+- Gerador `scripts/timeline.py`: spec JSON → SVG/PNG, com avisos de texto estourado; `examples/example.json` mostra todos os recursos
+- Fases, chamadas de API numeradas com selo de certeza, balões explicativos e de "o que é / por que confirmar", glossário e validação do conteúdo contra as fontes
 
 ### Plugin `i-have-adhd`
 
@@ -217,6 +227,9 @@ agent-skills/
     ├── figma-to-code/
     │   ├── plugin.json
     │   └── skills/
+    ├── service-blueprint/
+    │   ├── plugin.json
+    │   └── skills/service-blueprint/   # SKILL.md, scripts/timeline.py, examples/
     ├── i-have-adhd/
     │   ├── plugin.json
     │   ├── hooks/           # SessionStart opt-in

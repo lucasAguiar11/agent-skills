@@ -1,0 +1,35 @@
+{
+  "name": "service-blueprint",
+  "version": "0.1.0",
+  "description": "Blueprint de serviço e linha do tempo de processos como SVG único + PNG, com gerador por spec JSON, balões explicativos, glossário e validação do conteúdo",
+  "author": {
+    "name": "lucasAguiar11"
+  },
+  "license": "MIT",
+  "keywords": [
+    "service-blueprint",
+    "timeline",
+    "diagram",
+    "svg",
+    "process-map",
+    "integration-map"
+  ],
+  "skills": "./skills",
+  "interface": {
+    "displayName": "Service Blueprint",
+    "shortDescription": "Desenha processos com vários atores como SVG + PNG",
+    "longDescription": "Blueprint de serviço ou linha do tempo sequencial a partir de uma spec JSON: atores com cor própria, fases, chamadas de API numeradas com selo de certeza, balões que explicam o passo e o porquê de cada ponto a confirmar, glossário e validação do conteúdo contra as fontes do projeto.",
+    "developerName": "lucasAguiar11",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Monte a linha do tempo deste processo com os sistemas envolvidos.",
+      "Desenhe o blueprint de serviço do fluxo de devolução.",
+      "Quais chamadas à API do fornecedor esse processo precisa? Monte o mapa."
+    ],
+    "brandColor": "#1D4ED8"
+  }
+}

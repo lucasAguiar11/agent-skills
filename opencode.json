@@ -4,6 +4,7 @@
     "paths": [
       "plugins/workflow-kit/skills",
       "plugins/figma-to-code/skills",
+      "plugins/service-blueprint/skills",
       "plugins/i-have-adhd/skills",
       "plugins/yolo/skills"
     ]

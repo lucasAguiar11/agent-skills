@@ -4,7 +4,7 @@
     "name": "lucasAguiar11"
   },
   "metadata": {
-    "description": "Marketplace de skills reutilizaveis: entrega/planejamento/review (workflow-kit), Figma to code, i-have-adhd (ADHD-friendly output) e yolo (executa sem confirmar)",
+    "description": "Marketplace de skills reutilizaveis: entrega/planejamento/review (workflow-kit), Figma to code, service-blueprint (diagramas de processo), i-have-adhd (ADHD-friendly output) e yolo (executa sem confirmar)",
     "version": "1.48.0"
   },
   "plugins": [
@@ -33,6 +33,20 @@
         "design-to-code",
         "pixel-perfect",
         "design-system"
+      ],
+      "category": "design"
+    },
+    {
+      "name": "service-blueprint",
+      "source": "./plugins/service-blueprint",
+      "description": "Blueprint de serviço e linha do tempo de processos como SVG + PNG, com balões explicativos e validação do conteúdo",
+      "version": "0.1.0",
+      "keywords": [
+        "service-blueprint",
+        "timeline",
+        "diagram",
+        "svg",
+        "process-map"
       ],
       "category": "design"
     },

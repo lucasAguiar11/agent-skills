@@ -1,7 +1,7 @@
 # Publicar
 
 - **Marketplace:** `skill-forge`
-- **Plugins:** `workflow-kit`, `figma-to-code`, `i-have-adhd`, `yolo`
+- **Plugins:** `workflow-kit`, `figma-to-code`, `service-blueprint`, `i-have-adhd`, `yolo`
 - **Skill orquestradora:** `feature-delivery`
 
 ## Instalar
@@ -16,6 +16,7 @@ Settings → Plugins → `lucasAguiar11/agent-skills` → Install `workflow-kit`
 /plugin marketplace add lucasAguiar11/agent-skills
 /plugin install workflow-kit@skill-forge
 /plugin install figma-to-code@skill-forge
+/plugin install service-blueprint@skill-forge
 /plugin install i-have-adhd@skill-forge
 /plugin install yolo@skill-forge
 /reload-plugins
@@ -30,6 +31,7 @@ codex plugin marketplace add lucasAguiar11/agent-skills
 ```
 
 `/plugins` → **workflow-kit** → Install **workflow-kit**
+`/plugins` → **service-blueprint** → Install **service-blueprint**
 `/plugins` → **i-have-adhd** → Install **i-have-adhd**
 
 Use `$i-have-adhd` para ativar o modo no Codex.
@@ -39,6 +41,7 @@ Use `$i-have-adhd` para ativar o modo no Codex.
 ```bash
 hermes plugins install lucasAguiar11/agent-skills#plugins/workflow-kit --enable
 hermes plugins install lucasAguiar11/agent-skills#plugins/figma-to-code --enable
+hermes plugins install lucasAguiar11/agent-skills#plugins/service-blueprint --enable
 hermes plugins install lucasAguiar11/agent-skills#plugins/i-have-adhd --enable
 hermes plugins install lucasAguiar11/agent-skills#plugins/yolo --enable
 hermes gateway restart
@@ -56,6 +59,7 @@ Clone o repositorio e adicione os caminhos das skills no `opencode.json` do proj
     "paths": [
       "./agent-skills/plugins/workflow-kit/skills",
       "./agent-skills/plugins/figma-to-code/skills",
+      "./agent-skills/plugins/service-blueprint/skills",
       "./agent-skills/plugins/i-have-adhd/skills",
       "./agent-skills/plugins/yolo/skills"
     ]
