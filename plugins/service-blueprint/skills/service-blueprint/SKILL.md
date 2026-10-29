@@ -1,6 +1,6 @@
 ---
 name: service-blueprint
-description: Desenha o blueprint de serviço ou a linha do tempo sequencial de um processo com vários atores (cliente, equipe, sistemas, terceiros) como um SVG único + PNG. Use quando o usuário pedir blueprint de serviço, linha do tempo ou fluxo de um processo, mapa de integração entre sistemas ("quais chamadas vamos precisar"), ou uma imagem para apresentar um processo. Inclui o gerador scripts/timeline.py (spec JSON → SVG/PNG com avisos de texto estourado), regras de conteúdo, estilo sem "cara de IA", balões explicativos, glossário e validação do conteúdo contra as fontes.
+description: Desenha o blueprint de serviço ou a linha do tempo sequencial de um processo com vários atores (cliente, equipe, sistemas, terceiros) como um SVG único + PNG, e opcionalmente como board editável no Whimsical. Use quando o usuário pedir blueprint de serviço, linha do tempo ou fluxo de um processo, mapa de integração entre sistemas ("quais chamadas vamos precisar"), uma imagem para apresentar um processo, ou o mesmo diagrama no Whimsical. Inclui o gerador scripts/timeline.py (spec JSON → SVG/PNG com avisos de texto estourado), o conversor scripts/whimsical.py (SVG → objetos nativos do Whimsical), regras de conteúdo, estilo sem "cara de IA", balões explicativos, glossário e validação do conteúdo contra as fontes.
 ---
 
 # Blueprint de serviço / linha do tempo em SVG
@@ -10,6 +10,7 @@ Serve para qualquer serviço com vários atores. Termos de domínio citados aqui
 Arquivos desta skill (caminhos relativos a esta pasta):
 - `scripts/timeline.py` — gerador: `python3 scripts/timeline.py spec.json saida.svg --png`. Imprime `WARN` para texto que estoura.
 - `examples/example.json` — spec completa com todos os recursos (devolução de compra online, fictícia). Copie como ponto de partida.
+- `scripts/whimsical.py` — conversor do SVG para objetos nativos e editáveis do Whimsical (§9).
 
 ## 1. Escolher a forma
 
@@ -120,6 +121,50 @@ PNG: sem `rsvg-convert`, use o Chrome sem janela com janela = viewBox e escala 2
 ## 8. Validar o conteúdo (antes de dizer que terminou)
 
 Confira cada afirmação do desenho contra as fontes do projeto (procure a regra, a spec, a doc da API). Erros comuns: nome desatualizado de obrigação ou produto, condição faltando ("só acima do limite X"), data de início × data de exigência, passo opcional desenhado como obrigatório, código ilustrativo apresentado como real, etapa colocada antes da hora (ex.: algo que só acontece com a mercadoria já recebida). Corrija o desenho **e** o documento de origem; diga o que não foi conferido.
+
+## 9. Levar para o Whimsical (board editável)
+
+Quando o usuário quer editar o diagrama no Whimsical, peça por peça. Testado com o MCP do Whimsical.
+
+**Caminhos que não servem:**
+- **Subir o SVG ou o PNG como imagem:** o MCP não sobe arquivo, só o usuário arrastando, e a imagem não é editável.
+- **Sequence diagram nativo:** a diagramação automática perde balões, faixas, selos e cores.
+
+**O caminho que funciona:** recriar o SVG como objetos soltos (texto, retângulo, elipse, conector), nas mesmas posições.
+
+```
+python3 <pasta-da-skill>/scripts/whimsical.py saida.svg ops.json --x 2100 --y 60   # --scale 1.2 (padrão)
+```
+
+Envie cada lote de `ops.json` (`{"batches": [[...]]}`), **na ordem**, como `operations` da ferramenta `edit` do MCP remoto, numa área vazia do board. No SVG da linha do tempo saem cerca de 630 operações em 3 lotes.
+
+**MCPs:**
+
+| | Remoto | Desktop |
+|---|---|---|
+| Endereço | `https://mcp.whimsical.com/mcp`, login OAuth (`/mcp`) | `http://localhost:21190/mcp`, com o app aberto |
+| IDs | Completos, 22 caracteres | Curtos, 6 caracteres; o remoto recusa |
+| Cor | Aceita hex exato (vira cor da paleta do board) | REPL só aceita a paleta; `board_edit` arredonda o hex para a paleta |
+| Usar para | Criar, atualizar, apagar, conferir por imagem | `board_repl` (ler a árvore), `board_snapshot` |
+
+**Regras que o conversor já aplica:**
+- **Ordem de criação:** o Whimsical não tem "mandar para trás" (nem pelo REPL), e o objeto criado por último fica por cima. Por isso a ordem é fundo → faixas → linhas de vida e períodos → resto. As linhas de vida e os períodos saem cortados nas bordas das faixas. Formas que ficam dentro de outra viram filhas dela.
+- **Escala 1,2×:** a menor fonte do Whimsical (`xs`, cerca de 13 px) é maior que os 10–11 px do SVG.
+- **Forma com texto:** tem no mínimo 40 px de altura. O selo vira um retângulo de 20 px com o texto solto por cima.
+- **Balões:** só com o fundo do SVG, sem borda. Com `deco: outline`, o Whimsical calcula o fundo a partir da borda e fica um pêssego barrento, com borda grossa. Uma forma aceita uma cor só.
+- **Setas:** um conector precisa de dois objetos, então cada ponta ganha uma âncora de 2 px. Para mover uma seta, o usuário arrasta as âncoras.
+- **Texto que começa com `- `, `1. ` ou `#`** viraria lista ou título; o conversor põe um espaço de largura zero na frente.
+- **Texto que passa da borda do fundo** sai do grupo e some dos recortes; a largura é limitada à borda.
+
+**O que não tem equivalente:** a ponta do balão, a linha pontilhada (a espera vira barra clara) e o texto girado. O rótulo vertical de um período vira horizontal ao lado da barra e pode ficar atrás de um balão; confira e mova à mão.
+
+**Conferir:**
+- Use `fetch` do remoto com `image: true` e `crop_ids` = IDs das **faixas**: vem cada faixa com os filhos e as setas, no tema claro.
+- `viewport` renderiza inteiro todo objeto que toca a janela, e as linhas de vida tornam a imagem enorme.
+- O `board_snapshot` do desktop usa o tema do app (no escuro, as cores aparecem invertidas).
+- Liste os objetos com `fetch` (`detail: "detailed"`, `expand_groups: true`, `limit: 200`, paginando por `cursor`).
+
+**Refazer:** apague todos os objetos do diagrama (`delete` por id, até 400 por chamada; preserve anexos e o que o usuário criou) e envie os lotes de novo. Corrigir a ordem das camadas depois exige recriar tudo.
 
 ## Gerador à mão (blueprint por raias ou layouts diferentes)
 
