@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.51.0 — 2026-10-29
+
+- `workflow-kit`: `revisao-ponytail` vira `diff-review` (sem alias) e ganha modo rápido: pedido com "rápido"/"fast" delega ao novo agente `diff-reviewer` (`model: haiku`, skill pré-carregada), que roda uma passada única: um vizinho por tipo de arquivo na régua viva, sem sub-agentes e sem a releitura final no HEAD.
+
 ## 1.50.0 — 2026-10-29
 
 - `service-blueprint` (0.2.0): leva o diagrama para o Whimsical como board editável. Novo conversor `scripts/whimsical.py` (SVG do `timeline.py` → lotes de operações para o `edit` do MCP remoto do Whimsical), com a ordem de criação que deixa as linhas de vida atrás dos balões, cores exatas dos balões, selos e setas com âncoras. A skill ganha a seção §9: MCP remoto × desktop, regras do conversor, o que não tem equivalente, como conferir e como refazer.
