@@ -1,6 +1,6 @@
 ---
-name: revisao-ponytail
-description: "Revisão de código em pt-BR do diff desde um ponto fixo (commit, branch, tag ou merge-base) em dois eixos: Padrões (a mudança mantém a estrutura atual e segue as convenções que o repo já usa?) e Enxugamento (ponytail-review: o que dá pra cortar?). Só reporta o que tem evidência no código; zero findings é resultado válido. Use quando o usuário pedir em português para revisar branch, diff, PR ou trabalho em andamento, perguntar se a mudança segue os padrões ou se está over-engineered."
+name: diff-review
+description: "Revisão de código em pt-BR do diff desde um ponto fixo (commit, branch, tag ou merge-base) em dois eixos: Padrões (a mudança mantém a estrutura atual e segue as convenções que o repo já usa?) e Enxugamento (ponytail-review: o que dá pra cortar?). Só reporta o que tem evidência no código; zero findings é resultado válido. Tem modo rápido (passada única no agente `diff-reviewer`, modelo haiku). Use quando o usuário pedir em português para revisar branch, diff, PR ou trabalho em andamento, perguntar se a mudança segue os padrões ou se está over-engineered."
 ---
 
 Revisão do diff entre um ponto fixo e o estado atual, em dois eixos:
@@ -88,6 +88,16 @@ Acima de ~400 linhas ou ~10 arquivos, rode os eixos 3 e 4 em dois sub-agentes pa
 Para cada item: tem linha do diff? Tem prova que eu li? Sobrevive se o autor perguntar "mostra onde"? Qualquer "não" → apague. Item repetido nos dois eixos fica só em Padrões.
 
 Depois, releia no HEAD as linhas de cada item que sobrou (inclusive os vindos de sub-agente) e copie o trecho que vai na saída. Se o trecho não mostra o problema sozinho, apague o item.
+
+### Modo rápido
+
+Quando o usuário pedir revisão rápida (`rápido`, `fast`): delegue ao agente `diff-reviewer` (modelo `haiku`) passando só o ponto, e mostre a saída dele sem reescrever. Se o host ignora o `model` do agente, passe o modelo rápido do host na chamada; sem o agente no host, rode a passada única você mesmo.
+
+Passada única: mesmos passos, Regra zero e Saída, com três cortes:
+
+- Passo 2, régua viva: um vizinho por tipo de arquivo alterado, não por arquivo.
+- Passo 5 não roda: nenhum sub-agente, mesmo em diff grande.
+- Passo 6: o filtro continua; a releitura final no HEAD sai e os trechos vêm das leituras já feitas.
 
 ## Saída
 

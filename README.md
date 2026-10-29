@@ -128,12 +128,14 @@ Depois de editar o config, **reinicie o OpenCode** para carregar as skills.
 - `create-architectural-decision-record`
 - `commit`
 - `code-review-and-quality` (review multi-eixo de PR/MR ou de diff local; ex-`pr-review`)
-- `revisao-ponytail` (review pt-BR de diff: aderência aos padrões do repo + enxugamento via `ponytail-review`; só aponta o que tem evidência)
+- `diff-review` (review pt-BR de diff: aderência aos padrões do repo + enxugamento via `ponytail-review`; só aponta o que tem evidência; modo rápido no agente `diff-reviewer`, modelo haiku; ex-`revisao-ponytail`)
 - `supersede-feature`
 
 **Eficiência:** Claude Code usa `hooks/hooks.json` para injetar a política no `SessionStart`; OMP usa `extensions/index.ts`, declarada em `package.json → omp.extensions`, para transformar o contexto efetivo, mostrar `eficiência: ATIVA` somente após a aplicação e não duplicar a política quando o marcador já existe. Se compactação ou troca de contexto remover o marcador, a política é reinjetada. Após atualizar o plugin, reinicie a sessão para carregar a extensão. Instalar apenas as skills não carrega o runtime OMP.
 
 **Reader agents** (Claude Code — auto-discovery em `agents/`, context offload): `plan-reader`, `plan-detail-reader`, `feature-reader`, `adr-reader`, `adr-correlator`, `feature-index-reader`. Cada um lê um doc grande e devolve um digest de forma fixa, mantendo o thread principal enxuto. Nos demais hosts (Cursor/Codex/OpenCode/Hermes) os docs são lidos inline.
+
+**Agente `diff-reviewer`** (Claude Code, `model: haiku`): roda o modo rápido da `diff-review` numa passada única, read-only, e devolve só a revisão.
 
 ### Plugin `figma-to-code`
 
