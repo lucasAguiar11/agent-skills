@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.49.0 — 2026-10-29
+
 - Novo plugin `service-blueprint` (0.1.0): skill `service-blueprint` para desenhar blueprint de serviço ou linha do tempo sequencial de um processo como SVG único + PNG. Inclui o gerador `scripts/timeline.py` (spec JSON → SVG/PNG, com avisos de texto estourado), um exemplo completo, balões explicativos e de "o que é / por que confirmar", glossário, mapa de integração com chamadas numeradas e selo de certeza, e validação do conteúdo contra as fontes.
 
 ## 1.48.0 — 2026-10-28
