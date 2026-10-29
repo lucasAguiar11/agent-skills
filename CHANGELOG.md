@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.52.0 — 2026-10-29
+
+- `workflow-kit`: `diff-review` termina com **Veredito** (`Aprovar` / `Não aprovar`): só `[Quebra]` reprova; `[Desvio]`, Enxugamento e Perguntas não bloqueiam. O evento da review na PR segue o veredito (`REQUEST_CHANGES` ou `APPROVE`).
+
 ## 1.51.0 — 2026-10-29
 
 - `workflow-kit`: `revisao-ponytail` vira `diff-review` (sem alias) e ganha modo rápido: pedido com "rápido"/"fast" delega ao novo agente `diff-reviewer` (`model: haiku`, skill pré-carregada), que roda uma passada única: um vizinho por tipo de arquivo na régua viva, sem sub-agentes e sem a releitura final no HEAD.
