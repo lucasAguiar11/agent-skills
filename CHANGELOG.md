@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.53.0 — 2026-11-13
+
+- `workflow-kit`: `diff-review` ganha o eixo **Funcionalidade**: a mudança faz o que se propõe e a feature faz sentido para quem usa? A saída abre com a **Intenção** (e a fonte dela) e os itens são `[Falha]` (cenário concreto em que não entrega a intenção ou quebra o que existia; reprova) e `[Lacuna]` (caso sem tratar ou divergente do comportamento vizinho; não bloqueia). Dúvida de produto vai para `Perguntas`. Aderência à spec deixa de ser fora de escopo; o modo rápido só confere se entrega a intenção e se dá para chegar nela.
+
 ## 1.52.0 — 2026-10-29
 
 - `workflow-kit`: `diff-review` termina com **Veredito** (`Aprovar` / `Não aprovar`): só `[Quebra]` reprova; `[Desvio]`, Enxugamento e Perguntas não bloqueiam. O evento da review na PR segue o veredito (`REQUEST_CHANGES` ou `APPROVE`).
