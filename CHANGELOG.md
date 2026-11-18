@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.54.0 — 2026-11-18
+
+- `workflow-kit`: `diff-review` ganha a régua **Contrato**: campo vindo de fora (API, banco, arquivo, fila) que o diff lê, converte ou formata é julgado pelo formato do produtor (contrato da API, schema, DTO, handoff, inclusive em outro repo local), nunca pelo exemplo da PR, do KDoc ou do teste do próprio diff. Antes de aceitar parser ou formatador novo, procura no repo um que já trate o mesmo campo. Cenário provado pelo contrato pode virar `[Falha]` em vez de ir para `Perguntas`.
+
 ## 1.53.0 — 2026-11-13
 
 - `workflow-kit`: `diff-review` ganha o eixo **Funcionalidade**: a mudança faz o que se propõe e a feature faz sentido para quem usa? A saída abre com a **Intenção** (e a fonte dela) e os itens são `[Falha]` (cenário concreto em que não entrega a intenção ou quebra o que existia; reprova) e `[Lacuna]` (caso sem tratar ou divergente do comportamento vizinho; não bloqueia). Dúvida de produto vai para `Perguntas`. Aderência à spec deixa de ser fora de escopo; o modo rápido só confere se entrega a intenção e se dá para chegar nela.
