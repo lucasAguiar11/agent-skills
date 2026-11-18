@@ -41,6 +41,8 @@ Antes de julgar, registre o que a mudança se propõe a fazer e como o repo já 
 
 **Intenção** (régua do eixo Funcionalidade): o que a mudança entrega para quem usa, em uma ou duas frases, com a fonte. Procure nesta ordem e pare na primeira que responder: pedido do usuário nesta conversa; descrição da PR (`gh pr view`) e issue linkada; brief, PRD ou plano que o diff ou os commits citam; mensagens de commit. Sem nenhuma, infira do diff e marque `(inferida do diff)`.
 
+**Contrato** (régua dos dados de fora, eixo Funcionalidade): para cada campo vindo de fora (API, banco, arquivo, fila) que o diff lê, converte ou formata, anote o formato real pela fonte do produtor: doc de contrato da API, schema, DTO ou handoff, inclusive em outro repo local. Exemplo da PR, KDoc ou teste do próprio diff não vale como formato: foi escrito pelo autor e herda o mesmo engano. Antes de aceitar parser ou formatador novo, procure no repo um que já trate o mesmo campo (grep pelo nome do campo e pelo exemplo do contrato).
+
 **Padrões**: a lista abaixo é a **única** régua do eixo Padrões.
 
 - **Documentada**: `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `CODING_STANDARDS.md`, ADRs. Configs de lint/format/tsconfig só para saber o que a ferramenta já garante.
@@ -68,7 +70,7 @@ Rótulos:
 
 Limites:
 
-- Você leu, não rodou. Cenário que depende do que o código não mostra (lib externa, banco, rede, dado de produção) vai para `Perguntas`.
+- Você leu, não rodou. Cenário que depende do que o código não mostra (lib externa, banco, rede, dado de produção) vai para `Perguntas`, a não ser que o **Contrato** do passo 2 mostre o dado: aí o cenário usa o exemplo do contrato e pode virar `[Falha]`.
 - "Essa feature deveria existir?" e "quem usa não ia preferir X?" são decisão de produto: vão para `Perguntas`. Só viram item quando o repo prova a duplicata ou a contradição.
 - Intenção inferida do diff não sustenta `[Falha]` por "não entrega a intenção"; nesse caso `[Falha]` só para quebra de comportamento que existia.
 
