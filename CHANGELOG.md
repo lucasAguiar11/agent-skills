@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `workflow-kit`: `diff-review` ganha os eixos **Segurança** e **Processo**. Segurança olha só o que o diff toca na fronteira (dado de fora fora do contrato, concatenação em query/comando/JSON, segredo em log, auth e escopo, dependência) e marca `[Vulnerabilidade]` (cenário explorável; reprova) ou `[Exposição]` (proteção do repo ou do vizinho que faltou; não bloqueia). Processo julga a entrega contra a regra documentada (testes das invariantes, verificação depois da última edição, escopo cortado sem aprovação, docs e índice, dependência de release, revisão por quem escreveu) e marca `[Pendência]` (gate documentado; reprova) ou `[Aviso]`. Em diff grande, Processo fica com o agente principal, porque depende da conversa. Performance continua fora.
+
 ## 1.54.0 — 2026-11-18
 
 - `workflow-kit`: `diff-review` ganha a régua **Contrato**: campo vindo de fora (API, banco, arquivo, fila) que o diff lê, converte ou formata é julgado pelo formato do produtor (contrato da API, schema, DTO, handoff, inclusive em outro repo local), nunca pelo exemplo da PR, do KDoc ou do teste do próprio diff. Antes de aceitar parser ou formatador novo, procura no repo um que já trate o mesmo campo. Cenário provado pelo contrato pode virar `[Falha]` em vez de ir para `Perguntas`.

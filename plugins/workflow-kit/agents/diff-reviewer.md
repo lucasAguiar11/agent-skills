@@ -1,6 +1,6 @@
 ---
 name: diff-reviewer
-description: Fast single-pass review (haiku) of the diff since a fixed point, on the Functionality, Patterns and Trimming axes of the diff-review skill. Read-only. Receives the point (commit, branch, tag) and returns the skill's `Saída` section verbatim in pt-BR.
+description: Fast single-pass review (haiku) of the diff since a fixed point, on the Functionality, Security, Patterns, Trimming and Process axes of the diff-review skill. Read-only. Receives the point (commit, branch, tag) and returns the skill's `Saída` section verbatim in pt-BR.
 tools: Read, Grep, Glob, Bash, Skill
 model: haiku
 skills:

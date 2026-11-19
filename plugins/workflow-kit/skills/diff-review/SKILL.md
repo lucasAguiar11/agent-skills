@@ -1,28 +1,30 @@
 ---
 name: diff-review
-description: "Revisão de código em pt-BR do diff desde um ponto fixo (commit, branch, tag ou merge-base) em três eixos: Funcionalidade (a mudança faz o que se propõe e a feature faz sentido para quem usa?), Padrões (a mudança mantém a estrutura atual e segue as convenções que o repo já usa?) e Enxugamento (ponytail-review: o que dá pra cortar?). Só reporta o que tem evidência no código; zero findings é resultado válido. Tem modo rápido (passada única no agente `diff-reviewer`, modelo haiku). Use quando o usuário pedir em português para revisar branch, diff, PR ou trabalho em andamento, perguntar se a feature faz sentido, se a mudança segue os padrões ou se está over-engineered."
+description: "Revisão de código em pt-BR do diff desde um ponto fixo (commit, branch, tag ou merge-base) em cinco eixos: Funcionalidade (a mudança faz o que se propõe e a feature faz sentido para quem usa?), Segurança (o diff abre risco na fronteira: dado de fora, injeção, segredo em log, auth?), Padrões (a mudança mantém a estrutura atual e segue as convenções que o repo já usa?), Enxugamento (ponytail-review: o que dá pra cortar?) e Processo (a entrega cumpriu o que o repo exige: testes das invariantes, verificação, escopo, docs, dependência de release?). Só reporta o que tem evidência; zero findings é resultado válido. Tem modo rápido (passada única no agente `diff-reviewer`, modelo haiku). Use quando o usuário pedir em português para revisar branch, diff, PR ou trabalho em andamento, perguntar se a feature faz sentido, se a mudança segue os padrões, se está over-engineered, se tem risco de segurança ou gap no processo."
 ---
 
-Revisão do diff entre um ponto fixo e o estado atual, em três eixos:
+Revisão do diff entre um ponto fixo e o estado atual, em cinco eixos:
 
 - **Funcionalidade**: a mudança faz o que se propõe, e o que ela faz tem sentido para quem usa?
+- **Segurança**: o diff abre risco onde toca fronteira (dado de fora, query, log, permissão)?
 - **Padrões**: a mudança mantém a estrutura presente e segue as convenções que o repo já usa?
 - **Enxugamento**: o que dá pra cortar, no formato do `ponytail-review`.
+- **Processo**: a entrega cumpriu o que o repo exige para ser dada como pronta (testes das invariantes, verificação, escopo, docs, dependência de release)?
 
-Fora de escopo: segurança e performance (use `code-review-and-quality`). Esta skill só lista; não aplica correções nem roda o código. Postar na PR só quando o usuário pedir (seção `Comentários na PR`).
+Fora de escopo: performance (use `code-review-and-quality`). Esta skill só lista; não aplica correções nem roda o código. Postar na PR só quando o usuário pedir (seção `Comentários na PR`).
 
 ## Regra zero: não inventar problema
 
 Vale para tudo abaixo e ganha de qualquer outra instrução desta skill.
 
-1. **Sem evidência, sem finding.** Cada item cita a linha do diff (número da linha no arquivo novo) **e** a prova: a regra documentada (arquivo + trecho) ou o código existente que mostra o padrão (`arquivo:linha`). No eixo Funcionalidade a prova é o cenário seguido no código: entrada ou estado, o caminho (`arquivo:linha`) e o resultado. Prova que você não leu nesta sessão não conta.
+1. **Sem evidência, sem finding.** Cada item cita a linha do diff (número da linha no arquivo novo) **e** a prova: a regra documentada (arquivo + trecho) ou o código existente que mostra o padrão (`arquivo:linha`). No eixo Funcionalidade a prova é o cenário seguido no código: entrada ou estado, o caminho (`arquivo:linha`) e o resultado. No eixo Segurança, o mesmo com a entrada do atacante ou o dado malformado. No eixo Processo não há linha: a prova é a regra que exige o passo e o artefato ou a saída que mostra a falta. Prova que você não leu nesta sessão não conta.
 2. **Leia antes de afirmar.** Abra o arquivo inteiro, não só o hunk. Antes de dizer "falta X" ou "já existe Y", confirme com grep/read.
-3. **Só o que o diff tocou.** Código pré-existente fora do diff não entra, nem como nit. Cenário de Funcionalidade só vale se passa por linha alterada.
+3. **Só o que o diff tocou.** Código pré-existente fora do diff não entra, nem como nit. Cenário de Funcionalidade ou Segurança só vale se passa por linha alterada. Processo julga a entrega deste diff, não o histórico do repo.
 4. **A régua é o repo, não seu gosto.** Smell genérico, "boa prática" de fora ou o jeito que você escreveria não viram finding sem padrão do repo que os sustente. "Eu faria a feature de outro jeito" também não.
 5. **Formato diferente não é problema.** Mesma informação em outra forma (destructuring vs objeto, ordem de campos, `async` vs `.then`) só vira item se divergir de padrão verificado em código vizinho.
 6. **Ferramenta ganha.** O que lint, formatter ou `tsc` já garantem fica de fora.
 7. **Suposição encadeada vira pergunta.** Se a conclusão depende de regra de negócio ou de duas ou mais suposições, vai para `Perguntas` ou é descartada.
-8. **Zero é resposta válida.** "Faz o que se propõe.", "Segue os padrões." e "Já está enxuto. Pode subir." são saídas completas. Nunca preencha lista para parecer útil.
+8. **Zero é resposta válida.** "Faz o que se propõe.", "Sem risco de segurança no diff.", "Segue os padrões.", "Já está enxuto. Pode subir." e "Processo completo." são saídas completas. Nunca preencha lista para parecer útil.
 
 ## Processo
 
@@ -74,7 +76,27 @@ Limites:
 - "Essa feature deveria existir?" e "quem usa não ia preferir X?" são decisão de produto: vão para `Perguntas`. Só viram item quando o repo prova a duplicata ou a contradição.
 - Intenção inferida do diff não sustenta `[Falha]` por "não entrega a intenção"; nesse caso `[Falha]` só para quebra de comportamento que existia.
 
-### 4. Eixo Padrões
+### 4. Eixo Segurança
+
+O diff abre risco onde toca fronteira? A régua é a regra de segurança documentada no repo (`AGENTS.md`: redação de log, segredos, auth) e o mecanismo que os vizinhos já usam (validação na fronteira, query parametrizada, builder de JSON, encoder). Para cada hunk que toca entrada de usuário, dado de fora, request ou response, query, comando, log, armazenamento ou permissão, pergunte:
+
+- Dado de fora (usuário, API, arquivo, fila) é validado ou tem fallback seguro antes de virar lógica, query, comando ou tela? Valor fora do **Contrato** do passo 2 (enum desconhecido, tipo errado, `null`) derruba, corrompe ou passa adiante?
+- Monta query, comando, path, HTML ou JSON por concatenação onde o vizinho usa parametrização ou builder?
+- Segredo, token, documento, serial ou payload sensível vai para código, log, telemetria, mensagem de erro ou commit? (cite a regra de redação do repo)
+- Rota, ação ou dado novo passa pela mesma checagem de autenticação, permissão e escopo (tenant, filial) que os vizinhos?
+- Dependência nova ou atualizada: fonte confiável e sem vulnerabilidade conhecida? (só com a ferramenta que o repo já usa, como `npm audit`)
+
+Rótulos:
+
+- `[Vulnerabilidade]`: cenário explorável concreto: entrada do atacante ou dado malformado → caminho (`arquivo:linha`) → efeito (vazamento, execução, bypass, corrupção). Reprova.
+- `[Exposição]`: o diff deixa de aplicar a proteção que a regra documentada ou o vizinho aplica, sem cenário explorável demonstrado. Não bloqueia sozinho.
+
+Limites:
+
+- Ataque que depende do que o código não mostra (proxy, WAF, config de produção) vai para `Perguntas`.
+- Endurecimento genérico sem regra ou vizinho que o sustente não é item (Regra zero 4).
+
+### 5. Eixo Padrões
 
 Para cada hunk, pergunte só o que a régua responde:
 
@@ -92,7 +114,7 @@ Rótulos:
 - `[Quebra]`: viola regra documentada. Cite arquivo + trecho da regra.
 - `[Desvio]`: diverge de padrão vivo. Cite o `arquivo:linha` do vizinho. É julgamento; o autor pode ter motivo.
 
-### 5. Eixo Enxugamento
+### 6. Eixo Enxugamento
 
 Aplique a skill `ponytail-review` ao diff (carregue-a se estiver instalada). Sem ela, use o mesmo contrato: uma linha por item, `` `arquivo.ts:L<linha>`: <tag>: <o que cortar>. <o que entra no lugar>. ``, com as tags:
 
@@ -110,13 +132,31 @@ Ajustes desta skill:
 - `shrink` só com a forma curta escrita e equivalente. Se não consegue escrevê-la, não é finding.
 - `stdlib`/`native` nomeiam a função ou recurso exato e só valem se existirem na versão de runtime declarada pelo repo.
 
-### 6. Diff grande
+### 7. Eixo Processo
 
-Acima de ~400 linhas ou ~10 arquivos, rode os eixos 3, 4 e 5 em três sub-agentes paralelos. Cada prompt leva o comando do diff, a intenção e a régua do passo 2 e a **Regra zero colada na íntegra** (o sub-agente não tem outro acesso a ela). Ao receber, descarte qualquer item sem a evidência exigida.
+Não julga o código: julga se a entrega cumpriu o que o repo exige para ser dada como pronta. A régua é só o que está documentado: `AGENTS.md`/`CLAUDE.md`, a skill do fluxo usado (`feature-delivery`, `safe-handoff-execution`, `test-guide`, `verification-before-completion`), template de PR, `CONTRIBUTING.md`. A evidência é o artefato que falta (grep vazio, arquivo ausente, `git log`) ou, para o que roda, a saída do comando nesta conversa ou nos checks da PR. Sem conversa nem CI que mostrem, "não foi rodado" vira `Perguntas`.
 
-### 7. Filtro final
+Pergunte:
 
-Para cada item: tem linha do diff? Tem prova que eu li? Sobrevive se o autor perguntar "mostra onde"? Qualquer "não" → apague. Item repetido em mais de um eixo fica só no primeiro (Funcionalidade, depois Padrões).
+- **Testes das invariantes:** cada regra nova ou corrigida no diff (inclusive correção de carona) tem teste que falha se ela regredir? Teste existente foi afrouxado sem contrato que justifique?
+- **Verificação:** os comandos que a regra exige antes de concluir (teste focado, suíte, build, smoke na UI) rodaram depois da última edição? Houve baseline antes de mexer em contrato, quando a skill do fluxo pede?
+- **Escopo:** algo que a intenção pede foi deixado de fora ou trocado sem aprovação registrada? Algum arquivo do diff está fora do escopo aprovado? (Item da intenção não entregue com efeito para quem usa fica em Funcionalidade.)
+- **Artefatos:** doc, spec, índice de features, changelog, ADR ou handoff que a regra manda atualizar junto com a mudança.
+- **Release:** dependência de deploy (migration, flag, versão da API, variável de ambiente) está registrada onde o repo registra?
+- **Independência:** quem revisa é quem escreveu o código? Se a regra do repo ou do fluxo pede revisor independente, sinalize.
+
+Rótulos:
+
+- `[Pendência]`: a regra documentada trata o passo como gate de conclusão ou merge, e a evidência mostra que falta. Cite o trecho da regra. Reprova.
+- `[Aviso]`: a regra documentada pede o passo sem fazer dele gate, ou a falta tem efeito só no processo. Não bloqueia.
+
+### 8. Diff grande
+
+Acima de ~400 linhas ou ~10 arquivos, rode os eixos 3 a 6 em quatro sub-agentes paralelos. Cada prompt leva o comando do diff, a intenção e a régua do passo 2 e a **Regra zero colada na íntegra** (o sub-agente não tem outro acesso a ela). O eixo 7 fica com você: ele depende da conversa e dos comandos que rodaram, que o sub-agente não vê. Ao receber, descarte qualquer item sem a evidência exigida.
+
+### 9. Filtro final
+
+Para cada item: tem linha do diff (ou, em Processo, a regra e a prova da falta)? Tem prova que eu li? Sobrevive se o autor perguntar "mostra onde"? Qualquer "não" → apague. Item repetido em mais de um eixo fica só no primeiro (Funcionalidade, Segurança, Padrões, Enxugamento, Processo).
 
 Depois, releia no HEAD as linhas de cada item que sobrou (inclusive os vindos de sub-agente) e copie o trecho que vai na saída. Se o trecho não mostra o problema sozinho, apague o item.
 
@@ -124,12 +164,14 @@ Depois, releia no HEAD as linhas de cada item que sobrou (inclusive os vindos de
 
 Quando o usuário pedir revisão rápida (`rápido`, `fast`): delegue ao agente `diff-reviewer` (modelo `haiku`) passando só o ponto, e mostre a saída dele sem reescrever. Se o host ignora o `model` do agente, passe o modelo rápido do host na chamada; sem o agente no host, rode a passada única você mesmo.
 
-Passada única: mesmos passos, Regra zero e Saída, com quatro cortes:
+Passada única: mesmos passos, Regra zero e Saída, com seis cortes:
 
 - Passo 2, régua viva: um vizinho por tipo de arquivo alterado, não por arquivo.
 - Passo 3: só as duas primeiras perguntas (entrega a intenção, dá para chegar nela). Casos fora do caminho principal e comparação com comportamento vizinho ficam de fora.
-- Passo 6 não roda: nenhum sub-agente, mesmo em diff grande.
-- Passo 7: o filtro continua; a releitura final no HEAD sai e os trechos vêm das leituras já feitas.
+- Passo 4: só as duas primeiras perguntas (dado de fora na fronteira, concatenação) e a de segredo em log.
+- Passo 7: só testes das invariantes e artefatos; verificação, escopo e independência dependem da conversa e ficam de fora.
+- Passo 8 não roda: nenhum sub-agente, mesmo em diff grande.
+- Passo 9: o filtro continua; a releitura final no HEAD sai e os trechos vêm das leituras já feitas.
 
 ## Saída
 
@@ -168,6 +210,26 @@ Sem emoji. Exatamente esta estrutura:
 Comportamento vizinho em `outro.ts:20-24`:
 ```ts
 <linhas que mostram como o produto já se comporta em caso igual>
+```
+
+### Segurança
+
+#### 1. [Vulnerabilidade] <título curto>
+
+`arquivo.ts:L40-45` Cenário: <entrada do atacante ou dado malformado> → <o que acontece> → <efeito>. Ajuste: <o que fazer>.
+
+`arquivo.ts:40-45`
+```ts
+<linhas do arquivo novo por onde o cenário passa>
+```
+
+#### 2. [Exposição] <título curto>
+
+`arquivo.ts:L70` <proteção que falta>. Regra: <`AGENTS.md` "<trecho>" ou vizinho `arquivo:linha`>. Ajuste: <o que fazer>.
+
+`arquivo.ts:68-71`
+```ts
+<linhas do arquivo novo>
 ```
 
 ### Padrões
@@ -220,6 +282,16 @@ Fica assim:
 
 net: -<N> linhas possíveis.
 
+### Processo
+
+#### 1. [Pendência] <título curto>
+
+<o que falta>. Regra: `<arquivo>` "<trecho>". Evidência: <comando e saída, ou artefato ausente>. Ajuste: <o que fazer>.
+
+#### 2. [Aviso] <título curto>
+
+<o que falta>. Regra: `<arquivo>` "<trecho>". Evidência: <comando e saída, ou artefato ausente>. Ajuste: <o que fazer>.
+
 ### Perguntas
 
 #### <dúvida real que depende de contexto>
@@ -229,7 +301,7 @@ net: -<N> linhas possíveis.
 <trecho que motiva a dúvida, quando ela cita código>
 ```
 
-**Resumo:** Funcionalidade: <n> (<pior item>). Padrões: <n> (<pior item>). Enxugamento: <n> (<pior item>).
+**Resumo:** Funcionalidade: <n> (<pior item>). Segurança: <n> (<pior item>). Padrões: <n> (<pior item>). Enxugamento: <n> (<pior item>). Processo: <n> (<pior item>).
 
 **Veredito:** <Aprovar | Não aprovar> — <motivo em uma linha>
 ````
@@ -238,24 +310,28 @@ Trechos de código:
 
 - Copie do arquivo no HEAD, lido nesta sessão. Não reescreva nem resuma o código; marque linhas omitidas com `...`. Acima de cada bloco, `arquivo:linha-inicial-final` do trecho.
 - Mostre só as linhas que provam o item, até ~15 por bloco. Use a linguagem certa no bloco (`ts`, `sql`, `md`, `json`).
-- `[Falha]`/`[Lacuna]`: trecho do código novo por onde o cenário passa. Quando o "deveria" vem de comportamento que já existe, o trecho dele também.
+- `[Falha]`/`[Lacuna]`/`[Vulnerabilidade]`: trecho do código novo por onde o cenário passa. Quando o "deveria" vem de comportamento que já existe, o trecho dele também.
+- `[Exposição]`: trecho do código novo e, quando a proteção vem de um vizinho, o trecho dele.
 - `[Quebra]`: trecho do código novo. Mostre também o trecho da regra (doc, arquivo de config) quando ela não couber na frase.
 - `[Desvio]`: trecho do código novo e trecho do vizinho citado.
 - `shrink`: forma atual e a forma curta em blocos separados. `delete`/`yagni`: trecho a cortar, mais uma frase com a prova de que não tem uso (grep, chamador único).
 - Duplicata: os dois trechos, o novo e o que já existe.
 - Item que não é código (estrutura de pastas, seção de doc): mostre a árvore ou o trecho do doc no lugar do código.
+- `[Pendência]`/`[Aviso]`: o trecho da regra e a saída que prova a falta (grep vazio, `ls`, log do comando), no lugar do código.
 
 Estrutura:
 
 - **Intenção**: uma ou duas frases e a fonte. Não é item; se a intenção está errada, o autor corrige e a revisão roda de novo.
 - **Régua**: só as regras que você de fato usou para julgar, inclusive para aprovar; no máximo ~8 linhas.
-- Itens numerados por eixo, começando em 1, na ordem de gravidade (`[Falha]` antes de `[Lacuna]`, `[Quebra]` antes de `[Desvio]`).
+- Itens numerados por eixo, começando em 1, na ordem de gravidade (`[Falha]` antes de `[Lacuna]`, `[Vulnerabilidade]` antes de `[Exposição]`, `[Quebra]` antes de `[Desvio]`, `[Pendência]` antes de `[Aviso]`).
 - **Funcionalidade** vazio: `Faz o que se propõe.`
+- **Segurança** vazio: `Sem risco de segurança no diff.`
 - **Padrões** vazio: `Segue os padrões.`
 - **Enxugamento** vazio: `Já está enxuto. Pode subir.` no lugar dos itens e do `net`.
+- **Processo** vazio: `Processo completo.`
 - **Perguntas** vazio: omita a seção.
 - **Resumo** com eixo zerado: só o número, sem `(<pior item>)`.
-- **Veredito**: `Não aprovar` se houver algum `[Falha]` ou `[Quebra]`; senão `Aprovar`. `[Lacuna]`, `[Desvio]`, Enxugamento e Perguntas não bloqueiam; o motivo cita o `[Falha]` ou `[Quebra]`, ou quantos ajustes opcionais ficaram.
+- **Veredito**: `Não aprovar` se houver algum `[Falha]`, `[Vulnerabilidade]`, `[Quebra]` ou `[Pendência]`; senão `Aprovar`. `[Lacuna]`, `[Exposição]`, `[Desvio]`, `[Aviso]`, Enxugamento e Perguntas não bloqueiam; o motivo cita o item que bloqueia, ou quantos ajustes opcionais ficaram.
 - Não reordene nem misture eixos.
 
 ## Comentários na PR
@@ -263,7 +339,7 @@ Estrutura:
 Só quando o usuário pedir para postar. A revisão no chat continua completa; o comentário na PR é curto e direto.
 
 - Antes de postar, mostre o preview no chat e espere aprovação explícita. Ajuste pedido muda o preview e ele é mostrado de novo; só poste a versão aprovada, sem mudar nada.
-- Uma review, um comentário inline por item, na linha que mostra o problema. Corpo da review: uma linha (`<N> ajustes, comentados inline.`), sem repetir os itens.
+- Uma review, um comentário inline por item, na linha que mostra o problema. Corpo da review: uma linha (`<N> ajustes, comentados inline.`), sem repetir os itens. Itens de Processo não têm linha: vão no corpo, um por linha, depois dessa frase.
 - Comentário: 1–2 frases. O problema e o ajuste, com a referência (o cenário em uma frase, o `arquivo:linha` do padrão ou a regra do `AGENTS.md` em poucas palavras). Sem rótulo, sem título, sem explicar o óbvio.
 - Código só se a frase não basta, até ~5 linhas.
 - Bloco `suggestion` só se o item inteiro se resolve nas linhas comentadas e o arquivo compila depois de aplicar. Se precisa de import, outra linha, outro arquivo ou mover arquivo: sem `suggestion`, descreva o ajuste. Nunca divida um item em várias sugestões.
